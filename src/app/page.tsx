@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import Image from 'next/image';
-import ArtworksScroll from '@/components/ArtworkScroll';
+import PageClient from './page_client';
 
 export default async function ArtworksPage() {
 
@@ -19,42 +18,17 @@ export default async function ArtworksPage() {
 
 
 	const basePath = "/artworkfill";
+	const navItems = [
+		{ path: "", title: "lampes" },
+		{ path: "", title: "peintures" },
+		{ path: "", title: "sculptures" },
+	];
 
 	return (
-		// <HorizontalGallery2 images={images} basePath="/artworkfill"  />
-
-		<>
-
-			{/* <div ref={containerRef} className="h-screen w-full max-w-lg flex items-center relative">
-
-				{images.map((image, index) => (
-
-					<Image
-						key={index}
-						src={`${basePath}/${image}`}
-						ref={(el) => (imageRefs.current[index] = el)}
-						alt="image"
-						width={800} // set width in px
-						height={600} // set height in px
-						className={`object-contain absolute ${index == 0 ? "visible" : "hidden"}`}
-						priority={index < 3}
-					/>
-
-				))}
-
-			</div> */}
-
-			<ArtworksScroll
-				images={images}
-				basePath={basePath}
-				titles={[
-					"hello",
-					"world",
-					"!"
-				]}
-			/>
-
-		</>
-
+		<PageClient
+			basePath={basePath}
+			navItems={navItems}
+			images={images}
+		/>
 	);
 }

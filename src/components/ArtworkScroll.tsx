@@ -8,7 +8,7 @@ import { Bodoni_Moda } from "next/font/google";
 const bodoni = Bodoni_Moda({
 	subsets: ["latin"],
 	weight: ["400", "500", "600", "700", "800", "900"],
-	style: ["normal", "italic"], // optional if you want italics too
+	style: ["normal", "italic"],
 	display: "swap",
 });
 
@@ -17,44 +17,56 @@ gsap.registerPlugin(ScrollTrigger);
 interface ArtworksScrollProps {
 	images: string[];
 	basePath: string;
-	titles?: string[]; // Optional titles array
+	titles?: string[];
+	onScrollChange?: (isAtTop: boolean) => void;
 }
 
 const scrollMultiplier = 0.5;
 
-export default function ArtworksScroll({ images, basePath, titles }: ArtworksScrollProps) {
+export default function ArtworksScroll({ images, basePath, titles, onScrollChange }: ArtworksScrollProps) {
+
 	const [wrapperHeight, setWrapperHeight] = useState(0);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const imageRefs = useRef<HTMLImageElement[]>([]);
 
-	// Generate default titles if none provided
+
 	const imageTitles = titles || images.map((img, index) => {
-		// Extract filename without extension for default title
 		const filename = img.split('/').pop()?.split('.')[0] || `Artwork ${index + 1}`;
 		return filename.charAt(0).toUpperCase() + filename.slice(1);
 	});
 
 	useEffect(() => {
+
 		const totalImages = images.length;
 		const scrollDistance = window.innerHeight * totalImages * scrollMultiplier;
 		const calculatedHeight = window.innerHeight + scrollDistance;
 
 		setWrapperHeight(calculatedHeight);
+
 	}, [images]);
 
 	useLayoutEffect(() => {
+
 		if (!containerRef.current) return;
 
 		const totalImages = images.length;
 		const scrollDistance = window.innerHeight * totalImages * scrollMultiplier;
 
-		const pinTrigger = ScrollTrigger.create({
+		// const pinTrigger = ScrollTrigger.create({
+		// 	trigger: containerRef.current,
+		// 	start: "top top",
+		// 	end: `+=${scrollDistance}`,
+		// 	scrub: true,
+		// 	pin: true,
+		// });
+
+		const scrollTrigger = ScrollTrigger.create({
 			trigger: containerRef.current,
 			start: "top top",
 			end: `+=${scrollDistance}`,
 			scrub: true,
-			pin: true,
+			pin: true
 		});
 
 		gsap.set(imageRefs.current, { opacity: 0 });
@@ -72,12 +84,12 @@ export default function ArtworksScroll({ images, basePath, titles }: ArtworksScr
 				onEnter: () => {
 					gsap.set(imageRefs.current, { opacity: 0 });
 					gsap.set(imageRefs.current[i], { opacity: 1 });
-					setCurrentImageIndex(i); // Update current image index
+					setCurrentImageIndex(i);
 				},
 				onEnterBack: () => {
 					gsap.set(imageRefs.current, { opacity: 0 });
 					gsap.set(imageRefs.current[i], { opacity: 1 });
-					setCurrentImageIndex(i); // Update current image index
+					setCurrentImageIndex(i);
 				},
 			});
 		});
@@ -85,7 +97,8 @@ export default function ArtworksScroll({ images, basePath, titles }: ArtworksScr
 		return () => {
 			ScrollTrigger.getAll().forEach((t) => t.kill());
 		};
-	}, [images]);
+
+	}, [images, onScrollChange]);
 
 	return (
 		<div
@@ -110,8 +123,7 @@ export default function ArtworksScroll({ images, basePath, titles }: ArtworksScr
 				))}
 			</div>
 
-			{/* Dynamic Title - Fixed positioned in bottom right */}
-			<div className="fixed bottom-8 right-8 z-50 flex flex-col items-end">
+			<div className="fixed bottom-8 right-8 z-30 flex flex-col items-end">
 				<p className={`${bodoni.className} text-black text-7xl capitalize font-medium`}>
 					{imageTitles[currentImageIndex]}
 				</p>
