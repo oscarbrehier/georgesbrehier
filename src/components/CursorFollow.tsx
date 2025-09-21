@@ -11,11 +11,11 @@ export function CursorFollow({
 }) {
 
 	const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-	const [mouseHistory, setMouseHistory] = useState([]);
+	const [mouseHistory, setMouseHistory] = useState<{ x: number; y: number }[]>([]);
 	const [circlePos, setCirclePos] = useState({ x: -circleSize, y: -circleSize });
 	const [isMoving, setIsMoving] = useState(false);
 
-	const mouseHistoryRef = useRef([]);
+	const mouseHistoryRef = useRef<{ x: number; y: number }[]>([]);
 	const circlePosRef = useRef({ x: 0, y: 0 });
 
 	useEffect(() => {
