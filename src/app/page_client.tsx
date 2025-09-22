@@ -1,8 +1,8 @@
 "use client"
 
-import ArtworksScroll from '@/components/ArtworkScroll';
-import { CursorFollow } from '@/components/CursorFollow';
-import { useState } from 'react';
+import GalleryScroll from '@/components/GalleryScroll';
+import { GalleryPreview } from '@/components/GalleryPreview';
+import { useEffect, useState } from 'react';
 
 export default function PageClient({
 	navItems,
@@ -14,14 +14,18 @@ export default function PageClient({
 	navItems: { path: string, title: string }[],
 }) {
 
-	const [isAtTop, setIsAtTop] = useState(true);
+	const [currentImageIdx, setCurrentImageIdx] = useState(0);
+
+	useEffect(() => {
+		console.log(currentImageIdx)
+	}, [currentImageIdx]);
 
 	return (
 		<div className="h-auto w-full">
 
-			<CursorFollow
+			{/* <CursorFollow
 				hideOnScroll={!isAtTop}
-			/>
+			/> */}
 
 			<div className='h-auto w-full fixed top-8 left-8 text-black'>
 
@@ -39,15 +43,23 @@ export default function PageClient({
 
 			</div>
 
-			<ArtworksScroll
+			<GalleryPreview
+				basePath={basePath}
+				images={images}
+				currentImageIdx={currentImageIdx}
+				setCurrentImageIdx={setCurrentImageIdx}
+			/>
+
+			<GalleryScroll
 				images={images}
 				basePath={basePath}
 				titles={[
 					"title1",
 					"title2",
-					"title3"
+					"title3",
 				]}
-				onScrollChange={setIsAtTop}
+				currentImageIdx={currentImageIdx}
+				onScrollChange={setCurrentImageIdx}
 			/>
 
 		</div>

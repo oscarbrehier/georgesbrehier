@@ -84,7 +84,11 @@ export function CursorFollow({
 		};
 	}, [isMoving]);
 
-	useEffect(() => console.log(hideOnScroll), [hideOnScroll]);
+	useEffect(() => {
+		const initialPos = { x: window.innerWidth - (circleSize / 2), y: circleSize / 2 };
+		setCirclePos(initialPos);
+		circlePosRef.current = initialPos; // Add this line
+	}, []);
 
 	return (isMoving && !hideOnScroll) ? (
 		<div

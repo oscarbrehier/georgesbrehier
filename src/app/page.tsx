@@ -14,7 +14,7 @@ export default async function ArtworksPage() {
 
 	const images = files.filter((f) =>
 		['.png', '.jpg', '.jpeg', '.webp'].includes(path.extname(f).toLowerCase())
-	).slice(0, 3);
+	).slice(0, 4);
 
 
 	const basePath = "/artworkfill";
