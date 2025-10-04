@@ -26,7 +26,7 @@ export function ImageZoomProvider({ children }: { children: ReactNode }) {
 	const toggleZoom = () => setIsZoomed(v => !v);
 
 	useEffect(() => {
-		setStyle(isZoomed ? styles.zoomed : styles.normal);
+		// setStyle(isZoomed ? styles.zoomed : styles.normal);
 	}, [isZoomed]);
 
 	return (

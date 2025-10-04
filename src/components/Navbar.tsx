@@ -2,6 +2,7 @@ import { useImageZoom } from "@/utils/context/imageZoom";
 import { bodoni } from "@/utils/fonts";
 import { cn } from "@/utils/utils";
 import { Menu } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export function Navbar({
@@ -17,43 +18,60 @@ export function Navbar({
 
 		<>
 
-			<div className={cn("h-auto w-full fixed text-black transition-all duration-300 ease-in-out top-8 left-8 lg:block hidden e")} style={style}>
+			<div className='h-20 w w-full fixed flex justify-between px-8 pt-8 z-50'>
 
-				<p className='font-medium text-lg mb-8'>Georges Bréhier</p>
+				<div>
+					<p className='text-black font-medium'>Georges Bréhier</p>
+				</div>
 
-				<ul className=''>
+				<div className='sm:flex hidden space-x-8 text-black font-medium capitalize'>
 					{navItems.map((item, idx) => (
-						<li key={idx}>
-							<a href={item.path} className='capitalize'>
-								{item.title}
-							</a>
-						</li>
+						<Link
+							href=""
+							className={`${idx === 0 && "italic"}`}
+							key={idx}
+						>
+							{item.title}
+						</Link>
 					))}
-				</ul>
+				</div>
+
+				<div className='sm:hidden block'>
+					<button
+						onClick={() => setIsOpen(state => !state)}
+						className='capitalize text-black font-medium cursor-pointer w'>
+						menu
+					</button>
+				</div>
 
 			</div>
 
-			<button
-				onClick={() => setIsOpen(state => !state)}
-				className="lg:hidden inline-flex fixed top-8 right-8 size-auto items-center justify-center cursor-pointer z-50"
-			>
-				<Menu className="block text-black" size={30} strokeWidth={1.5} />
-			</button>
-
 			<div className={cn(
-				"h-screen w-screen bg-white fixed z-40 items-center justify-center transition-all ease-in-out duration-75",
-				isOpen ? "flex" : "hidden"
+				"sm:hidden",
+				isOpen ? "flex flex-col justify-center" : "hidden",
+				"bg-white h-screen w-full fixed z-40 py-20 px-8 space-y-4"
 			)}>
 
-				<ul className='space-y-4 w'>
-					{navItems.map((item, idx) => (
-						<li key={idx}>
-							<a href={item.path} className={cn("capitalize text-3xl transition-all ease-in-out", idx === 0 ? `text-black` : "text-stone-500 hover:text-black")}>
-								{item.title}
-							</a>
-						</li>
-					))}
-				</ul>
+				{navItems.map((item, idx) => (
+
+					<div
+						key={idx}
+						className="w-full"
+					>
+
+						<Link
+							href=""
+							className={cn(
+								"capitalize text-3xl",
+								idx === 0 ? "text-black" : "text-stone-500 hover:text-black"
+							)}
+						>
+							{item.title}
+						</Link>
+
+					</div>
+
+				))}
 
 			</div>
 
