@@ -3,6 +3,10 @@
 import GalleryScroll from '@/components/GalleryScroll';
 import { GalleryPreview } from '@/components/GalleryPreview';
 import { useEffect, useState } from 'react';
+import { LayoutDebug } from '@/components/LayoutDebug';
+import { cn } from '@/utils/utils';
+import { useImageZoom } from '@/utils/context/imageZoom';
+import { Navbar } from '@/components/Navbar';
 
 export default function PageClient({
 	navItems,
@@ -15,10 +19,7 @@ export default function PageClient({
 }) {
 
 	const [currentImageIdx, setCurrentImageIdx] = useState(0);
-
-	useEffect(() => {
-		console.log(currentImageIdx)
-	}, [currentImageIdx]);
+	const { style } = useImageZoom();
 
 	return (
 		<div className="h-auto w-full">
@@ -27,21 +28,9 @@ export default function PageClient({
 				hideOnScroll={!isAtTop}
 			/> */}
 
-			<div className='h-auto w-full fixed top-8 left-8 text-black'>
+			{/* <LayoutDebug /> */}
 
-				<p className='font-medium text-lg mb-8'>Georges Bréhier</p>
-
-				<ul className=''>
-					{navItems.map((item, idx) => (
-						<li key={idx}>
-							<a href={item.path} className='capitalize'>
-								{item.title}
-							</a>
-						</li>
-					))}
-				</ul>
-
-			</div>
+			<Navbar navItems={navItems} />
 
 			<GalleryPreview
 				basePath={basePath}

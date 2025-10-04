@@ -149,13 +149,10 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 import { Bodoni_Moda } from "next/font/google";
-
-const bodoni = Bodoni_Moda({
-	subsets: ["latin"],
-	weight: ["400", "500", "600", "700", "800", "900"],
-	style: ["normal", "italic"],
-	display: "swap",
-});
+import { GalleryImage } from "./GalleryImage";
+import { useImageZoom } from "@/utils/context/imageZoom";
+import { cn } from "@/utils/utils";
+import { bodoni } from "@/utils/fonts";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -183,6 +180,8 @@ export default function GalleryScroll({
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const imageRefs = useRef<HTMLImageElement[]>([]);
 	const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+
+	const { style } = useImageZoom();
 
 	const imageTitles = titles || images.map((img, index) => {
 		const filename = img.split('/').pop()?.split('.')[0] || `Artwork ${index + 1}`;
@@ -302,21 +301,30 @@ export default function GalleryScroll({
 				className="h-screen w-full flex items-center justify-center relative"
 			>
 				{images.map((image, index) => (
-					<img
-						key={index}
+					// <img
+					// 	key={index}
+					// 	ref={(el) => {
+					// 		if (el) imageRefs.current[index] = el;
+					// 	}}
+					// 	src={`${basePath}/${image}`}
+					// 	alt={`artwork ${index + 1}`}
+					// 	style={{ opacity: index === 0 ? 1 : 0 }}
+					// 	className={`object-contain absolute w-full h-full py-8`}
+					// />
+					<GalleryImage
+						key={image}
 						ref={(el) => {
 							if (el) imageRefs.current[index] = el;
 						}}
 						src={`${basePath}/${image}`}
-						alt={`artwork ${index + 1}`}
-						style={{ opacity: index === 0 ? 1 : 0 }}
-						className={`object-contain absolute w-full h-full py-8`}
+						index={index}
+						isVisible={currentImageIdx === index}
 					/>
 				))}
 			</div>
 
-			<div className="fixed bottom-8 right-8 z-30 flex flex-col items-end">
-				<p className={`${bodoni.className} text-black text-7xl capitalize font-medium`}>
+			<div className={cn("fixed z-30 flex flex-col items-end transition-all duration-300 ease-in-out bottom-8 right-8 lg:bg-transparent bg-white p-2")} style={style}>
+				<p className={`${bodoni.className} text-black xl:text-7xl text-5xl capitalize font-medium`}>
 					{imageTitles[currentImageIndex] || `title${currentImageIndex + 1}`}
 				</p>
 				<p className={`text-black text-xl capitalize font-medium font-mono`}>
