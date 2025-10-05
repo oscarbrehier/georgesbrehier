@@ -64,13 +64,13 @@ export default function PageClient({
 				onScrollChange={setCurrentImageIdx}
 			/>
 
-			<div className='h-auto w-screen flex flex-col items-center pt-24 space-y-20'>
+			<div className='h-auto w-full lg:hidden flex flex-col items-center py-24 space-y-20 sm:px-0 px-2'>
 
 				{images.map((image, idx) => (
 
 					<div
 						key={idx}
-						className="w-full max-w-xl flex flex-col items-center space-y-4"
+						className="w-full max-w-xl flex flex-col items-center space-y-2"
 					>
 
 						<img
@@ -79,18 +79,18 @@ export default function PageClient({
 							alt=""
 						/>
 
-						{/* <div className='w-full flex justify-between'>
+						<div className='w-full flex justify-between px-0'>
 
 							<p
-								className={cn("capitalize text-black text-4xl w font-medium", bodoni.className)}
+								className={cn("sm:text-lg text-md text-black font-medium capitalize")}
 							>
 								title{idx}
 							</p>
-							<p className={`text-black text-xl capitalize font-medium font-mono`}>
+							<p className={`sm:text-lg text-md text-black font-medium capitalize`}>
 								110cm x 152cm
 							</p>
 
-						</div> */}
+						</div>
 
 					</div>
 

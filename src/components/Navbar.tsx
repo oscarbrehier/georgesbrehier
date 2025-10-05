@@ -18,7 +18,7 @@ export function Navbar({
 
 		<>
 
-			<div className='h-20 w w-full fixed flex justify-between px-8 pt-8 z-50'>
+			<div className='h-20 w w-full fixed flex justify-between sm:px-8 px-2 pt-8 z-50 bg-white'>
 
 				<div>
 					<p className='text-black font-medium'>Georges Bréhier</p>
@@ -49,7 +49,7 @@ export function Navbar({
 			<div className={cn(
 				"sm:hidden",
 				isOpen ? "flex flex-col justify-center" : "hidden",
-				"bg-white h-screen w-full fixed z-40 py-20 px-8 space-y-4"
+				"bg-white h-screen w-full fixed z-40 py-20 px-2 space-y-4"
 			)}>
 
 				{navItems.map((item, idx) => (

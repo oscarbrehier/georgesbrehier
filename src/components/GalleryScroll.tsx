@@ -176,6 +176,7 @@ export default function GalleryScroll({
 					110cm x 152cm
 				</p>
 			</div>
+			
 		</div>
 	);
 }
