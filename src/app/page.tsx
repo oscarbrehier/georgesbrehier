@@ -1,34 +1,39 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import PageClient from './page_client';
+import InfiniteGallery from '@/components/gallery/Gallery';
 
 export default async function ArtworksPage() {
 
 	const artworkDir = path.join(process.cwd(), 'public', 'artworkfill');
 	let files: string[] = [];
+
 	try {
 		files = await fs.readdir(artworkDir);
 	} catch (e) {
 		console.error('Could not read artwork directory:', e);
-	}
+	};
 
-	const images = files.filter((f) =>
-		['.png', '.jpg', '.jpeg', '.webp'].includes(path.extname(f).toLowerCase())
-	).slice(0, 4);
-
-
+	let images: GalleryImageItem[] = [];
 	const basePath = "/artworkfill";
-	const navItems = [
-		{ path: "", title: "lampes" },
-		{ path: "", title: "peintures" },
-		{ path: "", title: "sculptures" },
-	];
+
+	files.forEach((f, idx) => {
+
+		if (['.png', '.jpg', '.jpeg', '.webp'].includes(path.extname(f).toLowerCase())) {
+			images.push({
+				id: idx,
+				url: `${basePath}/${f}`,
+				title: `title-${idx}`
+			});
+		};
+
+	});
 
 	return (
-		<PageClient
-			basePath={basePath}
-			navItems={navItems}
-			images={images}
-		/>
+		
+		<>
+			<InfiniteGallery images={images} />
+		</>
+
 	);
-}
+
+};
