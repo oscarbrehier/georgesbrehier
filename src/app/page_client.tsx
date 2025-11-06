@@ -35,7 +35,7 @@ export default function PageClient({
 
 	return (
 
-		<div className="h-auto w-full bg-white">
+		<div className="h-auto w-full bg-neutral-100">
 
 			{/* <CursorFollow
 				hideOnScroll={!isAtTop}

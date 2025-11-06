@@ -12,7 +12,7 @@ export function ImageFocus({
 
 		<>
 
-			<button onClick={onClose} className="absolute top-8 right-8 p-3 bg-white rounded-full flex-none text-neutral-800 cursor-pointer z-[69] www ww">
+			<button onClick={onClose} className="absolute top-8 right-8 p-3 bg-neutral-100 rounded-full flex-none text-neutral-800 cursor-pointer z-[69] www ww">
 				<X />
 			</button>
 

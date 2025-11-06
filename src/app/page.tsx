@@ -33,7 +33,7 @@ export default async function ArtworksPage() {
 	return (
 		
 		<>
-			<div className='h-32 w-full px-8 flex flex-col justify-center fixed top-0 left-0 lg:bg-transparent bg-foreground w pb-2 -space-y-1.5 z-[60]'>
+			<div className='h-32 w-full px-8 flex flex-col justify-center fixed top-0 left-0 lg:bg-transparent bg-neutral-100 w pb-2 -space-y-1.5 z-[60]'>
 				<p className={`${roboto.className} font-semibold text-xl capitalize text-neutral-800`}>georges</p>
 				<p className={`${roboto.className} font-semibold text-xl capitalize text-neutral-800`}>bréhier</p>
 			</div>

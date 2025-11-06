@@ -67,7 +67,7 @@ export default function HorizontalGallery({
 				)
 			}
 
-			<div className="lg:flex hidden h-screen items-center justify-center p-8">
+			<div className="lg:flex hidden h-screen items-center justify-center p-8 bg-neutral-100">
 
 				<div className="w-full max-w-7xl">
 
@@ -95,7 +95,7 @@ export default function HorizontalGallery({
 
 					</div>
 
-					<div className='w-full h-auto flex justify-center space-x-2 mt-8 border-2'>
+					<div className='w-full h-auto flex justify-center space-x-2 mt-8'>
 
 						<button
 							onClick={() => navigate('prev')}

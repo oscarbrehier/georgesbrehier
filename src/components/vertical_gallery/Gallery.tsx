@@ -61,7 +61,7 @@ export function VerticalGallery({ images }: { images: GalleryImageItem[] }) {
 
 	return (
 
-		<div className="lg:hidden flex h-auto w-full flex-col items-center pt-32 p-8 space-y-8">
+		<div className="lg:hidden flex h-auto w-full flex-col items-center pt-32 p-8 space-y-8 bg-neutral-100">
 
 			{displayedImages.map((image, idx) => (
 
