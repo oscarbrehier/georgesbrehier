@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GalleryImage } from './GalleryImage';
 import { ImageFocus } from './ImageFocus';
 
-export default function Gallery({
+export default function HorizontalGallery({
 	images
 }: {
 	images: GalleryImageItem[]
@@ -67,7 +67,7 @@ export default function Gallery({
 				)
 			}
 
-			<div className="h-screen flex items-center justify-center p-8">
+			<div className="lg:flex hidden h-screen items-center justify-center p-8">
 
 				<div className="w-full max-w-7xl">
 

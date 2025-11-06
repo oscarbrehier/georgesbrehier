@@ -21,7 +21,7 @@ export function GalleryImage({
 				className={`transition-all duration-500 ${isTransitioning ? 'scale-95' : 'scale-100'}`}
 			>
 
-				<div className="relative h-[70vh] w-auto aspect-[4/5] overflow-hidden rounded-md">
+				<div className="relative xl:h-[70vh] h-[60vh] w w-auto aspect-[4/5] overflow-hidden rounded-md">
 					<img
 						src={src.url}
 						alt={src.title}
@@ -34,7 +34,7 @@ export function GalleryImage({
 						</p>
 					</div> */}
 				</div>
-				
+
 			</div>
 
 		);
@@ -48,7 +48,7 @@ export function GalleryImage({
 			className={`cursor-pointer transition-all duration-500 flex-shrink-0 ${isTransitioning ? 'opacity-50' : 'opacity-60 hover:opacity-80'
 				}`}
 		>
-			<div className="relative w-64 h-80 overflow-hidden rounded-md">
+			<div className="relative xl:h-80 h-64 w-auto aspect-[4/5] overflow-hidden rounded-md">
 				<img
 					src={src.url}
 					alt={src.title}
