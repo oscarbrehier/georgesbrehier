@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GalleryImage } from './GalleryImage';
 import { ImageFocus } from './ImageFocus';
@@ -20,7 +20,7 @@ export default function HorizontalGallery({
 		return images[index];
 	};
 
-	const navigate = (direction: "next" | "prev") => {
+	const navigate = useCallback((direction: "next" | "prev") => {
 
 		if (isTransitioning) return;
 
@@ -36,7 +36,7 @@ export default function HorizontalGallery({
 
 		setTimeout(() => setIsTransitioning(false), 500);
 
-	};
+	}, [isTransitioning, images.length]);
 
 	useEffect(() => {
 

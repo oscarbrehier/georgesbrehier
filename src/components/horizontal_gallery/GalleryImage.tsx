@@ -1,4 +1,8 @@
-export function GalleryImage({
+import { cn } from "@/utils/utils";
+import Image from "next/image";
+import { memo } from "react";
+
+export const GalleryImage = memo(function GalleryImage({
 	src,
 	onNavigate,
 	onClick,
@@ -12,52 +16,36 @@ export function GalleryImage({
 	focused?: boolean
 }) {
 
-	if (focused) {
-
-		return (
-
-			<div
-				onClick={onClick}
-				className={`transition-all duration-500 ${isTransitioning ? 'scale-95' : 'scale-100'}`}
-			>
-
-				<div className="relative xl:h-[70vh] h-[60vh] w w-auto aspect-[4/5] overflow-hidden rounded-md">
-					<img
-						src={src.url}
-						alt={src.title}
-						className="w-full h-full object-cover"
-					/>
-					{/* <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
-						<h2 className="text-2xl font-bold text-white">{src.title}</h2>
-						<p className="text-sm text-gray-300 mt-1">
-							{src.currentIdx + 1} / {src.totalImages}
-						</p>
-					</div> */}
-				</div>
-
-			</div>
-
-		);
-
-	};
-
 	return (
 
 		<div
-			onClick={onNavigate}
-			className={`cursor-pointer transition-all duration-500 flex-shrink-0 ${isTransitioning ? 'opacity-50' : 'opacity-60 hover:opacity-80'
-				}`}
-		>
-			<div className="relative xl:h-80 h-64 w-auto aspect-[4/5] overflow-hidden rounded-md">
-				<img
+			onClick={focused ? onClick : onNavigate}
+			className={cn(
+				`transition-all duration-500`,
+				focused 
+					? `${isTransitioning ? 'scale-95' : 'scale-100'}`
+					: `cursor-pointer flex-shrink-0 ${isTransitioning ? 'opacity-50' : 'opacity-60 hover:opacity-80'}`
+		)}>
+
+			<div className={cn(
+				`w-auto aspect-[4/5] overflow-hidden rounded-md`,
+				focused ? `relative xl:h-[70vh] h-[60vh]` : `relative xl:h-80 h-64`
+			)}>
+
+				<Image
 					src={src.url}
 					alt={src.title}
 					className="w-full h-full object-cover"
-					loading="eager"
+					width={600}
+					height={800}
+					loading={focused ? "eager" : "lazy"}
+					fetchPriority={focused ? "high" : "auto"}
 				/>
+				
 			</div>
+
 		</div>
 
 	);
 
-};
+});
