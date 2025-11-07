@@ -1,113 +1,482 @@
 "use client"
 
-import { roboto } from "@/utils/fonts";
-import { CloudUpload } from "lucide-react";
+import type React from "react";
 import { useState } from "react";
-import { Upload } from "./Upload";
+import { Cloud, Loader2, Check, X, Image as ImageIcon } from "lucide-react";
+
+interface UploadFormData {
+	title: string
+	description: string
+	section: string
+	images: File[]
+	imagePreviews: string[]
+}
+
+interface UploadProgress {
+	filename: string
+	status: "pending" | "uploading" | "success" | "error"
+	error?: string
+}
 
 export default function Page() {
 
-	const [file, setFile] = useState<File | null>(null);
+	const [formData, setFormData] = useState<UploadFormData>({
+		title: "",
+		description: "",
+		section: "",
+		images: [],
+		imagePreviews: [],
+	});
+
 	const [isDragging, setIsDragging] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+	const [error, setError] = useState<string | null>(null);
 
-	async function upload() {
+	const handleDragEnter = (e: React.DragEvent) => {
 
-		if (!file) return;
+		e.preventDefault();
+		e.stopPropagation();
+		setIsDragging(true);
 
-		try {
+	};
 
-			const formData = new FormData();
-			formData.append("file", file);
+	const handleDragLeave = (e: React.DragEvent) => {
 
-			const res = await fetch("/api/gallery/upload", {
-				method: "POST",
-				body: formData
-			});
+		e.preventDefault();
+		e.stopPropagation();
+		setIsDragging(false);
 
-			const data = await res.json();
-			console.log(data.url);
+	};
 
-		} catch (err) {
+	const handleDragOver = (e: React.DragEvent) => {
 
-			console.error(err);
+		e.preventDefault();
+		e.stopPropagation();
+
+	};
+
+	const processImages = (files: FileList) => {
+
+		const imageFiles: File[] = [];
+		const previews: string[] = [];
+
+		Array.from(files).forEach((file) => {
+			
+			if (file.type.startsWith("image/")) {
+
+				imageFiles.push(file);
+				previews.push(URL.createObjectURL(file));
+
+			};
+
+		});
+
+		if (imageFiles.length === 0) {
+
+			setError("No valid image files selected");
+			setTimeout(() => setError(null), 3000);
+
+			return;
 
 		};
 
+		setFormData((prev) => ({
+			...prev,
+			images: [...prev.images, ...imageFiles],
+			imagePreviews: [...prev.imagePreviews, ...previews],
+		}));
+
+		setIsDragging(false);
+		setError(null);
+
+	};
+
+	const handleDrop = (e: React.DragEvent) => {
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		const files = e.dataTransfer.files;
+
+		if (files.length > 0) {
+			processImages(files);
+		};
+
+	};
+
+	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+		const files = e.currentTarget.files;
+
+		if (files && files.length > 0) {
+			processImages(files);
+		};
+
+	};
+
+	const removeImage = (index: number) => {
+
+		setFormData((prev) => ({
+			...prev,
+			images: prev.images.filter((_, i) => i !== index),
+			imagePreviews: prev.imagePreviews.filter((_, i) => i !== index),
+		}));
+
+	};
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+		
+		const { name, value } = e.currentTarget;
+
+		setFormData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+
+	};
+
+	async function uploadImage(file: File) {
+
+		const formData = new FormData();
+		formData.append("file", file);
+
+		const res = await fetch("/api/gallery/upload", {
+			method: "POST",
+			body: formData
+		});
+
+		if (!res.ok) {
+			throw new Error("Failed to upload image");
+		}
+
+		const data = await res.json();
+		return data.url;
+
+	};
+
+	async function uploadToGallery(imageUrl: string, title: string, description: string, section: string) {
+
+		const res = await fetch("/api/gallery", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				image_url: imageUrl,
+				title,
+				description,
+				section
+			})
+		});
+
+		if (!res.ok) {
+			const data = await res.json();
+			throw new Error(data.error || "Failed to save item to gallery");
+		};
+
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+
+		e.preventDefault();
+		setError(null);
+
+		if (formData.images.length === 0 || !formData.title || !formData.section) {
+			setError("Please fill in required fields and select at least one image");
+			return;
+		};
+
+		setIsLoading(true);
+
+		const progress: UploadProgress[] = formData.images.map((img) => ({
+			filename: img.name,
+			status: "pending"
+		}));
+		
+		setUploadProgress(progress);
+
+		for (let i = 0; i < formData.images.length; i++) {
+
+			const file = formData.images[i];
+
+			setUploadProgress((prev) =>
+				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
+			);
+
+			try {
+
+				const imageUrl = await uploadImage(file);
+
+				const itemTitle = formData.images.length > 1
+					? `${formData.title} - ${i + 1}`
+					: formData.title;
+
+				await uploadToGallery(imageUrl, itemTitle, formData.description, formData.section);
+
+				setUploadProgress((prev) =>
+					prev.map((p, idx) => idx === i ? { ...p, status: "success" } : p)
+				);
+
+			} catch (err: any) {
+
+				setUploadProgress((prev) =>
+					prev.map((p, idx) => idx === i ? { ...p, status: "error", error: err.message } : p)
+				);
+
+			};
+
+		};
+
+		setIsLoading(false);
+
+		const allSuccess = uploadProgress.every(p => p.status === "success");
+		
+		if (allSuccess) {
+
+			setTimeout(() => {
+				setFormData({
+					title: "",
+					description: "",
+					section: "",
+					images: [],
+					imagePreviews: []
+				});
+				setUploadProgress([]);
+			}, 2000);
+
+		};
 
 	};
 
 	return (
+		<div className="flex-col w-full flex items-center justify-center">
 
-		<Upload />
+			<div className="w-full max-w-2xl">
 
-		// <div className="h-screen w-full p-8 text-black flex flex-col items-center">
+				<form onSubmit={handleSubmit} className="space-y-8">
 
-		// 	<div className="h-auto w-1/2  space-y-10">
+					<div
+						onDragEnter={handleDragEnter}
+						onDragLeave={handleDragLeave}
+						onDragOver={handleDragOver}
+						onDrop={handleDrop}
+						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${isDragging
+								? "border-slate-400 bg-slate-100"
+								: "border-slate-200"
+							} ${formData.images.length > 0 ? "bg-slate-50" : "bg-white"}`}
+					>
 
-		// 		<div className="">
+						<input
+							id="image_input"
+							type="file"
+							accept="image/*"
+							multiple
+							onChange={handleFileInputChange}
+							className="hidden"
+						/>
 
-		// 			<p className={`${roboto.className} text-3xl font-semibold`}>Upload to gallery</p>
+						{formData.images.length > 0 ? (
 
-		// 		</div>
+							<div className="p-6">
 
-		// 		<div>
+								<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
 
-		// 			<div className="space-y-2">
+									{formData.imagePreviews.map((preview, index) => (
 
-		// 				<div
-		// 					className={`border-neutral-300 border-3 border-dashed rounded-lg p-16 text-center transition-all cursor-pointer ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-		// 						}`}
-		// 				>
+										<div key={index} className="relative group">
 
-		// 					<input
-		// 						type="file"
-		// 						id="file-input"
-		// 						onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-		// 						className="hidden"
-		// 						accept="video/*,.jpeg,.jpg,.png"
-		// 					/>
+											<img
+												src={preview}
+												alt={`Preview ${index + 1}`}
+												className="w-full h-32 object-cover rounded-lg"
+											/>
 
-		// 					<label htmlFor="file-input" className="w-full h-auto cursor-pointer space-y-4 flex justify-center items-center flex-col">
+											<button
+												type="button"
+												onClick={() => removeImage(index)}
+												className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+											>
+												<X className="w-4 h-4" />
+											</button>
 
-		// 						<div className="bg-amber-400 rounded-full p-4 flex-none">
-		// 							<Upload className="text-neutral-800" />
-		// 						</div>
+										</div>
 
-		// 						<p className="text-neutral-700 font-semibold">
-		// 							Drag & Drop or
-		// 							&nbsp;
-		// 							<span className="text-amber-600">Choose file</span>
-		// 							&nbsp;
-		// 							to upload
-		// 						</p>
-		// 						{/* <h2 className="text-lg font-semibold mb-2">Drop your file here</h2>
-		// 						<p className="text-sm mb-4">or click to browse from your computer</p>
-		// 						<p className="text-xs">Supported: JPEG, PNG</p> */}
+									))}
 
-		// 					</label>
+								</div>
 
-		// 				</div>
+								<button
+									type="button"
+									onClick={() => document.getElementById("image_input")?.click()}
+									className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-700 transition-colors text-sm font-medium"
+								>
+									Add more images
+								</button>
 
-		// 			</div>
+							</div>
 
-		// 		</div>
+						) : (
 
-		// 	</div>
+							<div className="px-12 py-8 text-center">
 
-		// 	{/* <input
-		// 		onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-		// 		type="file"
-		// 		accept="image/*"
-		// 	/>
+								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+									<Cloud className="w-8 h-8 text-slate-600" />
+								</div>
 
-		// 	<button
-		// 		onClick={upload}
-		// 	>
-		// 		upload
-		// 	</button> */}
+								<h3 className="text-lg font-medium text-slate-900 mb-2">
+									Drag your images here
+								</h3>
 
-		// </div>
+								<p className="text-sm text-slate-600 mb-4">
+									or click to browse (multiple files supported)
+								</p>
 
+								<label htmlFor="image_input" className="inline-block">
+									<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-900 text-white font-medium text-sm cursor-pointer hover:bg-slate-800 transition-colors">
+										Select images
+									</span>
+								</label>
+
+							</div>
+
+						)}
+
+					</div>
+
+					<div className="space-y-4">
+
+						<div>
+
+							<label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
+								Title {formData.images.length > 1 && <span className="text-slate-500">(numbers will be appended)</span>}
+							</label>
+
+							<input
+								id="title"
+								type="text"
+								name="title"
+								value={formData.title}
+								onChange={handleInputChange}
+								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
+							/>
+
+						</div>
+
+						<div>
+							
+							<label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
+								Description
+							</label>
+
+							<textarea
+								id="description"
+								name="description"
+								value={formData.description}
+								onChange={handleInputChange}
+								rows={2}
+								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all resize-none"
+							/>
+
+						</div>
+
+						<div>
+
+							<label htmlFor="section" className="block text-sm font-medium text-slate-700 mb-2">
+								Section
+							</label>
+
+							<select
+								id="section"
+								name="section"
+								value={formData.section}
+								onChange={handleInputChange}
+								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all appearance-none cursor-pointer"
+							>
+								<option value="">Choose a section</option>
+								<option value="sculptures">Sculptures</option>
+							</select>
+
+						</div>
+
+					</div>
+
+					{uploadProgress.length > 0 && (
+
+						<div className="space-y-2">
+
+							<h4 className="text-sm font-medium text-slate-700">Upload Progress</h4>
+
+							{uploadProgress.map((progress, index) => (
+
+								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+									
+									{progress.status === "pending" && (
+										<div className="w-5 h-5 rounded-full border-2 border-slate-300" />
+									)}
+
+									{progress.status === "uploading" && (
+										<Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />
+									)}
+
+									{progress.status === "success" && (
+										<Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+									)}
+
+									{progress.status === "error" && (
+										<X className="w-5 h-5 text-red-600 flex-shrink-0" />
+									)}
+
+									<div className="flex-1 min-w-0">
+										<p className="text-sm text-slate-900 truncate">{progress.filename}</p>
+										{progress.error && (
+											<p className="text-xs text-red-600">{progress.error}</p>
+										)}
+									</div>
+
+								</div>
+
+							))}
+
+						</div>
+
+					)}
+
+					{error && (
+						<div className="p-4 rounded-lg bg-red-50 border border-red-200">
+							<p className="text-sm text-red-600">{error}</p>
+						</div>
+					)}
+
+					<button
+						type="submit"
+						disabled={isLoading}
+						className="w-full py-3 px-6 rounded-lg bg-slate-900 text-white font-medium transition-all duration-200 hover:bg-slate-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+					>
+
+						{isLoading ? (
+
+							<>
+								<Loader2 className="w-5 h-5 animate-spin" />
+								Uploading {uploadProgress.filter(p => p.status === "success").length} / {formData.images.length}
+							</>
+
+						) : (
+
+							<>
+								Upload {formData.images.length > 0 && `(${formData.images.length} image${formData.images.length > 1 ? 's' : ''})`}
+							</>
+
+						)}
+
+					</button>
+
+				</form>
+
+			</div>
+
+		</div>
+		
 	);
-
+	
 };

@@ -20,10 +20,10 @@ export function SectionSelector({
 
 		<div className="space-x-10 capitalize">
 
-			{sections.map((section) => (
+			{sections.map((section, idx) => (
 
 				<Link
-					key={`section-${section}`}
+					key={`section-${section}-${idx}`}
 					href={`/dashboard/gallery?section=${section}`}
 					className={cn(
 						"cursor-pointer capitalize",

@@ -5,19 +5,25 @@ export async function POST(req: NextRequest) {
 
 	try {
 
-		const formData = await req.formData();
+		const request = req.clone();
+		const formData = await request.formData();
 		const fileEntry = formData.get("file");
 
-		if (!fileEntry || !(fileEntry instanceof File)) {
-			return new Response('No valid file provided', { status: 400 });
+		if (!fileEntry || !(fileEntry instanceof Blob)) {
+			return NextResponse.json({ error: "No valid file provided" }, { status: 400 });
 		};
 
-		const file = fileEntry;
+		const file = fileEntry as Blob;
 
-		const filename = `${Date.now()}-${file.name}`;
+		const arrayBuffer = await file.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
+
+		const ext = file.type.split("/")[1] ?? "jpg";
+		const filename = `${Date.now()}-upload.${ext}`;
+
 		const { error } = await supabase.storage
 			.from("gallery_images")
-			.upload(filename, file);
+			.upload(filename, buffer);
 
 		if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

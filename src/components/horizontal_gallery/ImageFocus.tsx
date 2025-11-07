@@ -4,7 +4,7 @@ export function ImageFocus({
 	src,
 	onClose
 }: {
-	src: GalleryImageItem,
+	src: GalleryItem,
 	onClose: () => void
 }) {
 
@@ -19,7 +19,7 @@ export function ImageFocus({
 			<div className="bg-foreground z-50 h-screen w-full absolute flex items-center justify-center p-8 top-0 left-0">
 				<img
 					className="h-full"
-					src={src.url}
+					src={src.image_url}
 					alt={src.title}
 				/>
 			</div>

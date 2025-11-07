@@ -1,6 +1,20 @@
 import React from "react";
 import { SignOutBtn } from "./SignOutBtn";
 import { createClient } from "@/utils/supabase/server";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "Dashboard",
+	robots: {
+		index: false,
+		follow: false,
+		nocache: true,
+		googleBot: {
+			index: false,
+			follow: false
+		}
+	}
+};
 
 export default async function Layout({
 	children

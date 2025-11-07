@@ -6,18 +6,18 @@ import { GalleryImage } from './GalleryImage';
 import { ImageFocus } from './ImageFocus';
 
 export default function HorizontalGallery({
-	images
+	items
 }: {
-	images: GalleryImageItem[]
+	items: GalleryItem[]
 }) {
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isTransitioning, setIsTransitioning] = useState(false);
-	const [imageFocus, setImageFocus] = useState<GalleryImageItem | null>(null);
+	const [imageFocus, setImageFocus] = useState<GalleryItem | null>(null);
 
 	const getImageAtIndex = (offset: number) => {
-		const index = (currentIndex + offset + images.length) % images.length;
-		return images[index];
+		const index = (currentIndex + offset + items.length) % items.length;
+		return items[index];
 	};
 
 	const navigate = useCallback((direction: "next" | "prev") => {
@@ -28,15 +28,15 @@ export default function HorizontalGallery({
 
 		setCurrentIndex((prev) => {
 			if (direction === 'next') {
-				return (prev + 1) % images.length;
+				return (prev + 1) % items.length;
 			} else {
-				return (prev - 1 + images.length) % images.length;
+				return (prev - 1 + items.length) % items.length;
 			}
 		});
 
 		setTimeout(() => setIsTransitioning(false), 500);
 
-	}, [isTransitioning, images.length]);
+	}, [isTransitioning, items.length]);
 
 	useEffect(() => {
 
@@ -67,41 +67,52 @@ export default function HorizontalGallery({
 				)
 			}
 
-			<div className="lg:flex hidden h-screen items-center justify-center p-8 bg-neutral-100">
+			<section
+				className="lg:flex hidden h-screen items-center justify-center p-8 bg-neutral-100"
+				aria-label="Artwork gallery"
+			>
 
 				<div className="w-full max-w-7xl">
 
-					<div className="relative flex items-center justify-center gap-8">
+					<nav
+						className="relative flex items-center justify-center gap-8"
+						aria-label="Gallery navigation"
+					>
 
 						<GalleryImage
-							src={{ url: prevImage.url, title: prevImage.title }}
+							src={{ url: prevImage.image_url, title: prevImage.title }}
 							onNavigate={() => navigate("prev")}
 							isTransitioning={isTransitioning}
 						/>
 
 						<GalleryImage
-							src={{ url: currentImage.url, title: currentImage.title }}
+							src={{ url: currentImage.image_url, title: currentImage.title }}
 							isTransitioning={isTransitioning}
 							onClick={() => setImageFocus(currentImage)}
 							focused
 						/>
 
 						<GalleryImage
-							src={{ url: nextImage.url, title: nextImage.title }}
+							src={{ url: nextImage.image_url, title: nextImage.title }}
 							onNavigate={() => navigate("next")}
 							isTransitioning={isTransitioning}
 
 						/>
 
-					</div>
+					</nav>
 
-					<div className='w-full h-auto flex justify-center space-x-2 mt-8'>
+					<div
+						className='w-full h-auto flex justify-center space-x-2 mt-4'
+						role="group"
+						aria-label="Gallery controls"
+					>
 
 						<button
 							onClick={() => navigate('prev')}
 							disabled={isTransitioning}
 							className='p-3 rounded-full bg-white text-neutral-800 cursor-pointer'
-							aria-label="Previous image"
+							aria-label={`Previous image: ${prevImage.title}`}
+							title="Previous image"
 						>
 							<ChevronLeft />
 						</button>
@@ -110,6 +121,8 @@ export default function HorizontalGallery({
 							onClick={() => setCurrentIndex(0)}
 							className='text-neutral-800 bg-white rounded-full px-5 py-3 cursor-pointer disabled:text-neutral-500'
 							disabled={currentIndex === 0}
+							aria-label={`Return to first image`}
+							title="Back to start"
 						>
 							Back to start
 						</button>
@@ -118,7 +131,8 @@ export default function HorizontalGallery({
 							onClick={() => navigate('next')}
 							disabled={isTransitioning}
 							className='p-3 rounded-full bg-white text-neutral-800 cursor-pointer'
-							aria-label="Next image"
+							aria-label={`Next image: ${nextImage.title}`}
+							title="Next image"
 						>
 							<ChevronRight />
 						</button>
@@ -127,7 +141,7 @@ export default function HorizontalGallery({
 
 				</div>
 
-			</div>
+			</section>
 
 		</>
 
