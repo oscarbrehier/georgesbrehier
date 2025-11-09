@@ -51,17 +51,12 @@ export default async function Page() {
 
 			<main>
 
-				{/* {
-					galleryItems && (
-
-						<HorizontalGallery items={galleryItems} />
-
-					)
-				} */}
-
-				{/* <VerticalGallery images={images} /> */}
-
-				{galleryItems && <Gallery items={galleryItems} />}
+				{galleryItems && (
+					<>
+						<Gallery items={galleryItems} />
+						<VerticalGallery images={galleryItems} />
+					</>
+				)}
 
 			</main>
 

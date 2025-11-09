@@ -53,7 +53,7 @@ export function Gallery({
 
 	return (
 
-		<div ref={containerRef} className="flex w-fit hide-scrollbar ml-36">
+		<div ref={containerRef} className="lg:flex hidden w-fit hide-scrollbar ml-36">
 
 			{items.map((item, idx) => (
 
