@@ -1,3 +1,5 @@
+"use server"
+
 import { supabase } from "@/lib/supabase";
 
 export async function getGalleryItemIds(section?: string) {
@@ -19,26 +21,25 @@ export async function getGalleryItemIds(section?: string) {
 
 };
 
-export async function getGalleryItems(ids: number[], section?: string) {
+export async function getGalleryItems(opts?: { section?: string, range?: number[] }) {
+
+	let { section, range } = opts || { section: null, range: [] };
 
 	if (!section) section = "all";
 
 	let query = supabase
 		.from("gallery_items")
 		.select("*")
-		.in("id", ids);
+		.order("created_at", { ascending: false });
 
 	if (section !== "all") {
 		query.eq("section", section);
 	};
 
-	// const { count, error } = await supabase
-	// 	.from("gallery_items")
-	// 	.select("*", { count: "exact", head: true });
-
-	// const itemIds = await getIds();
-	// console.log(itemIds);
-
+	if (range && range.length >= 2) {
+		query.range(range[0], range[1]);
+	};
+	
 	const res = await query;
 
 	return res;
