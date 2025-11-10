@@ -7,7 +7,7 @@ export async function getGalleryItemIds(section?: string) {
 	if (!section) section = "all"
 
 	const query = supabase
-		.from("gallery_items")
+		.from("works")
 		.select("id")
 
 	if (section !== "all") {
@@ -21,16 +21,17 @@ export async function getGalleryItemIds(section?: string) {
 
 };
 
-export async function getGalleryItems(opts?: { section?: string, range?: number[] }) {
+export async function getGalleryItems(opts?: { section?: string, range?: number[], collectionId?: string }) {
 
-	let { section, range } = opts || { section: null, range: [] };
+	let { section, range, collectionId } = opts || { section: null, range: [], collectionId: null };
 
 	if (!section) section = "all";
 
 	let query = supabase
-		.from("gallery_items")
+		.from("works")
 		.select("*")
-		.order("created_at", { ascending: false });
+		.order("created_at", { ascending: false })
+		.eq("collection_id", collectionId);
 
 	if (section !== "all") {
 		query.eq("section", section);

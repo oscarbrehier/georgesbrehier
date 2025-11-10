@@ -5,10 +5,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
+const leftMargin = 144;
+
 export function Gallery({
-	items
+	items,
 }: {
-	items: GalleryItem[]
+	items: GalleryItem[],
 }) {
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -28,10 +30,10 @@ export function Gallery({
 			return acc + (section as HTMLElement).offsetWidth;
 		}, 0);
 
-		const scrollDistance = totalWidth - window.innerWidth;
+		const scrollDistance = totalWidth - window.innerWidth + leftMargin;
 
 		const animation = gsap.to(sections, {
-			x: () => -(totalWidth - window.innerWidth),
+			x: () => -scrollDistance,
 			ease: "none",
 			scrollTrigger: {
 				trigger: containerRef.current,
@@ -53,13 +55,13 @@ export function Gallery({
 
 	return (
 
-		<div ref={containerRef} className="lg:flex hidden w-fit hide-scrollbar ml-36">
+		<div ref={containerRef} className={`lg:flex hidden hide-scrollbar ml-36`}>
 
 			{items.map((item, idx) => (
 
 				<div
 					key={`gallery-${item.title}-${idx}`}
-					className="panel h-screen 2xl:w-[30vw] xl:w-[40vw] w-[50vw] relative flex items-center justify-center"
+					className="panel h-screen 2xl:w-[30vw] xl:w-[40vw] w-[50vw] relative flex items-center justify-center shrink-0"
 				>
 
 					<div className="relative w-3/4 h-[80%]">

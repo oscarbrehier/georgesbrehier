@@ -11,7 +11,23 @@ declare global {
 		image_url: string;
 		section: string;
 		createAt: string;
-	}
+	};
+	interface GallerySection {
+		id: string;
+		title: string;
+		is_default: boolean;
+		slug?: string;
+	};
+	interface GalleryCollection {
+		id: string;
+		section_id: string;
+		title: string;
+		is_default: boolean;
+		slug?: string;
+	};
+	interface GalleryCollectionWithSection extends GalleryCollection {
+		section: GallerySection
+	};
 };
 
 export {};

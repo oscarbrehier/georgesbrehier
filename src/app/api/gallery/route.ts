@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
 
 	const body = await req.json();
-	const { title, description, image_url, section } = body;
+	const { title, description, image_url, collectionId } = body;
 
 	const { data, error } = await supabase
-		.from("gallery_items")
-		.insert([{ title, description, image_url, section }])
+		.from("works")
+		.insert([{ title, description, image_url, collection_id: collectionId }])
 		.select();
 
 	if (error) return NextResponse.json({ error: error.message }, { status: 500 });

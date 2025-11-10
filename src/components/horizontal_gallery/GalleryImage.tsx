@@ -23,7 +23,7 @@ export const GalleryImage = memo(function GalleryImage({
 			className={cn(
 				`transition-all duration-500`,
 				focused 
-					? `${isTransitioning ? 'scale-95' : 'scale-100'}`
+					? ``
 					: `cursor-pointer flex-shrink-0 ${isTransitioning ? 'opacity-50' : 'opacity-60 hover:opacity-80'}`
 		)}>
 
@@ -33,7 +33,7 @@ export const GalleryImage = memo(function GalleryImage({
 			)}>
 
 				<Image
-					src={src.url}
+					src={src.url ?? null}
 					alt={src.title}
 					className="w-full h-full object-cover"
 					width={600}

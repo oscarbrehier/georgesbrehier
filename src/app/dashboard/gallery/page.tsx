@@ -6,7 +6,7 @@ import { cache } from "react";
 const getSections = cache(async () => {
 
 	const { error, data } = await supabase
-		.from("gallery_items")
+		.from("works")
 		.select("section");
 
 	const sections = data?.map(({ section }) => section);
@@ -22,7 +22,7 @@ const getSections = cache(async () => {
 const getGalleryItems = cache(async (section: string) => {
 
 	let query = supabase
-		.from("gallery_items")
+		.from("works")
 		.select("*");
 
 	if (section !== "all") {
