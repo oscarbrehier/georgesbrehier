@@ -3,7 +3,7 @@
 import { LogOut, Settings, UserPen } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-export function SignOutBtn() {
+export function HelperModal() {
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -42,7 +42,7 @@ export function SignOutBtn() {
 	return (
 
 		<div
-			className="absolute bottom-4 right-4 flex flex-col items-end space-y-2"
+			className="fixed bottom-4 right-4 flex flex-col items-end space-y-2"
 		>
 
 			{

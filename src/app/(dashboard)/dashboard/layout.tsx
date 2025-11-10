@@ -1,5 +1,5 @@
 import React from "react";
-import { SignOutBtn } from "./SignOutBtn";
+import { HelperModal } from "./HelperModal";
 import { createClient } from "@/utils/supabase/server";
 import { Metadata } from "next";
 
@@ -31,7 +31,7 @@ export default async function Layout({
 
 			{
 				data.user && (
-					<SignOutBtn />
+					<HelperModal />
 				)
 			}
 			

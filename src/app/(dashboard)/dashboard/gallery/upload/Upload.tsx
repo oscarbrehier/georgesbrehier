@@ -2,8 +2,9 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Cloud, Loader2, Check, X, Image as ImageIcon } from "lucide-react";
+import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react";
 import { getCollectionsBySectionId } from "@/utils/supabase/getCollection";
+import Link from "next/link";
 
 interface UploadFormData {
 	title: string
@@ -287,9 +288,9 @@ export function Upload({
 						onDragOver={handleDragOver}
 						onDrop={handleDrop}
 						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${isDragging
-							? "border-slate-400 bg-slate-100"
-							: "border-slate-200"
-							} ${formData.images.length > 0 ? "bg-slate-50" : "bg-white"}`}
+							? "border-neutral-400 bg-neutral-100"
+							: "border-neutral-200"
+							} ${formData.images.length > 0 ? "bg-neutral-50" : "bg-white"}`}
 					>
 
 						<input
@@ -334,7 +335,7 @@ export function Upload({
 								<button
 									type="button"
 									onClick={() => document.getElementById("image_input")?.click()}
-									className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-700 transition-colors text-sm font-medium"
+									className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
 								>
 									Add more images
 								</button>
@@ -345,20 +346,20 @@ export function Upload({
 
 							<div className="px-12 py-8 text-center">
 
-								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-									<Cloud className="w-8 h-8 text-slate-600" />
+								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-100 mb-4">
+									<Cloud className="w-8 h-8 text-neutral-600" />
 								</div>
 
-								<h3 className="text-lg font-medium text-slate-900 mb-2">
+								<h3 className="text-lg font-medium text-neutral-900 mb-2">
 									Drag your images here
 								</h3>
 
-								<p className="text-sm text-slate-600 mb-4">
+								<p className="text-sm text-neutral-600 mb-4">
 									or click to browse (multiple files supported)
 								</p>
 
 								<label htmlFor="image_input" className="inline-block">
-									<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-900 text-white font-medium text-sm cursor-pointer hover:bg-slate-800 transition-colors">
+									<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
 										Select images
 									</span>
 								</label>
@@ -373,8 +374,8 @@ export function Upload({
 
 						<div>
 
-							<label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
-								Title {formData.images.length > 1 && <span className="text-slate-500">(numbers will be appended)</span>}
+							<label htmlFor="title" className="block text-sm font-medium text-neutral-700 mb-2">
+								Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}
 							</label>
 
 							<input
@@ -383,14 +384,14 @@ export function Upload({
 								name="title"
 								value={formData.title}
 								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
 							/>
 
 						</div>
 
 						<div>
 
-							<label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
+							<label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
 								Description
 							</label>
 
@@ -400,14 +401,14 @@ export function Upload({
 								value={formData.description}
 								onChange={handleInputChange}
 								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all resize-none"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
 							/>
 
 						</div>
 
 						<div>
 
-							<label htmlFor="section" className="block text-sm font-medium text-slate-700 mb-2">
+							<label htmlFor="section" className="block text-sm font-medium text-neutral-700 mb-2">
 								Section
 							</label>
 
@@ -416,7 +417,7 @@ export function Upload({
 								name="sectionId"
 								value={formData.sectionId}
 								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all appearance-none cursor-pointer"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
 							>
 
 								<option value="">Choose a section</option>
@@ -433,28 +434,40 @@ export function Upload({
 
 						<div>
 
-							<label htmlFor="section" className="block text-sm font-medium text-slate-700 mb-2">
+							<label htmlFor="section" className="block text-sm font-medium text-neutral-700 mb-2">
 								Collection
 							</label>
 
-							<select
-								id="collection"
-								name="collectionId"
-								value={formData.collectionId}
-								onChange={handleInputChange}
-								disabled={!collections}
-								className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all appearance-none cursor-pointer"
-							>
+							<div className="w-full h-auto flex items-center space-x-2">
 
-								<option value="">Choose a collection</option>
-								{collections?.map((collection) => (
-									<option
-										key={collection.id}
-										className="capitalize"
-										value={collection.id}>{collection.title}</option>
-								))}
+								<select
+									id="collection"
+									name="collectionId"
+									value={formData.collectionId}
+									onChange={handleInputChange}
+									disabled={!collections}
+									className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
+								>
 
-							</select>
+									<option value="">Choose a collection</option>
+									{collections?.map((collection) => (
+										<option
+											key={collection.id}
+											className="capitalize"
+											value={collection.id}>{collection.title}</option>
+									))}
+
+								</select>
+
+								<Link
+									href="/dashboard/gallery/new/collection"
+									title="Create new collection"
+									className="p-2 bg-neutral-200 text-neutral-600 rounded-full cursor-pointer"
+								>
+									<Plus />
+								</Link>
+
+							</div>
 
 						</div>
 
@@ -464,14 +477,14 @@ export function Upload({
 
 						<div className="space-y-2">
 
-							<h4 className="text-sm font-medium text-slate-700">Upload Progress</h4>
+							<h4 className="text-sm font-medium text-neutral-700">Upload Progress</h4>
 
 							{uploadProgress.map((progress, index) => (
 
-								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-neutral-50 border border-neutral-200">
 
 									{progress.status === "pending" && (
-										<div className="w-5 h-5 rounded-full border-2 border-slate-300" />
+										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
 									)}
 
 									{progress.status === "uploading" && (
@@ -487,7 +500,7 @@ export function Upload({
 									)}
 
 									<div className="flex-1 min-w-0">
-										<p className="text-sm text-slate-900 truncate">{progress.filename}</p>
+										<p className="text-sm text-neutral-900 truncate">{progress.filename}</p>
 										{progress.error && (
 											<p className="text-xs text-red-600">{progress.error}</p>
 										)}
@@ -510,7 +523,7 @@ export function Upload({
 					<button
 						type="submit"
 						disabled={isLoading}
-						className="w-full py-3 px-6 rounded-lg bg-slate-900 text-white font-medium transition-all duration-200 hover:bg-slate-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+						className="w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 					>
 
 						{isLoading ? (

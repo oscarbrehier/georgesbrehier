@@ -1,4 +1,4 @@
-import { CollectionNav } from "@/app/[section]/[collection]/CollectionNav"
+import { CollectionNav } from "@/app/(main)/[section]/[collection]/CollectionNav"
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 
 export default async function NavSlot({
