@@ -17,6 +17,7 @@ async function loadCollections(sectionSlug: string) {
 		`
 			id,
 			title,
+			is_default,
 			section:sections!inner (
 				slug
 			)
@@ -35,6 +36,8 @@ export async function NavContent({ params }: Props) {
 	if (collections.length === 0) return null;
 
 	const sorted = collections.sort((a, b) => Number(b.is_default) - Number(a.is_default));
+
+	console.log(sorted)
 
 	return (
 

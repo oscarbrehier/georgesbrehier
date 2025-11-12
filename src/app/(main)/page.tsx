@@ -9,7 +9,16 @@ export const metadata: Metadata = {
 
 export default async function Page() {
 
-	const defaultSection = await fetchSupabase<GallerySection>("sections");
+	const defaultSection = await fetchSupabase<GallerySection>(
+		"sections",
+		{ is_default: true },
+		`
+			title,
+			slug
+		`,
+		true
+	);
+	
 	if (!defaultSection) return notFound();
 
 	redirect(`/${defaultSection.title}`);
