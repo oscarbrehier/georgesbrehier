@@ -143,7 +143,6 @@ export default async function Page({
 	if (!collection) {
 
 		collection = await getDefaultCollection(section.id);
-		console.log(collection)
 		if (!collection) return notFound();
 
 		redirect(`/${section.slug}/${collection?.slug}`);

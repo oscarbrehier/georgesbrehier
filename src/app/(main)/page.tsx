@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-
+	
 };
 
 
@@ -18,7 +18,7 @@ export default async function Page() {
 		`,
 		true
 	);
-	
+
 	if (!defaultSection) return notFound();
 
 	redirect(`/${defaultSection.title}`);
