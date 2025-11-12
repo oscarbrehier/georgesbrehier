@@ -19,9 +19,6 @@ export function Gallery({
 
 		if (!containerRef.current) return;
 
-		document.documentElement.classList.add("hide-scrollbar");
-		document.body.classList.add("hide-scrollbar");
-
 		gsap.registerPlugin(ScrollTrigger);
 
 		const sections = gsap.utils.toArray(".panel");
@@ -80,6 +77,6 @@ export function Gallery({
 
 		</div>
 
-	)
+	);
 
-}
+};

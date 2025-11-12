@@ -1,27 +1,28 @@
 "use client"
 
-import { createCollection } from "@/app/actions/createCollection";
-import { Check, Info } from "lucide-react";
-import { useActionState, useState } from "react";
-import { useFormState } from "react-dom";
+import { createCollection, CreateCollectionReturn } from "@/app/actions/createCollection";
+import { Check, Info, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useActionState, useEffect, useState } from "react";
 
 const initialState = { message: "", error: "" };
+const initialForm = {
+	sectionId: "",
+	collectionTitle: "",
+	isDefault: false
+};
 
 export function EntityForm({
 	entity,
 	sections = [],
 }: {
 	entity: string,
-	sections: GallerySection[]
+	sections: GallerySection[],
 }) {
 
-	const [formData, setFormData] = useState({
-		sectionId: "",
-		collectionTitle: "",
-		isDefault: false
-	});
+	const [formData, setFormData] = useState(initialForm);
 
-	const [state, formAction] = useActionState<{ message?: string, error?: string } | undefined, FormData>(createCollection, initialState);
+	const [state, formAction, pending] = useActionState<CreateCollectionReturn | undefined, FormData>(createCollection, initialState);
 
 	function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
 
@@ -37,6 +38,14 @@ export function EntityForm({
 	const isFormComplete =
 		formData.sectionId.trim().length > 0 &&
 		formData.collectionTitle.trim().length > 0;
+
+	useEffect(() => {
+
+		if (pending) {
+			setFormData(initialForm);
+		};
+
+	}, [pending]);
 
 	return (
 
@@ -156,10 +165,27 @@ export function EntityForm({
 				<button
 					type="submit"
 					disabled={!isFormComplete}
-					className="w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+					className="cursor-pointer w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 				>
-					Create collection {formData.collectionTitle && `: ${formData.collectionTitle}`}
+
+					{pending ? (
+						<Loader2 className="w-5 h-5 text-green-600 animate-spin flex-shrink-0" />
+					) : (
+						<span>Create collection {formData.collectionTitle && `: ${formData.collectionTitle}`}</span>
+					)}
+
 				</button>
+
+				{state?.success && (
+
+					<Link
+						href="/dashboard/gallery/upload"
+						className="cursor-pointer w-full py-3 px-6 rounded-lg bg-neutral-500 w text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+					>
+						Return to upload page
+					</Link>
+
+				)}
 
 			</div>
 

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react";
 import { getCollectionsBySectionId } from "@/utils/supabase/getCollection";
 import Link from "next/link";
+import { useUploadFormStore } from "@/stores/useUploadForm";
 
 interface UploadFormData {
 	title: string
@@ -27,14 +28,7 @@ export function Upload({
 	sections: GallerySection[]
 }) {
 
-	const [formData, setFormData] = useState<UploadFormData>({
-		title: "",
-		description: "",
-		sectionId: "",
-		collectionId: "",
-		images: [],
-		imagePreviews: [],
-	});
+	const { formData, setFormData, resetForm } = useUploadFormStore();
 
 	const [isDragging, setIsDragging] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -90,11 +84,10 @@ export function Upload({
 
 		};
 
-		setFormData((prev) => ({
-			...prev,
-			images: [...prev.images, ...imageFiles],
-			imagePreviews: [...prev.imagePreviews, ...previews],
-		}));
+		setFormData({
+			images: [...formData.images, ...imageFiles],
+			imagePreviews: [...formData.imagePreviews, ...previews],
+		});
 
 		setIsDragging(false);
 		setError(null);
@@ -126,11 +119,10 @@ export function Upload({
 
 	const removeImage = (index: number) => {
 
-		setFormData((prev) => ({
-			...prev,
-			images: prev.images.filter((_, i) => i !== index),
-			imagePreviews: prev.imagePreviews.filter((_, i) => i !== index),
-		}));
+		setFormData({
+			images: formData.images.filter((_, i) => i !== index),
+			imagePreviews: formData.imagePreviews.filter((_, i) => i !== index),
+		});
 
 	};
 
@@ -143,20 +135,18 @@ export function Upload({
 			const collectionsRes = await getCollectionsBySectionId(value);
 			setCollections(collectionsRes ?? null);
 
-			setFormData((prev) => ({
-				...prev,
+			setFormData({
 				collectionId: "",
-				[name]: value,
-			}));
+				sectionId: value,
+			});
 
 			return;
 
 		};
 
-		setFormData((prev) => ({
-			...prev,
+		setFormData({
 			[name]: value,
-		}));
+		});
 
 
 	};
@@ -260,14 +250,7 @@ export function Upload({
 		if (allSuccess) {
 
 			setTimeout(() => {
-				setFormData({
-					title: "",
-					description: "",
-					sectionId: "",
-					collectionId: "",
-					images: [],
-					imagePreviews: []
-				});
+				resetForm();
 				setUploadProgress([]);
 			}, 2000);
 
@@ -276,7 +259,7 @@ export function Upload({
 	};
 
 	return (
-		<div className="flex-col w-full flex items-center justify-center">
+		<div className="flex-1 flex-col w-full flex items-center justify-center">
 
 			<div className="w-full max-w-2xl">
 
@@ -290,7 +273,7 @@ export function Upload({
 						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${isDragging
 							? "border-neutral-400 bg-neutral-100"
 							: "border-neutral-200"
-							} ${formData.images.length > 0 ? "bg-neutral-50" : "bg-white"}`}
+							} ${formData.images.length > 0 ? "bg-neutral-50" : "bg-neutral-50"}`}
 					>
 
 						<input
@@ -384,7 +367,7 @@ export function Upload({
 								name="title"
 								value={formData.title}
 								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
 							/>
 
 						</div>
@@ -401,7 +384,7 @@ export function Upload({
 								value={formData.description}
 								onChange={handleInputChange}
 								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
 							/>
 
 						</div>
@@ -417,7 +400,7 @@ export function Upload({
 								name="sectionId"
 								value={formData.sectionId}
 								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
 							>
 
 								<option value="">Choose a section</option>
@@ -446,7 +429,7 @@ export function Upload({
 									value={formData.collectionId}
 									onChange={handleInputChange}
 									disabled={!collections}
-									className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
+									className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
 								>
 
 									<option value="">Choose a collection</option>
@@ -462,7 +445,7 @@ export function Upload({
 								<Link
 									href="/dashboard/gallery/new/collection"
 									title="Create new collection"
-									className="p-2 bg-neutral-200 text-neutral-600 rounded-full cursor-pointer"
+									className="p-2 bg-neutral-200 text-neutral-500 rounded-full cursor-pointer"
 								>
 									<Plus />
 								</Link>

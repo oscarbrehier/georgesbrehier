@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import "../globals.css";
 import { roboto } from "@/utils/fonts";
 
@@ -27,7 +28,9 @@ export default function Layout({
 
 			</header>
 
-			{children}
+			<Suspense>
+				{children}
+			</Suspense>
 
 		</>
 

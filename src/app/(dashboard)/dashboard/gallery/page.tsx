@@ -1,15 +1,18 @@
 import { supabase } from "@/lib/supabase";
-import { SectionSelector } from "./SectionSelector";
 import { redirect, RedirectType } from "next/navigation";
 import { cache } from "react";
+import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
+import { Selector } from "./Selector";
 
 const getSections = cache(async () => {
 
 	const { error, data } = await supabase
-		.from("works")
-		.select("section");
+		.from("sections")
+		.select("*");
 
-	const sections = data?.map(({ section }) => section);
+
+
+	const sections = data?.map(({ title }) => title);
 
 	if (sections && sections.length !== 0 && !error) {
 		return ["all", ...sections];
@@ -35,6 +38,28 @@ const getGalleryItems = cache(async (section: string) => {
 
 });
 
+const getCollections = cache(async (section: string | null) => {
+
+	const data = await fetchSupabase<GalleryCollection[]>(
+		"collections",
+		{
+			...((section && section !== "all") && { "section.slug": section })
+		},
+		`
+			id,
+			title,
+			slug,
+			section:sections!inner (
+				id,
+				slug
+			)
+		`
+	);
+
+	return data;
+
+});
+
 export default async function Page({
 	searchParams
 }: {
@@ -44,6 +69,9 @@ export default async function Page({
 	const params = await searchParams;
 	let section = Array.isArray(params.section) ? params.section[0] : params.section;
 
+	const collections = await getCollections(section ?? null);
+	console.log(collections);
+
 	const sections = await getSections();
 
 	if (!section || !sections?.includes(section)) {
@@ -52,16 +80,17 @@ export default async function Page({
 
 	const { data: galleryItems, error } = await getGalleryItems(section);
 
-	if (error) {
+	if (error || !collections) {
 		return null;
 	};
+
 
 	return (
 
 		<div className="flex-1 w-full space-y-4">
 
 			{sections && (
-				<SectionSelector sections={sections} current={section} />
+				<Selector sections={sections} current={section} collections={collections} />
 			)}
 
 			<div className="grid grid-cols-6 gap-4 mt-12">
@@ -85,20 +114,3 @@ export default async function Page({
 	);
 
 };
-
-// {
-//   error: null,
-//   data: [
-//     {
-//       id: 2,
-//       title: 'test',
-//       description: 'test1',
-//       image_url: 'https://wqcpryhdynoyeylgnnza.supabase.co/storage/v1/object/public/gallery_images/1762444194262-Rolling_Stones_1965.jpg',
-//       created_at: '2025-11-06T15:50:02.206931+00:00',
-//       section: 'sculptures'
-//     }
-//   ],
-//   count: null,
-//   status: 200,
-//   statusText: 'OK'
-// }

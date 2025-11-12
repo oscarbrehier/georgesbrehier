@@ -1,11 +1,53 @@
 import { Gallery } from "@/components/Gallery";
 import { VerticalGallery } from "@/components/vertical_gallery/Gallery";
-import { roboto } from "@/utils/fonts";
-import { getCollectionsBySectionId } from "@/utils/supabase/getCollection";
 import { getGalleryItems } from "@/utils/supabase/getGalleryItems";
 import { notFound, redirect } from "next/navigation";
-import { CollectionNav } from "./CollectionNav";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
+import { ResolvingMetadata } from "next";
+import { capitalize } from "@/utils/capitalize";
+import { ScrollHint } from "@/components/ScrollHint";
+
+type Props = {
+	params: Promise<{ section: string, collection: string }>
+};
+
+export async function generateStaticParams() {
+
+	const collections = await fetchSupabase<GalleryCollectionWithSection[]>(
+		"collections",
+		{},
+		`
+			id,
+			slug,
+			section:sections!inner (
+				slug
+			)
+		`,
+	);
+
+	if (!collections) return [];
+
+	return collections
+		.filter(c => c.section?.slug && c.slug)
+		.map(c => ({
+			section: c.section!.slug,
+			collection: c.slug
+		}));
+
+};
+
+export async function generateMetadata(
+	{ params }: Props,
+	parent: ResolvingMetadata
+) {
+
+	const { section, collection } = await params;
+
+	return {
+		title: `${capitalize(section)} - Georges Bréhier`
+	};
+
+};
 
 async function getDefaultCollection(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
@@ -31,9 +73,7 @@ async function getDefaultCollection(sectionId: string): Promise<GalleryCollectio
 
 export default async function Page({
 	params
-}: {
-	params: Promise<{ section: string, collection: string }>
-}) {
+}: Props) {
 
 	const { section: sectionSlug, collection: collectionSlug } = await params;
 
@@ -96,6 +136,8 @@ export default async function Page({
 		<>
 
 			<main>
+
+				<ScrollHint />
 
 				{galleryItems && (
 					<>

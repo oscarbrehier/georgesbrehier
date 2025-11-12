@@ -1,6 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
+import { cacheTag } from "next/cache";
 
 export async function getCollectionsBySection(selector: string, value: string): Promise<GalleryCollection | null> {
 
@@ -31,6 +32,9 @@ export async function getCollectionByTitle(title: string): Promise<GalleryCollec
 }
 
 export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[] | null> {
+
+	'use cache'
+	cacheTag("collections");
 
 	if (!sectionId) return null;
 

@@ -17,9 +17,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	];
 
 	return (
+
 		<div className="min-h-screen w-full p-8 space-y-4 flex flex-col">
 
-			<div className="h-auto w-full flex items-end py-4 space-x-10 text-black border-b border-black capitalize">
+			<div className="h-10 flex space-x-10 border-b-[1px] border-neutral-200">
 
 				{navItems.map((item) => {
 
@@ -32,9 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 							href={fullHref}
 							className={cn(
 								"cursor-pointer",
-								isActive
-									? "text-5xl md:text-6xl font-light text-slate-900 mb-2 tracking-tight"
-									: "text-neutral-600 hover:text-black"
+								isActive ? "text-black" : "text-neutral-500"
 							)}
 						>
 							{item.label}
@@ -48,5 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			{children}
 
 		</div>
+
 	);
-}
+
+};

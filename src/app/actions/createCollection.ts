@@ -1,9 +1,15 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
-export async function createCollection(prevState: { message?: string; error?: string } | undefined, formData: FormData) {
+export interface CreateCollectionReturn {
+	success?: boolean;
+	message?: string;
+	error?: string;
+}
+
+export async function createCollection(prevState: CreateCollectionReturn | undefined, formData: FormData) {
 
 	const isDefault = formData.get("isDefault") === "on";
 	const sectionId = formData.get("sectionId")?.toString();
@@ -35,9 +41,9 @@ export async function createCollection(prevState: { message?: string; error?: st
 
 		return { error: error.message };
 
-	}
+	};
 
-	revalidatePath("/dashboard/gallery/upload");
-	return { message: "Collection created!" };
+	revalidateTag("collections", "max");
+	return { success: true, message: `Successfully created collection \`${title}\`.` };
 
 };
