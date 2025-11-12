@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export async function VerticalGallery({ images }: { images: GalleryItem[] }) {
+export default async function VerticalGallery({ images }: { images: GalleryItem[] }) {
 
 	return (
 

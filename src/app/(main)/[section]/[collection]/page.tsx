@@ -1,11 +1,16 @@
-import { Gallery } from "@/components/Gallery";
-import { VerticalGallery } from "@/components/vertical_gallery/Gallery";
 import { getGalleryItems } from "@/utils/supabase/getGalleryItems";
 import { notFound, redirect } from "next/navigation";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { ResolvingMetadata } from "next";
 import { capitalize } from "@/utils/capitalize";
 import { ScrollHint } from "@/components/ScrollHint";
+import { cacheTag } from "next/cache";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import { GallerySkeleton } from "@/components/gallery/Skeleton";
+
+const Gallery = dynamic(() => import("@/components/gallery/Gallery"));
+const VerticalGallery = dynamic(() => import("@/components/vertical_gallery/Gallery"), { ssr: true });
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -51,6 +56,10 @@ export async function generateMetadata(
 
 async function getDefaultCollection(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
+	"use cache"
+
+	cacheTag(`default-collection-${sectionId}`);
+
 	const collection = await fetchSupabase<GalleryCollectionWithSection>(
 		"collections",
 		{ section_id: sectionId, is_default: true },
@@ -71,18 +80,31 @@ async function getDefaultCollection(sectionId: string): Promise<GalleryCollectio
 
 };
 
+async function getSection(slug: string): Promise<GallerySection | null> {
+
+	"use cache"
+	cacheTag(`section-${slug}`);
+
+	let sections = await fetchSupabase<GallerySection>(
+		"sections",
+		{ slug },
+		"*",
+		true
+	);
+
+	return sections;
+
+};
+
 export default async function Page({
 	params
 }: Props) {
 
+	"use cache"
+
 	const { section: sectionSlug, collection: collectionSlug } = await params;
 
-	let section = await fetchSupabase<GallerySection>(
-		"sections",
-		{ slug: sectionSlug },
-		"*",
-		true
-	);
+	let section = await getSection(sectionSlug);
 
 	if (!section) {
 
@@ -129,7 +151,9 @@ export default async function Page({
 	};
 
 	const { data: galleryItems, error } = await getGalleryItems({ collectionId: collection.id });
-	if (error || !galleryItems || galleryItems.length == 0) return notFound(); // should show an error page
+	if (error || !galleryItems || galleryItems.length == 0) return notFound();
+
+	cacheTag(`gallery-items-collection-${collection.id}`);
 
 	return (
 
@@ -139,12 +163,8 @@ export default async function Page({
 
 				<ScrollHint />
 
-				{galleryItems && (
-					<>
-						<Gallery items={galleryItems} />
-						<VerticalGallery images={galleryItems} />
-					</>
-				)}
+				<Gallery items={galleryItems} />
+				<VerticalGallery images={galleryItems} />
 
 			</main>
 

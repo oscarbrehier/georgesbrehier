@@ -6,8 +6,9 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 const leftMargin = 144;
+gsap.registerPlugin(ScrollTrigger);
 
-export function Gallery({
+export default function Gallery({
 	items,
 }: {
 	items: GalleryItem[],
@@ -18,8 +19,6 @@ export function Gallery({
 	useEffect(() => {
 
 		if (!containerRef.current) return;
-
-		gsap.registerPlugin(ScrollTrigger);
 
 		const sections = gsap.utils.toArray(".panel");
 
@@ -52,7 +51,7 @@ export function Gallery({
 
 	return (
 
-		<div ref={containerRef} className={`lg:flex hidden hide-scrollbar ml-36`}>
+		<div ref={containerRef} className={`lg:flex hidden hide-scrollbar ml-36`} style={{ willChange: "transform" }}>
 
 			{items.map((item, idx) => (
 

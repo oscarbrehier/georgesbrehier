@@ -1,8 +1,6 @@
-// components/CollectionNav.tsx
 'use client';
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@/utils/utils";
 
 export function CollectionNav({
@@ -14,7 +12,6 @@ export function CollectionNav({
 	currentCollection: string,
 	section: string
 }) {
-	const router = useRouter();
 
 	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, title: string) => {
 		e.preventDefault();
@@ -22,9 +19,13 @@ export function CollectionNav({
 	};
 
 	return (
+
 		<ul>
+
 			{collections.map((collection) => (
+
 				<li key={collection.id}>
+
 					<Link
 						href={`/${section}/${collection.title}`}
 						onClick={(e) => handleClick(e, collection.title)}
@@ -35,8 +36,13 @@ export function CollectionNav({
 					>
 						{collection.title}
 					</Link>
+
 				</li>
+
 			))}
+
 		</ul>
+
 	);
-}
+	
+};

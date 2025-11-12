@@ -37,7 +37,7 @@ export default async function Page({
 				title,
 				slug
 			)
-    	`,
+		`,
 		true
 	);
 
