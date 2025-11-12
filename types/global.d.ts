@@ -25,9 +25,21 @@ declare global {
 		is_default: boolean;
 		slug?: string;
 	};
+	interface GalleryCollectionSEO {
+		seo_title: string,
+		seo_description: string,
+		seo_og_image_url: string,
+		seo_og_image_width: number,
+		seo_og_image_height: number,
+		seo_og_image_alt: string,
+		seo_twitter_image_url: string,
+		seo_twitter_image_type: string,
+		seo_canonical_url: null,
+		seo_robots: string
+	};
 	interface GalleryCollectionWithSection extends GalleryCollection {
 		section: GallerySection
 	};
 };
 
-export {};
+export { };

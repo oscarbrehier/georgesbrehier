@@ -1,13 +1,11 @@
 import { getGalleryItems } from "@/utils/supabase/getGalleryItems";
 import { notFound, redirect } from "next/navigation";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
-import { ResolvingMetadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 import { capitalize } from "@/utils/capitalize";
 import { ScrollHint } from "@/components/ScrollHint";
 import { cacheTag } from "next/cache";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import { GallerySkeleton } from "@/components/gallery/Skeleton";
 
 const Gallery = dynamic(() => import("@/components/gallery/Gallery"));
 const VerticalGallery = dynamic(() => import("@/components/vertical_gallery/Gallery"), { ssr: true });
@@ -48,8 +46,31 @@ export async function generateMetadata(
 
 	const { section, collection } = await params;
 
+	const baseTitle = `${capitalize(section)} - ${capitalize(collection)}`;
+	const url = `/${section}/${collection}`;
+
 	return {
-		title: `${capitalize(section)} - Georges Bréhier`
+		title: `${baseTitle} | Georges Bréhier`,
+		description: "",
+		openGraph: {
+			title: baseTitle,
+			description: "",
+			url,
+			siteName: "Georges Bréhier",
+			type: "website",
+			locale: "en_US"
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: baseTitle,
+			description: "",
+
+		},
+		robots: {
+			index: true,
+			follow: true
+		},
+		keywords: [section, collection, "Georges Bréhier"]
 	};
 
 };
