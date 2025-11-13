@@ -9,7 +9,6 @@ export default async function Page() {
 		"sections",
 		{ is_default: true },
 		`
-			title,
 			slug
 		`,
 		true
@@ -17,6 +16,6 @@ export default async function Page() {
 
 	if (!defaultSection) return notFound();
 
-	redirect(`/${defaultSection.title}`);
+	redirect(`/${defaultSection.slug}`);
 
 };

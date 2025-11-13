@@ -33,12 +33,27 @@ export default async function Page({
 }) {
 
 	const { collection } = await params;
+
 	const seo = await getCollectionSEO(collection);
+	const imageGallery = await fetchSupabase<GalleryItem[]>(
+		"works",
+		{ "collection.slug": collection },
+		`
+			id,
+			title,
+			image_url,
+			collection:collections!inner (
+				slug
+			)
+		`
+	);
+
+	if (!imageGallery) return ;
 
 	return (
 
 		<>
-			{seo && (<SeoEditor collection={collection} data={seo} />)}
+			{seo && (<SeoEditor collection={collection} data={seo} imageGallery={imageGallery} />)}
 		</>
 
 	);

@@ -1,9 +1,16 @@
 "use client"
 
+import { updateSEO } from "@/app/actions/updateSEO";
 import { Input } from "@/components/dashboard/Input";
 import { Select } from "@/components/dashboard/Select";
-import { Key } from "lucide-react";
-import { useState } from "react";
+import { cn } from "@/utils/utils";
+import { ArrowLeft, Images, Key } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { ImageGallery } from "./ImageGallery";
+import { roboto } from "@/utils/fonts";
+import { SeoForm } from "./SeoForm";
+import { SeoPreview } from "./Preview";
 
 const defaultSEO: GalleryCollectionSEO = {
 	seo_title: "",
@@ -20,11 +27,16 @@ const defaultSEO: GalleryCollectionSEO = {
 
 export function SeoEditor({
 	collection,
+	imageGallery,
 	data
 }: {
 	collection: string,
+	imageGallery: GalleryItem[],
 	data: GalleryCollectionSEO
 }) {
+
+	const [isLoading, setIsLoading] = useState(false);
+	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
 	const [seo, setSEO] = useState<GalleryCollectionSEO>({
 		...defaultSEO,
@@ -45,167 +57,75 @@ export function SeoEditor({
 
 	};
 
-	function handleSubmit() {
+	async function handleSubmit() {
 
-		const formData = new FormData();
-		
-		Object.entries(seo).forEach(([Key, value]) => {
-		
-			if (value !== undefined) {
-				formData.append(Key, value);
+		setIsLoading(true);
+
+		try {
+
+			const result = await updateSEO(collection, seo);
+
+			if (result?.error) {
+
+				console.log(result.error)
+
 			};
-		
-		});
 
-		console.log(formData.get('seo_title'))
+		} finally {
+			setIsLoading(false);
+		};
 
 	};
 
 	return (
 
-		<div className="flex-1 w-full pt-10 flex items-center flex-col space-y-16">
+		<div className={cn(
+			"h-auto min-h-screen w-full pt-10",
+		)}>
 
-			<div className="space-y-3">
+			<div className={cn(
+				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
+			)}>
 				<p className="text-5xl text-black">SEO Settings ({collection})</p>
 				<p className="text-neutral-500">Manage search engine optimization and social media metadata</p>
 			</div>
 
-			<div className="w-1/2 space-y-8">
+			{isPanelOpen ? (
 
-				<p className="text-black text-3xl">Basic Information</p>
+				<div className="flex flex-col items-end space-y-4">
 
-				<div className="w-full flex flex-col space-y-8">
+					<button
+						onClick={() => setIsPanelOpen(false)}
+						className="text-neutral-900 flex bg-neutral-200 rounded-md py-2 px-3 space-x-2 cursor-pointer"
+					>
+						<ArrowLeft />
+						<span>Back to form</span>
+					</button>
 
-					<Input
-						id="title"
-						label="Title"
-						sublabel={`Current length: ${seo.seo_title.length} characters`}
-						placeholder="Enter page title (50-60 characters recommended)"
-						value={seo.seo_title}
-						onChange={(e) => handleChange("seo_title", e.target.value)}
-					/>
+					<div className="w-full grid grid-cols-2 gap-4">
 
-					<Input
-						id="description"
-						label="Description"
-						sublabel={`Current length: ${seo.seo_description.length} characters`}
-						placeholder="Enter meta description (150-160 characters recommended)"
-						value={seo.seo_description}
-						onChange={(e) => handleChange("seo_description", e.target.value)}
-					/>
-
-					<Select
-						label="Robots Meta Tag"
-						id="robot_meta_tag"
-						options={[
-							{ title: "index, follow" },
-							{ title: "index, nofollow" },
-							{ title: "noindex, follow" },
-							{ title: "noindex, nofollow" },
-						]}
-						value={seo.seo_robots}
-						onChange={(e) => handleChange("seo_robots", e.target.value)}
-					/>
-
-					<Input
-						id="canonical_url"
-						label="Canonical URL (Optional)"
-						placeholder="https://example.com/page"
-						value={seo.seo_canonical_url ?? ""}
-						onChange={(e) => handleChange("seo_canonical_url", e.target.value)}
-					/>
-
-				</div>
-
-			</div>
-
-			<div className="w-1/2 space-y-8">
-
-				<p className="text-black text-3xl">Open Graph (Facebook, LinkedIn)</p>
-
-				<div className="w-full flex flex-col space-y-8">
-
-					<Input
-						id="og_image_url"
-						label="Image URL"
-						placeholder="https://example.com/image.jpg"
-						value={seo.seo_og_image_url}
-						onChange={(e) => handleChange("seo_og_image_url", e.target.value)}
-					/>
-
-					<div className="grid grid-cols-2 gap-2">
-
-						<Input
-							id="og_image_width"
-							label="Image Width (px)"
-							value={seo.seo_og_image_width}
-							onChange={(e) => handleChange("seo_og_image_width", e.target.value)}
+						<ImageGallery
+							images={imageGallery}
+							onSelect={(e) => handleChange("seo_og_image_url", e.image_url)}
 						/>
 
-						<Input
-							id="og_image_height"
-							label="Image Height (px)"
-							value={seo.seo_og_image_height}
-							onChange={(e) => handleChange("seo_og_image_height", e.target.value)}
-						/>
+						<SeoPreview seo={seo} />
 
 					</div>
 
-					<Input
-						id="og_image_alt"
-						label="Image Alt Text"
-						placeholder="Describe the image for accessibility"
-						value={seo.seo_og_image_alt}
-						onChange={(e) => handleChange("seo_og_image_alt", e.target.value)}
-					/>
-
 				</div>
 
-			</div>
+			) : (
 
-			<div className="w-1/2 space-y-8">
+				<SeoForm
+					collection={collection}
+					seo={seo}
+					handleChange={handleChange}
+					onSubmit={handleSubmit}
+					onPanelOpen={() => setIsPanelOpen(true)}
+				/>
 
-				<p className="text-black text-3xl">Twitter / X</p>
-
-				<div className="w-full flex flex-col space-y-8">
-
-					<Input
-						id="seo_twitter_image_url"
-						label="Image URL"
-						placeholder="https://example.com/twitter-image.jpg"
-						value={seo.seo_twitter_image_url}
-						onChange={(e) => handleChange("seo_twitter_image_url", e.target.value)}
-					/>
-
-					<Select
-						label="Card Type"
-						id="twitter_image_type"
-						options={[
-							{ title: "summary", value: "summary" },
-							{ title: "summary large image", value: "summary_large_image" },
-							{ title: "app", value: "app" },
-						]}
-						value={seo.seo_twitter_image_type}
-						onChange={(e) => handleChange("seo_twitter_image_type", e.target.value)}
-						sublabel={
-							{
-								summary: "Small card with image on the side",
-								summary_large_image: "Large card with full-width image",
-								app: "Card optimized for app links",
-							}[seo.seo_twitter_image_type] ?? ""
-						}
-					/>
-
-				</div>
-
-			</div>
-
-			<button
-				onClick={handleSubmit}
-				className="bg-neutral-900 text-white w-1/2 py-3 rounded-md cursor-pointer"
-			>
-				Save changes
-			</button>
+			)}
 
 		</div>
 

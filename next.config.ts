@@ -2,18 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 
-	logging: {
+	// logging: {
 
-		fetches: {
-			fullUrl: true,
-			hmrRefreshes: true
-		},
+	// 	fetches: {
+	// 		fullUrl: true,
+	// 		hmrRefreshes: true
+	// 	},
 
-		incomingRequests: {
-			ignore: [/\bapi\/health\b/],
-		}
+	// 	incomingRequests: {
+	// 		ignore: [/\bapi\/health\b/],
+	// 	}
 
-	},
+	// },
 
 	cacheComponents: true,
 

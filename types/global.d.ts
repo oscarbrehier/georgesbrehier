@@ -10,7 +10,7 @@ declare global {
 		description: string;
 		image_url: string;
 		section: string;
-		createAt: string;
+		created_at: string;
 	};
 	interface GallerySection {
 		id: string;
