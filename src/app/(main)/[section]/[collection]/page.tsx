@@ -51,7 +51,7 @@ export async function generateMetadata(
 	const baseTitle = `${capitalize(section)} - ${capitalize(collection)}`;
 	const url = `/${section}/${collection}`;
 
-	const imageUrl = await fetchSupabase(
+	const collectionData = await fetchSupabase(
 		"collections",
 		{ "slug": collection },
 		`
@@ -67,7 +67,7 @@ export async function generateMetadata(
 		openGraph: {
 			title: baseTitle,
 			description: "",
-			url: imageUrl ?? null,
+			url: collectionData.seo_og_image_url ?? null,
 			siteName: "Georges Bréhier",
 			type: "website",
 			locale: "en_US"
