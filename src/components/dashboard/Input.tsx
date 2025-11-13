@@ -2,7 +2,7 @@ import { cn } from "@/utils/utils";
 import React from "react";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-	label: string;
+	label: string | React.ReactNode;
 	id: string;
 	sublabel?: string | React.ReactNode;
 };

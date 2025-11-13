@@ -1,7 +1,10 @@
+import React from "react";
+
 type InputProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 	label: string;
 	id: string;
-	options: { title: string; value?: string; id?: string }[];
+	// options: { title: string; value?: string; id?: string }[];
+	children: React.ReactNode;
 	sublabel?: string;
 };
 
@@ -9,7 +12,7 @@ export function Select({
 	label,
 	id,
 	sublabel,
-	options,
+	children,
 	...props
 }: InputProps) {
 
@@ -27,15 +30,16 @@ export function Select({
 				className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
 			>
 
-				{/* <option value="">{optionTitle}</option> */}
-				{options.map((option, idx) => (
+				{/* {options.map((option, idx) => (
 					<option
 						key={idx}
 						{...(option.value && { value: option.value })}
 					>
 						{option.title}
 					</option>
-				))}
+				))} */}
+
+				{children}
 
 			</select>
 

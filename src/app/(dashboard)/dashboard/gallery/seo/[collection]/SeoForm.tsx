@@ -21,8 +21,7 @@ export function SeoForm({
 		<div className="w-full flex justify-center pb-10">
 
 			<div className={cn(
-				"flex items-center flex-col space-y-16 transition-all duration-300 ease-in-out",
-				"w-1/2"
+				"w-full max-w-4xl flex items-center flex-col space-y-16 transition-all duration-300 ease-in-out",
 			)}>
 
 				<div className="w-full space-y-8">
@@ -52,15 +51,21 @@ export function SeoForm({
 						<Select
 							label="Robots Meta Tag"
 							id="robot_meta_tag"
-							options={[
-								{ title: "index, follow" },
-								{ title: "index, nofollow" },
-								{ title: "noindex, follow" },
-								{ title: "noindex, nofollow" },
-							]}
 							value={seo.seo_robots}
 							onChange={(e) => handleChange("seo_robots", e.target.value)}
-						/>
+						>
+							{["index, follow", "index, nofollow", "noindex, follow", "noindex, nofollow"]
+								.map((item, idx) => (
+
+								<option
+									key={idx}
+									value={item}
+								>
+									{item}
+								</option>
+
+							))}
+						</Select>
 
 						<Input
 							id="canonical_url"
@@ -155,11 +160,6 @@ export function SeoForm({
 						<Select
 							label="Card Type"
 							id="twitter_image_type"
-							options={[
-								{ title: "summary", value: "summary" },
-								{ title: "summary large image", value: "summary_large_image" },
-								{ title: "app", value: "app" },
-							]}
 							value={seo.seo_twitter_image_type}
 							onChange={(e) => handleChange("seo_twitter_image_type", e.target.value)}
 							sublabel={
@@ -169,7 +169,21 @@ export function SeoForm({
 									app: "Card optimized for app links",
 								}[seo.seo_twitter_image_type] ?? ""
 							}
-						/>
+						>
+					
+							{[
+								{ title: "summary", value: "summary" },
+								{ title: "summary large image", value: "summary_large_image" },
+								{ title: "app", value: "app" },
+							].map((item, idx) => (
+
+								<option key={idx} value={item.value}>
+									{item.title}
+								</option>
+
+							))}
+
+						</Select>
 
 					</div>
 

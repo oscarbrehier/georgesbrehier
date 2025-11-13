@@ -35,12 +35,16 @@ const getGalleryItems = cache(
 			collection:collections!inner (
 				id,
 				slug,
-				title
+				title,
+				section:sections!inner (
+					id,
+					slug
+				)
 			)	
 		`)
 
 		if (section !== "all") {
-			query.eq("section", section);
+			query.eq("collection.section.slug", section);
 		};
 
 		const { error, data } = await query.returns<GalleryItemWithCollection[]>();
@@ -52,11 +56,11 @@ const getGalleryItems = cache(
 
 const getCollections = cache(async (section: string | null) => {
 
+	const filter = (section && section !== "all") ? { "sections.slug": section } : {};
+
 	const data = await fetchSupabase<GalleryCollection[]>(
 		"collections",
-		{
-			...((section && section !== "all") && { "section.slug": section })
-		},
+		filter,
 		`
 			id,
 			title,
@@ -80,6 +84,7 @@ export default async function Page({
 
 	const params = await searchParams;
 	let section = Array.isArray(params.section) ? params.section[0] : params.section;
+
 
 	const collections = await getCollections(section ?? null);
 
@@ -122,7 +127,7 @@ export default async function Page({
 					return (
 
 						<section key={collection.slug} id={collection.slug} className="space-y-2 pt-4">
-							
+
 							<h2
 								className={cn(
 									"text-5xl text-black sticky top-10 bg-neutral-100 py-2",

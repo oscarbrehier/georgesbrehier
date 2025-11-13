@@ -50,6 +50,9 @@ declare global {
 	interface GalleryCollectionWithSection extends GalleryCollection {
 		section: GallerySection
 	};
+	interface GalleryItemWithCollection extends GalleryItem {
+		collection: GalleryCollection;
+	};
 };
 
 export { };

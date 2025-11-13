@@ -6,6 +6,9 @@ import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react
 import { getCollectionsBySectionId } from "@/utils/supabase/getCollection";
 import Link from "next/link";
 import { useUploadFormStore } from "@/stores/useUploadForm";
+import { cn } from "@/utils/utils";
+import { Select } from "@/components/dashboard/Select";
+import { Input } from "@/components/dashboard/Input";
 
 interface UploadFormData {
 	title: string
@@ -259,9 +262,18 @@ export function Upload({
 	};
 
 	return (
-		<div className="flex-1 flex-col w-full flex items-center justify-center">
+		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10">
 
-			<div className="w-full max-w-2xl">
+			<div className={cn(
+				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
+			)}>
+
+				<p className="text-5xl text-black">Upload to gallery</p>
+				<p className="text-neutral-500">Upload single or multiple items to the gallery</p>
+
+			</div>
+
+			<div className="w-full max-w-4xl">
 
 				<form onSubmit={handleSubmit} className="space-y-8">
 
@@ -355,22 +367,14 @@ export function Upload({
 
 					<div className="space-y-4">
 
-						<div>
-
-							<label htmlFor="title" className="block text-sm font-medium text-neutral-700 mb-2">
-								Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}
-							</label>
-
-							<input
-								id="title"
-								type="text"
-								name="title"
-								value={formData.title}
-								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
-							/>
-
-						</div>
+						<Input
+							label={<>Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}</>}
+							id="title"
+							type="text"
+							name="title"
+							value={formData.title}
+							onChange={handleInputChange}
+						/>
 
 						<div>
 
@@ -389,70 +393,38 @@ export function Upload({
 
 						</div>
 
-						<div>
+						<Select
+							label="Section"
+							id="section"
+							name="sectionId"
+							value={formData.sectionId}
+							onChange={handleInputChange}
+						>
+							<option value="">Choose a section</option>
+							{sections.map((section) => (
+								<option
+									key={section.id}
+									className="capitalize"
+									value={section.id}>{section.title}</option>
+							))}
+						</Select>
 
-							<label htmlFor="section" className="block text-sm font-medium text-neutral-700 mb-2">
-								Section
-							</label>
-
-							<select
-								id="section"
-								name="sectionId"
-								value={formData.sectionId}
-								onChange={handleInputChange}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
-							>
-
-								<option value="">Choose a section</option>
-								{sections.map((section) => (
-									<option
-										key={section.id}
-										className="capitalize"
-										value={section.id}>{section.title}</option>
-								))}
-
-							</select>
-
-						</div>
-
-						<div>
-
-							<label htmlFor="section" className="block text-sm font-medium text-neutral-700 mb-2">
-								Collection
-							</label>
-
-							<div className="w-full h-auto flex items-center space-x-2">
-
-								<select
-									id="collection"
-									name="collectionId"
-									value={formData.collectionId}
-									onChange={handleInputChange}
-									disabled={!collections}
-									className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
-								>
-
-									<option value="">Choose a collection</option>
-									{collections?.map((collection) => (
-										<option
-											key={collection.id}
-											className="capitalize"
-											value={collection.id}>{collection.title}</option>
-									))}
-
-								</select>
-
-								<Link
-									href="/dashboard/gallery/new/collection"
-									title="Create new collection"
-									className="p-2 bg-neutral-200 text-neutral-500 rounded-full cursor-pointer"
-								>
-									<Plus />
-								</Link>
-
-							</div>
-
-						</div>
+						<Select
+							label="Collection"
+							id="collection"
+							name="collectionId"
+							value={formData.collectionId}
+							onChange={handleInputChange}
+							disabled={!collections}
+						>
+							<option value="">Choose a collection</option>
+							{collections?.map((collection) => (
+								<option
+									key={collection.id}
+									className="capitalize"
+									value={collection.id}>{collection.title}</option>
+							))}
+						</Select>
 
 					</div>
 

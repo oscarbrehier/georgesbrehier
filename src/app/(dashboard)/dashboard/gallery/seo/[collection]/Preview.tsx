@@ -37,7 +37,7 @@ export function SeoPreview({
 
 			</div>
 
-			<div className="max-w-md mt-4">
+			<div className="max-w-md mt-2">
 
 				<div className="bg-neutral-200 w rounded-md overflow-hidden">
 

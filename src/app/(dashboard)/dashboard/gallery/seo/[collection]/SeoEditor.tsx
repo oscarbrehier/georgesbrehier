@@ -102,7 +102,7 @@ export function SeoEditor({
 						<span>Back to form</span>
 					</button>
 
-					<div className="w-full grid grid-cols-2 gap-4">
+					<div className="w-full grid grid-cols-2 gap-8">
 
 						<ImageGallery
 							images={imageGallery}
