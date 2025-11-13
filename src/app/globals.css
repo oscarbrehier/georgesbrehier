@@ -50,6 +50,7 @@
 	body {
 		background-color: #f5f5f5;
 		color: var(--foreground);
+		scroll-behavior: smooth;
 	}
 }
 
@@ -60,6 +61,7 @@ html {
 	font-family: Arial, Helvetica, sans-serif;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	scroll-behavior: smooth;
 }
 
 html::-webkit-scrollbar,

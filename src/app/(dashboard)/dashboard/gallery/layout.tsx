@@ -13,14 +13,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 	const navItems = [
 		{ href: "/gallery", label: "gallery" },
-		{ href: "/gallery/upload", label: "upload" }
+		{ href: "/gallery/upload", label: "upload" },
+		{ href: "/gallery/seo", label: "seo" },
 	];
 
 	return (
 
-		<div className="min-h-screen w-full p-8 space-y-4 flex flex-col">
+		<div className="min-h-screen w-full px-8 pb-8 pt-10 flex flex-col">
 
-			<div className="h-10 flex space-x-10 border-b-[1px] border-neutral-200">
+			<div className="h-10 flex items-center px-8 space-x-10 border-b-[1px] border-neutral-200 fixed top-0 left-0 w-full bg-neutral-100 z-[70]">
 
 				{navItems.map((item) => {
 

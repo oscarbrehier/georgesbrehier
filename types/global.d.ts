@@ -16,14 +16,24 @@ declare global {
 		id: string;
 		title: string;
 		is_default: boolean;
-		slug?: string;
+		slug: string;
 	};
 	interface GalleryCollection {
 		id: string;
 		section_id: string;
 		title: string;
 		is_default: boolean;
-		slug?: string;
+		slug: string;
+		seo_title: string,
+		seo_description: string,
+		seo_og_image_url: string,
+		seo_og_image_width: number,
+		seo_og_image_height: number,
+		seo_og_image_alt: string,
+		seo_twitter_image_url: string,
+		seo_twitter_image_type: string,
+		seo_canonical_url: null,
+		seo_robots: string;
 	};
 	interface GalleryCollectionSEO {
 		seo_title: string,

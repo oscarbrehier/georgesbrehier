@@ -3,6 +3,8 @@ import { redirect, RedirectType } from "next/navigation";
 import { cache } from "react";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { Selector } from "./Selector";
+import { cn } from "@/utils/utils";
+import { roboto } from "@/utils/fonts";
 
 const getSections = cache(async () => {
 
@@ -22,21 +24,31 @@ const getSections = cache(async () => {
 
 });
 
-const getGalleryItems = cache(async (section: string) => {
+const getGalleryItems = cache(
+	async (section: string): Promise<GalleryItemWithCollection[] | null> => {
 
-	let query = supabase
-		.from("works")
-		.select("*");
+		let query = supabase
+			.from("works")
+			.select(`
+			id,
+			image_url,
+			collection:collections!inner (
+				id,
+				slug,
+				title
+			)	
+		`)
 
-	if (section !== "all") {
-		query.eq("section", section);
-	};
+		if (section !== "all") {
+			query.eq("section", section);
+		};
 
-	const res = await query;
+		const { error, data } = await query.returns<GalleryItemWithCollection[]>();
+		if (error || !data || data.length === 0) return null;
 
-	return res;
+		return data;
 
-});
+	});
 
 const getCollections = cache(async (section: string | null) => {
 
@@ -77,34 +89,70 @@ export default async function Page({
 		redirect(`/dashboard/gallery?section=all`, RedirectType.replace);
 	};
 
-	const { data: galleryItems, error } = await getGalleryItems(section);
+	const galleryItems = await getGalleryItems(section);
 
-	if (error || !collections) {
+	if (!galleryItems) {
 		return null;
 	};
 
+	const groupedGalleryItems = galleryItems.reduce<Record<string, GalleryItemWithCollection[]>>((acc, item) => {
+
+		const slug = item.collection.slug;
+		(acc[slug] ||= []).push(item);
+		return acc;
+
+	}, {});
 
 	return (
 
-		<div className="flex-1 w-full space-y-4">
+		<div className="h-auto min-h-screen w-full">
 
-			{sections && (
+			{(sections && collections) && (
 				<Selector sections={sections} current={section} collections={collections} />
 			)}
 
-			<div className="grid grid-cols-6 gap-4 mt-12">
+			<div className="pl-44 flex flex-col space-y-8 mt-4">
 
-				{galleryItems?.map((item) => (
+				{collections?.map((collection) => {
 
-					<div
-						key={item.id}
-					>
-						<img
-							src={item.image_url}
-						/>
-					</div>
+					const items = groupedGalleryItems[collection.slug];
+					if (!items) return null;
 
-				))}
+
+					return (
+
+						<section key={collection.slug} id={collection.slug} className="space-y-2 pt-4">
+							
+							<h2
+								className={cn(
+									"text-5xl text-black sticky top-10 bg-neutral-100 py-2",
+									roboto.className
+								)}
+							>
+								{collection.title}
+							</h2>
+
+							<div className="grid grid-cols-6 gap-4">
+
+								{items.map((item) => (
+
+									<div
+										key={item.id}
+										className="bg-neutral-200 flex items-center"
+									>
+
+										<img src={item.image_url} />
+
+									</div>
+
+								))}
+
+							</div>
+
+						</section>
+
+					);
+				})}
 
 			</div>
 

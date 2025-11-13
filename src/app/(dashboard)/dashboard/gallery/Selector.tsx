@@ -15,11 +15,23 @@ export function Selector({
 
 	if (!sections) return;
 
+	function scrollTo(collection: string) {
+
+		if (!document) return ;
+
+		const target = document.getElementById(collection);
+
+		if (target) {
+			target.scrollIntoView({ behavior: "smooth" });
+		};
+
+	};
+
 	return (
 
-		<div className="h-auto w-full flex flex-col space-y-4">
+		<div className="h-full w-44 bg-neutral-100 flex flex-col fixed space-y-6 top-18 pr-8">
 
-			<div className="space-x-10 border-[1px]">
+			<div className="space-y-2 flex flex-col">
 
 				{sections.map((section, idx) => (
 
@@ -37,14 +49,16 @@ export function Selector({
 
 			</div>
 
-			<div className="flex items-center space-x-10">
+			<div className="bg-neutral-300 h-[1px] w-full" />
 
-				<div className="bg-black h-[1px] w-32 w" />
+			<div className="flex items-start flex-col w-full space-y-2">
 
-				{collections.map((collection) => (
+				{collections.map((collection, idx) => (
 
 					<button
-						className="text-black"
+						onClick={() => scrollTo(collection.title)}
+						key={`${collection.title}-${idx}`}
+						className="text-black cursor-pointer"
 					>
 						{collection.title}
 					</button>
