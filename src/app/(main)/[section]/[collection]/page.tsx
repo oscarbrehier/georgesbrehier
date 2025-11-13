@@ -44,10 +44,22 @@ export async function generateMetadata(
 	parent: ResolvingMetadata
 ) {
 
+	"use cache"
+
 	const { section, collection } = await params;
 
 	const baseTitle = `${capitalize(section)} - ${capitalize(collection)}`;
 	const url = `/${section}/${collection}`;
+
+	const imageUrl = await fetchSupabase(
+		"collections",
+		{ "slug": collection },
+		`
+			slug,
+			seo_og_image_url
+		`,
+		true
+	);
 
 	return {
 		title: `${baseTitle} | Georges Bréhier`,
@@ -55,7 +67,7 @@ export async function generateMetadata(
 		openGraph: {
 			title: baseTitle,
 			description: "",
-			url,
+			url: imageUrl ?? null,
 			siteName: "Georges Bréhier",
 			type: "website",
 			locale: "en_US"

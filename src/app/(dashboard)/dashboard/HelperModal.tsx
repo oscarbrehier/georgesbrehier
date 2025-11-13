@@ -50,7 +50,7 @@ export function HelperModal() {
 
 					<div ref={modalRef} className="bg-neutral-900 rounded-xl p-2">
 
-						<div className="min-w-32 pr-8 hover:bg-neutral-800 rounded-lg p-2 cursor-pointer flex items-center space-x-2">
+						{/* <div className="min-w-32 pr-8 hover:bg-neutral-800 rounded-lg p-2 cursor-pointer flex items-center space-x-2">
 
 							<UserPen size={16} />
 
@@ -60,7 +60,7 @@ export function HelperModal() {
 								Change password
 							</button>
 
-						</div>
+						</div> */}
 
 						<form
 							action="/api/auth/signout"
