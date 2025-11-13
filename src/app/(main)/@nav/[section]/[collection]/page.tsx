@@ -37,8 +37,6 @@ export async function NavContent({ params }: Props) {
 
 	const sorted = collections.sort((a, b) => Number(b.is_default) - Number(a.is_default));
 
-	console.log(sorted)
-
 	return (
 
 		<CollectionNav

@@ -70,7 +70,6 @@ export default async function Page({
 	let section = Array.isArray(params.section) ? params.section[0] : params.section;
 
 	const collections = await getCollections(section ?? null);
-	console.log(collections);
 
 	const sections = await getSections();
 

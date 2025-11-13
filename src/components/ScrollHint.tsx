@@ -42,7 +42,7 @@ export function ScrollHint() {
 	const hint = (
 
 		<div
-			className={`fixed bottom-8 right-8 z-[70] flex items-center justify-around rounded-full bg-neutral-700 p-3 text-white transition-all duration-500 ${isHiding ? "opacity-0 scale-95" : "opacity-100 animate-float"
+			className={`fixed bottom-8 right-8 z-[70] lg:flex hidden items-center justify-around rounded-full bg-neutral-700 p-3 text-white transition-all duration-500 ${isHiding ? "opacity-0 scale-95" : "opacity-100 animate-float"
 				}`}
 		>
 			<ArrowDown />

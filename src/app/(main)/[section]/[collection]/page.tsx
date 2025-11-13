@@ -103,9 +103,6 @@ async function getDefaultCollection(sectionId: string): Promise<GalleryCollectio
 
 async function getSection(slug: string): Promise<GallerySection | null> {
 
-	"use cache"
-	cacheTag(`section-${slug}`);
-
 	let sections = await fetchSupabase<GallerySection>(
 		"sections",
 		{ slug },
