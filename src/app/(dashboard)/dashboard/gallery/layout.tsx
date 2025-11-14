@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { cn } from "@/utils/utils";
 import { usePathname } from "next/navigation";
-import { LogOutBtn } from "./LogOutBtn";
+import { AuthNav } from "./AuthNav";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 
@@ -50,7 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 				<div>
 
-					<LogOutBtn />
+					<AuthNav />
 
 				</div>
 

@@ -38,13 +38,13 @@ export async function updateSession(request: NextRequest) {
 
 	if (
 		!user &&
-		!request.nextUrl.pathname.startsWith('/dashboard/login') &&
+		!request.nextUrl.pathname.startsWith('/dashboard/auth/login') &&
 		!request.nextUrl.pathname.startsWith('/dashboard/auth') &&
 		!request.nextUrl.pathname.startsWith('/dashboard/error')
 	) {
 
 		const url = request.nextUrl.clone();
-		url.pathname = "/dashboard/login";
+		url.pathname = "/dashboard/auth/login";
 		
 		return NextResponse.redirect(url);
 
