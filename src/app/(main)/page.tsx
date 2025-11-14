@@ -1,35 +1,25 @@
 import { fetchSupabase } from '@/utils/supabase/fetchSupabase';
 import { notFound, redirect } from 'next/navigation';
 import { Metadata } from 'next';
-import { getBaseUrl } from '@/utils/seo';
+import { baseSeo, getBaseUrl } from '@/utils/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
 
 	"use cache"
 
-	const defaultSection = await fetchSupabase<GallerySection>(
-		"sections",
-		{ is_default: true },
-		`
-			slug,
-			title
-		`,
-		true
-	);
-
 	const url = getBaseUrl();
-	const title = "Georges Bréhier - Portfolio";
-	const description = "Portfolio of Georges Bréhier - Visual artist and photographer showcasing collections of artwork and photography.";
+	const title = "Portfolio";
+	const description = baseSeo.description;
 
 	return {
 		title,
 		description,
-		keywords: ["Georges Bréhier", "art", "photography", "portfolio", "visual artist"],
+		keywords: [baseSeo.name, "art", "portfolio"],
 		openGraph: {
 			title,
 			description,
 			url,
-			siteName: "Georges Bréhier",
+			siteName: baseSeo.name,
 			type: "website",
 			locale: "en_US"
 		},
