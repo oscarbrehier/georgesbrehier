@@ -1,4 +1,3 @@
-import { cn } from "@/utils/utils";
 import Image from "next/image";
 
 export function GalleryMarkup({
@@ -20,20 +19,21 @@ export function GalleryMarkup({
 
 					<div
 						data-itemid={item.id}
-						className={cn(
-							"relative transition-all duration-75 ease-in-out w-3/4 h-[80%]",
-							// selected === item.id ? "w-full h-full" : "w-3/4 h-[80%]"
-						)}
+						className="relative transition-all duration-75 ease-in-out w-3/4 h-[80%]"
 					>
 						<Image
 							src={item.image_url}
-							alt={item.title}
+							alt={item.description || item.title}
 							fill
 							className="gallery-image cursor-pointer object-contain"
 							loading={idx < 3 ? "eager" : "lazy"}
-						// onClick={() => toggleSelected(item.id)}
+
 						/>
 					</div>
+
+					{item.title && (
+						<figcaption className="sr-only">{item.title}</figcaption>
+					)}
 
 				</figure>
 

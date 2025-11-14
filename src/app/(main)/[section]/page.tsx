@@ -1,5 +1,8 @@
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { notFound, redirect } from "next/navigation";
+import { Metadata } from "next";
+import { baseSeo, getFullUrl } from "@/utils/seo";
+import { capitalize } from "@/utils/capitalize";
 
 export async function generateStaticParams() {
 
@@ -16,6 +19,60 @@ export async function generateStaticParams() {
 	}));
 
 }
+
+export async function generateMetadata({
+	params
+}: {
+	params: Promise<{ section: string }>
+}): Promise<Metadata> {
+
+	"use cache"
+
+	const { section: sectionSlug } = await params;
+
+	const section = await fetchSupabase<GallerySection>(
+		"sections",
+		{ slug: sectionSlug },
+		"*",
+		true
+	);
+
+	if (!section) {
+
+		return {
+			title: `${capitalize(sectionSlug)}`,
+		};
+
+	};
+
+	const url = getFullUrl(`/${sectionSlug}`);
+	const title = capitalize(section.title);
+	const description = ``;
+
+	return {
+		title,
+		description,
+		keywords: [sectionSlug, section.title, baseSeo.name, "art", "portfolio"],
+		openGraph: {
+			title: section.title,
+			description,
+			url,
+			siteName: baseSeo.name,
+			type: "website",
+			locale: "en_US"
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: section.title,
+			description
+		},
+		robots: {
+			index: true,
+			follow: true
+		}
+	};
+
+};
 
 export default async function Page({
 	params

@@ -1,7 +1,5 @@
 "use client"
 
-import { authenticateAdmin } from "@/app/actions/authenticateAdmin";
-import { useState } from "react";
 import { login } from "./actions";
 
 export default function Page() {

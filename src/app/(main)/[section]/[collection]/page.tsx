@@ -7,6 +7,8 @@ import { ScrollHint } from "@/components/ScrollHint";
 import { cacheTag } from "next/cache";
 import VerticalGallery from "@/components/vertical_gallery/Gallery";
 import GalleryWrapper from "@/components/gallery/GalleryWrapper";
+import Script from "next/script";
+import { baseSeo, getFullUrl } from "@/utils/seo";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -46,42 +48,103 @@ export async function generateMetadata(
 
 	const { section, collection } = await params;
 
-	const baseTitle = `${capitalize(section)} - ${capitalize(collection)}`;
 	const url = `/${section}/${collection}`;
+	const fullUrl = getFullUrl(url);
 
-	const collectionData = await fetchSupabase(
+	const collectionData = await fetchSupabase<GalleryCollectionWithSection>(
 		"collections",
 		{ "slug": collection },
 		`
+			id,
 			slug,
-			seo_og_image_url
+			title,
+			seo_title,
+			seo_description,
+			seo_og_image_url,
+			seo_og_image_width,
+			seo_og_image_height,
+			seo_og_image_alt,
+			seo_twitter_image_url,
+			seo_twitter_image_type,
+			seo_canonical_url,
+			seo_robots,
+			section:sections!inner (
+				id,
+				slug,
+				title
+			)
 		`,
 		true
 	);
 
+	if (!collectionData) {
+
+		return {
+			title: `${capitalize(section)} - ${capitalize(collection)}`,
+		};
+
+	};
+
+	const robotsValue = collectionData.seo_robots || "index, follow";
+
+	const [index, follow] = robotsValue.split(", ").map(v => v.trim());
+
+	const robots = {
+		index: index === "index",
+		follow: follow === "follow",
+		googleBot: {
+			index: index === "index",
+			follow: follow === "follow",
+		}
+	};
+
+	const title = capitalize(collectionData.seo_title) || `${capitalize(collectionData.title)} - ${capitalize(collectionData.section?.title)}`;
+	const description = collectionData.seo_description || baseSeo.description;
+
+	const ogImages = [];
+
+	if (collectionData.seo_og_image_url) {
+
+		ogImages.push({
+			url: collectionData.seo_og_image_url,
+			width: collectionData.seo_og_image_width || 1200,
+			height: collectionData.seo_og_image_height || 630,
+			alt: collectionData.seo_og_image_alt || title,
+		});
+
+	};
+
+	const twitterImages = collectionData.seo_twitter_image_url 
+		? [collectionData.seo_twitter_image_url]
+		: collectionData.seo_og_image_url 
+		? [collectionData.seo_og_image_url]
+		: [];
+
+	console.log(ogImages)
+
 	return {
-		title: `${baseTitle} | Georges Bréhier`,
-		description: "",
+		title: `${title}`,
+		description,
+		keywords: [section, collection, collectionData.title, baseSeo.name, "art", "portfolio"],
 		openGraph: {
-			title: baseTitle,
-			description: "",
-			url,
-			siteName: "Georges Bréhier",
+			title,
+			description,
+			url: fullUrl,
+			siteName: baseSeo.name,
 			type: "website",
 			locale: "en_US",
-			images: collectionData.seo_og_image_url ? [collectionData.seo_og_image_url] : []
+			images: ogImages.length > 0 ? ogImages : undefined
 		},
 		twitter: {
-			card: "summary_large_image",
-			title: baseTitle,
-			description: "",
-
+			card: (collectionData.seo_twitter_image_type as "summary" | "summary_large_image") || "summary_large_image",
+			title,
+			description,
+			images: twitterImages.length > 0 ? twitterImages : undefined
 		},
-		robots: {
-			index: true,
-			follow: true
-		},
-		keywords: [section, collection, "Georges Bréhier"]
+		robots,
+		alternates: {
+			canonical: collectionData.seo_canonical_url || fullUrl
+		}
 	};
 
 };
@@ -163,7 +226,8 @@ export default async function Page({
 			is_default,
 			section:sections!inner (
 				id,
-				slug
+				slug,
+				title
 			)
 		`,
 		true
@@ -183,9 +247,42 @@ export default async function Page({
 
 	cacheTag(`gallery-items-collection-${collection.id}`);
 
+	const fullUrl = getFullUrl(`/${section.slug}/${collection.slug}`);
+	
+	const structeredData = {
+		"@context": "https://schema.org",
+		"@type": "ImageGallery",
+		"name": `${collection.title} - ${section.title}`,
+		"description": `Gallery collection: ${collection.title} by Georges Bréhier`,
+		"url": fullUrl,
+		"author": {
+			"@type": "Person",
+			"name": "Georges Bréhier"
+		},
+		"datePublished": galleryItems.length > 0 ? galleryItems[0].created_at : undefined,
+		"dateModified": galleryItems.length > 0 ? galleryItems[galleryItems.length - 1].created_at : undefined,
+		"image": galleryItems.map((image: GalleryItem) => ({
+			"@type": "ImageObject",
+			"contentUrl": image.image_url,
+			"name": image.title,
+			"description": image.description || image.title,
+			"datePublished": image.created_at,
+			"author": { 
+				"@type": "Person", 
+				"name": "Georges Bréhier" 
+			}
+		}))
+	};
+
 	return (
 
 		<>
+
+			<Script
+				id="gallery-jsonld"
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(structeredData) }}
+			/>
 
 			<main>
 

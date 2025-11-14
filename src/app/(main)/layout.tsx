@@ -20,7 +20,7 @@ export default function Layout({
 					<span>bréhier</span>
 				</h1>
 
-				<nav className='lg:w-full w-auto lg:mt-20'>
+				<nav className='lg:w-full w-auto lg:mt-20' aria-label="Main navigation">
 
 					{nav}
 
@@ -33,7 +33,6 @@ export default function Layout({
 			</Suspense>
 
 		</>
-
 	);
 
 };

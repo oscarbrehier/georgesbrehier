@@ -8,17 +8,25 @@ export default async function VerticalGallery({ images }: { images: GalleryItem[
 
 			{images.map((image, idx) => (
 
-				<div key={`${image.id}-${idx}`} className="max-w-xl">
+				<figure
+					key={`${image.id}-${idx}`}
+					className="max-w-xl"
+				>
 
 					<Image
 						src={image.image_url}
+						alt={image.title}
 						width={600}
 						height={800}
-						alt={image.title}
 						className="w-full h-auto"
+						loading={idx < 3 ? "eager" : "lazy"}
 					/>
 
-				</div>
+					{image.title && (
+						<figcaption className="text-black mt-1 sr-only">{image.title}</figcaption>
+					)}
+
+				</figure>
 
 			))}
 

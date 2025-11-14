@@ -2,7 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { roboto } from "@/utils/fonts";
+
+import { baseSeo, getBaseUrl } from "@/utils/seo";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -14,34 +15,46 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
-const name = "Georges Bréhier";
-const description = "";
-const url = "";
+const name = baseSeo.name;
+const description = baseSeo.description;
+const url = getBaseUrl();
 
 export const metadata: Metadata = {
-	title: name,
+	metadataBase: url ? new URL(url) : undefined,
+	title: {
+		default: name,
+		template: `%s | ${name}`
+	},
 	description: description,
 	authors: [{ name }],
+	creator: name,
+	publisher: name,
 	openGraph: {
 		title: name,
 		description,
 		url,
 		siteName: `${name} Portfolio`,
-		images: [
-			{
-				url: '',
-				width: 0,
-				height: 0
-			}
-		],
-		locale: "en_EN",
+		locale: "en_US",
 		type: "website"
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: `${name} - Portfolio`,
-		description,
-		images: []
+		title: name,
+		description
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			'max-video-preview': -1,
+			'max-image-preview': 'large',
+			'max-snippet': -1,
+		}
+	},
+	verification: {
+		// google: 'code',
 	}
 };
 
@@ -63,6 +76,6 @@ export default function RootLayout({
 			</body>
 		</html>
 
-	)
+	);
 
-}
+};
