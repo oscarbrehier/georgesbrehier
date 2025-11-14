@@ -1,14 +1,12 @@
 import { getGalleryItems } from "@/utils/supabase/getGalleryItems";
 import { notFound, redirect } from "next/navigation";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
-import { Metadata, ResolvingMetadata } from "next";
+import { ResolvingMetadata } from "next";
 import { capitalize } from "@/utils/capitalize";
 import { ScrollHint } from "@/components/ScrollHint";
 import { cacheTag } from "next/cache";
-import dynamic from "next/dynamic";
-
-const Gallery = dynamic(() => import("@/components/gallery/Gallery"));
-const VerticalGallery = dynamic(() => import("@/components/vertical_gallery/Gallery"), { ssr: true });
+import VerticalGallery from "@/components/vertical_gallery/Gallery";
+import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -67,10 +65,11 @@ export async function generateMetadata(
 		openGraph: {
 			title: baseTitle,
 			description: "",
-			url: collectionData.seo_og_image_url ?? null,
+			url,
 			siteName: "Georges Bréhier",
 			type: "website",
-			locale: "en_US"
+			locale: "en_US",
+			images: collectionData.seo_og_image_url ? [collectionData.seo_og_image_url] : []
 		},
 		twitter: {
 			card: "summary_large_image",
@@ -192,7 +191,7 @@ export default async function Page({
 
 				<ScrollHint />
 
-				<Gallery items={galleryItems} />
+				<GalleryWrapper items={galleryItems} />
 				<VerticalGallery images={galleryItems} />
 
 			</main>
