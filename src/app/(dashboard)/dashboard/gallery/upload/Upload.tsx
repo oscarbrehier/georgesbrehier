@@ -416,6 +416,7 @@ export function Upload({
 							value={formData.collectionId}
 							onChange={handleInputChange}
 							disabled={!collections}
+							sublabel={<a href="/dashboard/gallery/new/collection" className="underline cursor-pointer w">Create a new collection</a>}
 						>
 							<option value="">Choose a collection</option>
 							{collections?.map((collection) => (

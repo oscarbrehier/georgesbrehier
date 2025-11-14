@@ -15,40 +15,43 @@ export function GalleryAnimator({
 
 	useEffect(() => {
 
-		const container = document.getElementById("gallery-container");
-		if (!container) return;
+		const mm = gsap.matchMedia();
 
-		const sections = gsap.utils.toArray<HTMLElement>(".panel");
+		mm.add("(min-width: 1024px)", () => {
 
-		const totalWidth = sections.reduce((acc: number, section) => {
-			return acc + (section as HTMLElement).offsetWidth;
-		}, 0);
+			const container = document.getElementById("gallery-container");
+			if (!container) return;
+
+			const sections = gsap.utils.toArray<HTMLElement>(".panel");
+
+			const totalWidth = sections.reduce((acc: number, section) => {
+				return acc + (section as HTMLElement).offsetWidth;
+			}, 0);
 
 
-		const panelWidth = sections[0].offsetWidth;
-		const imageWidth = panelWidth * 0.75;
-		const imageInsetLeft = (panelWidth - imageWidth) / 2;
-		const imageRight = imageInsetLeft + imageWidth;
-		const endPadding = (window.innerWidth / 2) - imageRight + imageWidth;
+			const panelWidth = sections[0].offsetWidth;
+			const imageWidth = panelWidth * 0.75;
+			const imageInsetLeft = (panelWidth - imageWidth) / 2;
+			const imageRight = imageInsetLeft + imageWidth;
+			const endPadding = (window.innerWidth / 2) - imageRight + imageWidth;
 
-		const scrollDistance = totalWidth - window.innerWidth + leftMargin + endPadding;
+			const scrollDistance = totalWidth - window.innerWidth + leftMargin + endPadding;
 
-		const animation = gsap.to(sections, {
-			x: () => -scrollDistance,
-			ease: "none",
-			scrollTrigger: {
-				trigger: container,
-				pin: true,
-				scrub: 1,
-				end: () => "+=" + scrollDistance
-			}
+			const animation = gsap.to(sections, {
+				x: () => -scrollDistance,
+				ease: "none",
+				scrollTrigger: {
+					trigger: container,
+					pin: true,
+					scrub: 1,
+					end: () => "+=" + scrollDistance
+				}
+			});
+			
 		});
 
 		return () => {
-			document.documentElement.classList.remove('hide-scrollbar');
-			document.body.classList.remove('hide-scrollbar');
-			animation.kill();
-			ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+			mm.revert();
 		};
 
 	}, [items]);
@@ -62,15 +65,15 @@ export function GalleryAnimator({
 
 			const target = event.currentTarget as HTMLElement;
 			const id = target.dataset.itemid;
-			
+
 			if (id === selectedId) {
-				
+
 				clearSelected();
 				selectedId = null;
-				return ;
-				
+				return;
+
 			};
-			
+
 			clearSelected();
 			target.classList.add("w-full", "h-full");
 			selectedId = id ?? null;
@@ -92,7 +95,6 @@ export function GalleryAnimator({
 		};
 
 	}, [items]);
-
 
 	return null;
 

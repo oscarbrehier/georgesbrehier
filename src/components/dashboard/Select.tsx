@@ -5,7 +5,7 @@ type InputProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
 	id: string;
 	// options: { title: string; value?: string; id?: string }[];
 	children: React.ReactNode;
-	sublabel?: string;
+	sublabel?: string | React.ReactNode;
 };
 
 export function Select({
