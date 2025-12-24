@@ -1,56 +1,14 @@
-import { fetchSupabase } from '@/utils/supabase/fetchSupabase';
-import { notFound, redirect } from 'next/navigation';
-import { Metadata } from 'next';
-import { baseSeo, getBaseUrl } from '@/utils/seo';
+import { notFound, redirect } from 'next/navigation'
+import { getCachedDefaultSection } from '@/utils/supabase/sections'
 
-export async function generateMetadata(): Promise<Metadata> {
+export default async function Home() {
 
-	"use cache"
+	const defaultSection = await getCachedDefaultSection();
 
-	const url = getBaseUrl();
-	const title = "Portfolio";
-	const description = baseSeo.description;
+	if (defaultSection?.slug) {
+		redirect(`/${defaultSection.slug}`)
+	}
 
-	return {
-		title,
-		description,
-		keywords: [baseSeo.name, "art", "portfolio"],
-		openGraph: {
-			title,
-			description,
-			url,
-			siteName: baseSeo.name,
-			type: "website",
-			locale: "en_US"
-		},
-		twitter: {
-			card: "summary_large_image",
-			title,
-			description
-		},
-		robots: {
-			index: true,
-			follow: true
-		}
-	};
-
-}
-
-export default async function Page() {
-
-	"use cache"
-
-	const defaultSection = await fetchSupabase<GallerySection>(
-		"sections",
-		{ is_default: true },
-		`
-			slug
-		`,
-		true
-	);
-
-	if (!defaultSection) return notFound();
-
-	redirect(`/${defaultSection.slug}`);
+	return notFound();
 
 };

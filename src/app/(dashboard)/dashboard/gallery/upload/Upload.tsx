@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react";
-import { getCollectionsBySectionId } from "@/utils/supabase/getCollection";
+import { getCollectionsBySectionId } from "@/utils/supabase/collections";
 import Link from "next/link";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
@@ -416,6 +416,7 @@ export function Upload({
 							value={formData.collectionId}
 							onChange={handleInputChange}
 							disabled={!collections}
+							sublabel={<a href="/dashboard/gallery/new/collection" className="underline cursor-pointer w">Create a new collection</a>}
 						>
 							<option value="">Choose a collection</option>
 							{collections?.map((collection) => (

@@ -21,3 +21,4 @@ export const baseSeo = {
 	name: "Georges Bréhier",
 	description: ""
 };
+

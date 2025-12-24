@@ -1,7 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
-import { cacheTag } from "next/cache";
+import { cacheTag, unstable_cache } from "next/cache";
 
 export async function getCollectionsBySection(selector: string, value: string): Promise<GalleryCollection | null> {
 
@@ -47,3 +47,32 @@ export async function getCollectionsBySectionId(sectionId: string): Promise<Gall
 	return data;
 
 };
+
+export async function getDefaultCollection(sectionId: string): Promise<GalleryCollection | null> {
+
+	if (!sectionId) return null;
+
+	const { data, error } = await supabase
+		.from("collections")
+		.select("*")
+		.eq("section_id", sectionId)
+		.eq("is_default", true)
+		.single();
+
+	if (error) {
+		console.error("Error fetching default collection:", error);
+		return null;
+	};
+
+	return data;
+
+};
+
+export const getCachedDefaultCollection = unstable_cache(
+	async (sectionId: string) => getDefaultCollection(sectionId),
+	['default-collection'],
+	{
+		tags: ['collections'],
+		revalidate: 3600
+	}
+);
