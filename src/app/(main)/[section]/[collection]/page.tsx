@@ -9,6 +9,7 @@ import VerticalGallery from "@/components/vertical_gallery/Gallery";
 import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
+import { getCollectionMetadata } from "@/utils/supabase/collections";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -44,40 +45,14 @@ export async function generateMetadata(
 	parent: ResolvingMetadata
 ) {
 
-	"use cache"
-
 	const { section, collection } = await params;
 
 	const url = `/${section}/${collection}`;
 	const fullUrl = getFullUrl(url);
 
-	const collectionData = await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ "slug": collection },
-		`
-			id,
-			slug,
-			title,
-			seo_title,
-			seo_description,
-			seo_og_image_url,
-			seo_og_image_width,
-			seo_og_image_height,
-			seo_og_image_alt,
-			seo_twitter_image_url,
-			seo_twitter_image_type,
-			seo_canonical_url,
-			seo_robots,
-			section:sections!inner (
-				id,
-				slug,
-				title
-			)
-		`,
-		true
-	);
+	const metadata = await getCollectionMetadata(collection);
 
-	if (!collectionData) {
+	if (!metadata) {
 
 		return {
 			title: `${capitalize(section)} - ${capitalize(collection)}`,
@@ -85,7 +60,7 @@ export async function generateMetadata(
 
 	};
 
-	const robotsValue = collectionData.seo_robots || "index, follow";
+	const robotsValue = metadata.seo_robots || "index, follow";
 
 	const [index, follow] = robotsValue.split(", ").map(v => v.trim());
 
@@ -98,34 +73,34 @@ export async function generateMetadata(
 		}
 	};
 
-	const title = capitalize(collectionData.seo_title) || `${capitalize(collectionData.title)} - ${capitalize(collectionData.section?.title)}`;
-	const description = collectionData.seo_description || baseSeo.description;
+	const title = capitalize(metadata.seo_title) || `${capitalize(metadata.title)} - ${capitalize(metadata.section?.title)}`;
+	const description = metadata.seo_description || baseSeo.description;
 
 	const ogImages = [];
 
-	if (collectionData.seo_og_image_url) {
+	if (metadata.seo_og_image_url) {
 
 		ogImages.push({
-			url: collectionData.seo_og_image_url,
-			width: collectionData.seo_og_image_width || 1200,
-			height: collectionData.seo_og_image_height || 630,
-			alt: collectionData.seo_og_image_alt || title,
+			url: metadata.seo_og_image_url,
+			width: metadata.seo_og_image_width || 1200,
+			height: metadata.seo_og_image_height || 630,
+			alt: metadata.seo_og_image_alt || title,
 		});
 
 	};
 
-	const twitterImages = collectionData.seo_twitter_image_url 
-		? [collectionData.seo_twitter_image_url]
-		: collectionData.seo_og_image_url 
-		? [collectionData.seo_og_image_url]
-		: [];
+	const twitterImages = metadata.seo_twitter_image_url
+		? [metadata.seo_twitter_image_url]
+		: metadata.seo_og_image_url
+			? [metadata.seo_og_image_url]
+			: [];
 
 	console.log(ogImages)
 
 	return {
 		title: `${title}`,
 		description,
-		keywords: [section, collection, collectionData.title, baseSeo.name, "art", "portfolio"],
+		keywords: [section, collection, metadata.title, baseSeo.name, "art", "portfolio"],
 		openGraph: {
 			title,
 			description,
@@ -136,14 +111,14 @@ export async function generateMetadata(
 			images: ogImages.length > 0 ? ogImages : undefined
 		},
 		twitter: {
-			card: (collectionData.seo_twitter_image_type as "summary" | "summary_large_image") || "summary_large_image",
+			card: (metadata.seo_twitter_image_type as "summary" | "summary_large_image") || "summary_large_image",
 			title,
 			description,
 			images: twitterImages.length > 0 ? twitterImages : undefined
 		},
 		robots,
 		alternates: {
-			canonical: collectionData.seo_canonical_url || fullUrl
+			canonical: metadata.seo_canonical_url || fullUrl
 		}
 	};
 
@@ -248,7 +223,7 @@ export default async function Page({
 	cacheTag(`gallery-items-collection-${collection.id}`);
 
 	const fullUrl = getFullUrl(`/${section.slug}/${collection.slug}`);
-	
+
 	const structeredData = {
 		"@context": "https://schema.org",
 		"@type": "ImageGallery",
@@ -267,9 +242,9 @@ export default async function Page({
 			"name": image.title,
 			"description": image.description || image.title,
 			"datePublished": image.created_at,
-			"author": { 
-				"@type": "Person", 
-				"name": "Georges Bréhier" 
+			"author": {
+				"@type": "Person",
+				"name": "Georges Bréhier"
 			}
 		}))
 	};

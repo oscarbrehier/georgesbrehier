@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase";
 import { cacheTag, unstable_cache } from "next/cache";
+import { fetchSupabase } from "./fetchSupabase";
 
 export async function getCollectionsBySection(selector: string, value: string): Promise<GalleryCollection | null> {
 
@@ -76,3 +77,36 @@ export const getCachedDefaultCollection = unstable_cache(
 		revalidate: 3600
 	}
 );
+
+export async function getCollectionMetadata(collection: string): Promise<GalleryCollectionWithSection | null> {
+
+	"use cache"
+	cacheTag(`collection-metadata-${collection}`);
+
+	return await fetchSupabase<GalleryCollectionWithSection>(
+		"collections",
+		{ "slug": collection },
+		`
+			id,
+			slug,
+			title,
+			seo_title,
+			seo_description,
+			seo_og_image_url,
+			seo_og_image_width,
+			seo_og_image_height,
+			seo_og_image_alt,
+			seo_twitter_image_url,
+			seo_twitter_image_type,
+			seo_canonical_url,
+			seo_robots,
+			section:sections!inner (
+				id,
+				slug,
+				title
+			)
+		`,
+		true
+	);
+
+};

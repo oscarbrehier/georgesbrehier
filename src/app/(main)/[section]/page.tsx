@@ -5,17 +5,18 @@ import { getCachedDefaultCollection } from '@/utils/supabase/collections'
 export default async function SectionPage({
 	params,
 }: {
-	params: { section: string }
+	params: Promise<{ section: string }>
 }) {
 
+	const { section } = await params;
 	const defaultSection = await getCachedDefaultSection();
 
-	if (defaultSection?.slug === params.section) {
+	if (defaultSection?.slug === section) {
 
 		const defaultCollection = await getCachedDefaultCollection(defaultSection.id);
 
 		if (defaultCollection?.slug) {
-			redirect(`/${params.section}/${defaultCollection.slug}`);
+			redirect(`/${section}/${defaultCollection.slug}`);
 		};
 		
 	};
