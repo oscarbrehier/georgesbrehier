@@ -13,11 +13,6 @@ export function CollectionNav({
 	section: string
 }) {
 
-	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, title: string) => {
-		e.preventDefault();
-		window.location.href = `/${section}/${title}`;
-	};
-
 	return (
 
 		<ul>
@@ -27,11 +22,10 @@ export function CollectionNav({
 				<li key={collection.id}>
 
 					<Link
-						href={`/${section}/${collection.title}`}
-						onClick={(e) => handleClick(e, collection.title)}
+						href={`/${section}/${collection.slug}`}
 						className={cn(
 							"capitalize",
-							collection.title === currentCollection ? "text-black" : "text-neutral-600 hover:text-black"
+							collection.slug === currentCollection ? "text-black" : "text-neutral-600 hover:text-black"
 						)}
 					>
 						{collection.title}

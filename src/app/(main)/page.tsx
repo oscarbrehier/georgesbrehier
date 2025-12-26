@@ -1,9 +1,9 @@
 import { notFound, redirect } from 'next/navigation'
-import { getCachedDefaultSection } from '@/utils/supabase/sections'
+import { getDefaultSection } from '@/utils/supabase/sections'
 
 export default async function Home() {
 
-	const defaultSection = await getCachedDefaultSection();
+	const defaultSection = await getDefaultSection();
 
 	if (defaultSection?.slug) {
 		redirect(`/${defaultSection.slug}`)

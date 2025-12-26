@@ -1,21 +1,29 @@
 import { supabase } from "@/lib/supabase";
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
+import { fetchSupabase } from "./fetchSupabase";
 
-export async function getSectionBy(selector: string, value: string): Promise<GallerySection | null> {
+export async function getSection(slug: string): Promise<GallerySection | null> {
 
-	if (!selector || !value) return null;
+	"use cache"
+	cacheTag(`section-slug-${slug}`);
+	cacheLife("hours");
 
-	const { data, error } = await supabase
-		.from("sections")
-		.select("*")
-		.eq(selector, value);
+	let sections = await fetchSupabase<GallerySection>(
+		"sections",
+		{ slug },
+		"*",
+		true
+	);
 
-	if (error || data.length === 0) return null;
-	return data[0];
- 
+	return sections;
+
 };
 
 export async function getDefaultSection(): Promise<GallerySection | null> {
+
+	"use cache"
+	cacheTag(`default-section`);
+	cacheLife("hours");
 
 	const { data, error } = await supabase
 		.from("sections")
@@ -31,12 +39,3 @@ export async function getDefaultSection(): Promise<GallerySection | null> {
 	return data;
 
 };
-
-export const getCachedDefaultSection = unstable_cache(
-	async () => getDefaultSection(),
-	['default-section'],
-	{
-		tags: ['sections'],
-		revalidate: 3600
-	}
-);

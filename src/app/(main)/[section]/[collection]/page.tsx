@@ -4,12 +4,12 @@ import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { ResolvingMetadata } from "next";
 import { capitalize } from "@/utils/capitalize";
 import { ScrollHint } from "@/components/ScrollHint";
-import { cacheTag } from "next/cache";
 import VerticalGallery from "@/components/vertical_gallery/Gallery";
 import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
-import { getCollectionMetadata } from "@/utils/supabase/collections";
+import { getCollectionMetadata, getDefaultCollectionBySectionId } from "@/utils/supabase/collections";
+import { getDefaultSection, getSection } from "@/utils/supabase/sections";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -95,8 +95,6 @@ export async function generateMetadata(
 			? [metadata.seo_og_image_url]
 			: [];
 
-	console.log(ogImages)
-
 	return {
 		title: `${title}`,
 		description,
@@ -124,103 +122,33 @@ export async function generateMetadata(
 
 };
 
-async function getDefaultCollection(sectionId: string): Promise<GalleryCollectionWithSection | null> {
-
-	"use cache"
-
-	cacheTag(`default-collection-${sectionId}`);
-
-	const collection = await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ section_id: sectionId, is_default: true },
-		`
-				id,
-				slug,
-				title,
-				is_default,
-				section:sections!inner (
-					id,
-					slug
-				)
-				`,
-		true
-	);
-
-	return collection;
-
-};
-
-async function getSection(slug: string): Promise<GallerySection | null> {
-
-	let sections = await fetchSupabase<GallerySection>(
-		"sections",
-		{ slug },
-		"*",
-		true
-	);
-
-	return sections;
-
-};
-
 export default async function Page({
 	params
 }: Props) {
 
-	"use cache"
-
 	const { section: sectionSlug, collection: collectionSlug } = await params;
 
 	let section = await getSection(sectionSlug);
+	const defaultSectionPromise = getDefaultSection();
 
 	if (!section) {
-
-		section = await fetchSupabase<GallerySection>(
-			"sections",
-			{ is_default: true },
-			"*",
-			true
-		);
-
+		section = await defaultSectionPromise;
 		if (!section) return notFound();
-
-		const defaultCollection = await getDefaultCollection(section.id);
-		if (!defaultCollection) return notFound();
-
-		redirect(`/${section.slug}/${defaultCollection.slug}`);
-
 	};
 
-	let collection = await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ "slug": collectionSlug, section_id: section.id },
-		`
-			id,
-			slug,
-			title,
-			is_default,
-			section:sections!inner (
-				id,
-				slug,
-				title
-			)
-		`,
-		true
-	);
+	const collectionPromise = getCollectionMetadata(collectionSlug);
+	const defaultCollectionPromise = getDefaultCollectionBySectionId(section.id);
+
+	let collection = await collectionPromise;
 
 	if (!collection) {
-
-		collection = await getDefaultCollection(section.id);
+		collection = await defaultCollectionPromise;
 		if (!collection) return notFound();
-
-		redirect(`/${section.slug}/${collection?.slug}`);
-
+		redirect(`/${section.slug}/${collection.slug}`);
 	};
 
 	const { data: galleryItems, error } = await getGalleryItems({ collectionId: collection.id });
 	if (error || !galleryItems || galleryItems.length == 0) return notFound();
-
-	cacheTag(`gallery-items-collection-${collection.id}`);
 
 	const fullUrl = getFullUrl(`/${section.slug}/${collection.slug}`);
 
@@ -236,7 +164,7 @@ export default async function Page({
 		},
 		"datePublished": galleryItems.length > 0 ? galleryItems[0].created_at : undefined,
 		"dateModified": galleryItems.length > 0 ? galleryItems[galleryItems.length - 1].created_at : undefined,
-		"image": galleryItems.map((image: GalleryItem) => ({
+		"image": galleryItems.slice(0, 20).map((image: GalleryItem) => ({
 			"@type": "ImageObject",
 			"contentUrl": image.image_url,
 			"name": image.title,
@@ -257,6 +185,7 @@ export default async function Page({
 				id="gallery-jsonld"
 				type="application/ld+json"
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(structeredData) }}
+				strategy="afterInteractive"
 			/>
 
 			<main>

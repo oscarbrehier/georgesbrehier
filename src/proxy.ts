@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getCachedDefaultSection } from './utils/supabase/sections'
-import { getCachedDefaultCollection } from './utils/supabase/collections'
+import { getDefaultSection } from './utils/supabase/sections'
 import { updateSession } from './utils/supabase/middleware'
+import { getDefaultCollectionBySectionId } from './utils/supabase/collections';
 
 export async function proxy(request: NextRequest) {
 
@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
 
 		try {
 
-			const defaultSection = await getCachedDefaultSection();
+			const defaultSection = await getDefaultSection();
 			if (defaultSection?.slug) {
 				return NextResponse.redirect(new URL(`/${defaultSection.slug}`, request.url));
 			};
@@ -37,11 +37,11 @@ export async function proxy(request: NextRequest) {
 
 		try {
 
-			const section = await getCachedDefaultSection();
+			const section = await getDefaultSection();
 
 			if (section && section.slug === sectionSlug) {
 
-				const defaultCollection = await getCachedDefaultCollection(section.id);
+				const defaultCollection = await getDefaultCollectionBySectionId(section.id);
 				if (defaultCollection?.slug) {
 					return NextResponse.redirect(new URL(`/${sectionSlug}/${defaultCollection.slug}`, request.url));
 				};

@@ -2,7 +2,7 @@
 
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const leftMargin = 144;
 gsap.registerPlugin(ScrollTrigger);
@@ -24,10 +24,7 @@ export function GalleryAnimator({
 
 			const sections = gsap.utils.toArray<HTMLElement>(".panel");
 
-			const totalWidth = sections.reduce((acc: number, section) => {
-				return acc + (section as HTMLElement).offsetWidth;
-			}, 0);
-
+			const totalWidth = sections.reduce((acc, section) => acc + section.offsetWidth, 0);
 
 			const panelWidth = sections[0].offsetWidth;
 			const imageWidth = panelWidth * 0.75;
@@ -47,7 +44,7 @@ export function GalleryAnimator({
 					end: () => "+=" + scrollDistance
 				}
 			});
-			
+
 		});
 
 		return () => {
@@ -58,40 +55,42 @@ export function GalleryAnimator({
 
 	useEffect(() => {
 
-		const imageContainers = document.querySelectorAll("[data-itemid]");
+		const container = document.getElementById("gallery-container");
+		if (!container) return;
+
 		let selectedId: string | null = null;
 
 		function handleClick(event: Event) {
 
-			const target = event.currentTarget as HTMLElement;
+			const target = (event.target as HTMLElement).closest("[data-itemid]") as HTMLElement | null;;
+			if (!target) return;
+
 			const id = target.dataset.itemid;
 
 			if (id === selectedId) {
-
-				clearSelected();
+				clearSelected(container!);
 				selectedId = null;
 				return;
-
 			};
 
-			clearSelected();
+			clearSelected(container!);
 			target.classList.add("w-full", "h-full");
 			selectedId = id ?? null;
 
 		};
 
-		function clearSelected() {
-
-			imageContainers.forEach(div => div.classList.remove("w-full", "h-full"));
-
+		function clearSelected(el: HTMLElement) {
+			el.querySelectorAll("[data-itemid]").forEach((div) => {
+				(div as HTMLElement).classList.remove("w-full", "h-full");
+			});
 		};
 
-		imageContainers.forEach(div => div.addEventListener("click", handleClick));
-		window.addEventListener("scroll", clearSelected);
+		container.addEventListener("click", handleClick);
+		window.addEventListener("scroll", () => clearSelected(container));
 
 		return () => {
-			imageContainers.forEach(div => div.removeEventListener("click", handleClick));
-			window.removeEventListener("scroll", clearSelected);
+			container.removeEventListener("click", handleClick);
+			window.removeEventListener("scroll", () => clearSelected(container));
 		};
 
 	}, [items]);

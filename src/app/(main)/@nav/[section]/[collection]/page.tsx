@@ -17,6 +17,7 @@ async function loadCollections(sectionSlug: string) {
 		`
 			id,
 			title,
+			slug,
 			is_default,
 			section:sections!inner (
 				slug

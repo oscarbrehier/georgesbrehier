@@ -26,8 +26,9 @@ export function GalleryMarkup({
 							alt={item.description || item.title}
 							fill
 							className="gallery-image cursor-pointer object-contain"
+							priority={idx < 3}
 							loading={idx < 3 ? "eager" : "lazy"}
-
+							quality={85}
 						/>
 					</div>
 
