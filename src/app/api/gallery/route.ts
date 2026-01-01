@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -12,6 +13,8 @@ export async function POST(req: NextRequest) {
 		.select();
 
 	if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+	revalidatePath(`gallery-collection-${collectionId}`)
 
 	return NextResponse.json({ data }, { status: 200 });
 

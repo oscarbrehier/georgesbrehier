@@ -4,7 +4,6 @@ import type React from "react";
 import { useState } from "react";
 import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react";
 import { getCollectionsBySectionId } from "@/utils/supabase/collections";
-import Link from "next/link";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
 import { Select } from "@/components/dashboard/Select";
