@@ -29,7 +29,7 @@ export function Selector({
 
 	return (
 
-		<div className="h-full w-44 bg-neutral-100 flex flex-col fixed space-y-6 top-18 pr-8">
+		<div className="h-full w-44 flex flex-col space-y-6 pr-8">
 
 			<div className="space-y-2 flex flex-col">
 

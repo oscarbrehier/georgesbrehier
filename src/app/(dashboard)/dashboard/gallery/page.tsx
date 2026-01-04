@@ -5,6 +5,8 @@ import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { Selector } from "./Selector";
 import { cn } from "@/utils/utils";
 import { roboto } from "@/utils/fonts";
+import { GalleryItem } from "./GalleryItem";
+import { GalleryToolbar } from "./Toolbar";
 
 const getSections = cache(async () => {
 
@@ -110,15 +112,17 @@ export default async function Page({
 
 	return (
 
-		<div className="h-auto min-h-screen w-full">
+		<div className="h-[calc(100vh-104px)] w-full flex">
 
-			{(sections && collections) && (
-				<Selector sections={sections} current={section} collections={collections} />
-			)}
+			<div className="h-full w-44">
+				{(sections && collections) && (
+					<Selector sections={sections} current={section} collections={collections} />
+				)}
+			</div>
 
-			<div className="pl-44 flex flex-col space-y-8 mt-4">
+			<div className="h-full w-full overflow-y-scroll">
 
-				{collections?.map((collection) => {
+				{collections?.map((collection, idx) => {
 
 					const items = groupedGalleryItems[collection.slug];
 					if (!items) return null;
@@ -126,11 +130,11 @@ export default async function Page({
 
 					return (
 
-						<section key={collection.slug} id={collection.slug} className="space-y-2 pt-4">
+						<section key={collection.slug} id={collection.slug} className={cn("space-y-2", idx !== 0 && "mt-8")}>
 
 							<h2
 								className={cn(
-									"text-5xl text-black sticky top-10 bg-neutral-100 py-2",
+									"text-5xl text-black bg-neutral-100 py-2",
 									roboto.className
 								)}
 							>
@@ -141,14 +145,10 @@ export default async function Page({
 
 								{items.map((item) => (
 
-									<div
+									<GalleryItem
 										key={item.id}
-										className="bg-neutral-200 flex items-center"
-									>
-
-										<img src={item.image_url} />
-
-									</div>
+										item={item}
+									/>
 
 								))}
 
@@ -158,6 +158,7 @@ export default async function Page({
 
 					);
 				})}
+
 
 			</div>
 
