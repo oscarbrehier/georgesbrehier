@@ -8,7 +8,7 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 	"use cache"
 
 	let { section = "all", range, collectionId } = opts || {};
-	
+
 	if (collectionId) cacheTag(`gallery-collection-${collectionId}`);
 	cacheLife("hours");
 
@@ -27,7 +27,7 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 	if (range && range.length >= 2) {
 		query = query.range(range[0], range[1]);
 	};
-	
+
 	const res = await query;
 
 	return res;

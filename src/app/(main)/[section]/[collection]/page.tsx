@@ -1,4 +1,4 @@
-import { getGalleryItems } from "@/utils/supabase/getGalleryItems";
+import { getGalleryItems } from "@/utils/supabase/gallery";
 import { notFound, redirect } from "next/navigation";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { ResolvingMetadata } from "next";

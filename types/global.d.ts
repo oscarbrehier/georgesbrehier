@@ -53,6 +53,8 @@ declare global {
 	interface GalleryItemWithCollection extends GalleryItem {
 		collection: GalleryCollection;
 	};
+
+	type GalleryItemToDelete = { id: number; collectionId: string };
 };
 
 export { };
