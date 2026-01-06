@@ -6,6 +6,7 @@ import { roboto } from "@/utils/fonts";
 import { GalleryItem } from "./GalleryItem";
 import { useEffect, useState } from "react";
 import { Toolbar } from "./Toolbar";
+import { useRouter } from "next/navigation";
 
 export function GalleryUI({
 	section,
@@ -18,6 +19,8 @@ export function GalleryUI({
 	collections: GalleryCollection[],
 	groupedGalleryItems: Record<string, GalleryItemWithCollection[]>
 }) {
+
+	const router = useRouter();
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedItems, setSelectedItems] = useState<GalleryItemToDelete[]>([]);
@@ -77,6 +80,10 @@ export function GalleryUI({
 											isEditMode={isEditing}
 											onSelect={() => setSelectedItems(prev => [...prev, { id: item.id, collectionId: item.collection.id }])}
 											onDeselect={() => setSelectedItems(prev => prev.filter(i => i.id !== item.id))}
+											onDeleted={() => {
+												setSelectedItems(prev => prev.filter(i => i.id !== item.id));
+												router.refresh();
+											}}
 										/>
 
 									))}

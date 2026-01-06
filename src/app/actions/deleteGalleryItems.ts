@@ -3,6 +3,10 @@
 import { supabase } from "@/lib/supabase";
 import { revalidateTag } from "next/cache";
 
+export async function deleteGalleryItem(item: GalleryItemToDelete) {
+	return deleteGalleryItems([item]);
+};
+
 export async function deleteGalleryItems(items: GalleryItemToDelete[]): Promise<{ error: null | string, count: number }> {
 
 	if (!items.length) return { error: null, count: 0 };
