@@ -10,6 +10,7 @@ declare global {
 		description: string;
 		image_url: string;
 		section: string;
+		position: number;
 		created_at: string;
 	};
 	interface GallerySection {

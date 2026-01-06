@@ -2,38 +2,57 @@
 
 import { deleteGalleryItems } from "@/app/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
-import { Ban, Pencil, PencilOff } from "lucide-react";
+import { Ban, CheckCheck, Pencil, PencilOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function Toolbar({
 	isEditing,
 	selectedItems,
 	onEditToggle,
-	onClearSelected
+	onClearSelected,
+	onSave,
+	hasChanges
 }: {
 	isEditing: boolean;
 	selectedItems: GalleryItemToDelete[];
 	onEditToggle: () => void;
 	onClearSelected: () => void;
+	onSave: () => void;
+	hasChanges: boolean;
 }) {
 
 	const router = useRouter();
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	async function handleDelete() {
+
+		if (isDeleting) return;
+		setIsDeleting(true);
 
 		try {
 
 			const { count, error } = await deleteGalleryItems(selectedItems);
-			if (error) console.log(error)
-			console.log("successfully delete", count, "items");
+
+			if (error) {
+
+				toast("Failed to delete item:", {
+					description: error
+				});
+
+				return;
+
+			}
+
+			toast(`Sucessfully deleted ${count} items`);
+
 			onClearSelected();
 			router.refresh();
 
-		} catch (err) {
-
-			console.log(err)
-
-		}
+		} finally {
+			setIsDeleting(false);
+		};
 
 	};
 
@@ -51,7 +70,7 @@ export function Toolbar({
 							"bg-red-600 hover:bg-red-700 text-neutral-50"
 						)}
 							onClick={handleDelete}
-							disabled={selectedItems.length === 0}
+							disabled={selectedItems.length === 0 || isDeleting}
 						>
 							<Ban size={18} />
 							<p className="text-sm">Delete {selectedItems.length} {selectedItems.length === 1 ? "Item" : "Items"}</p>
@@ -61,6 +80,24 @@ export function Toolbar({
 
 				)
 			}
+
+			{hasChanges && (
+				<div className="flex items-center space-x-2">
+
+					<button className={cn(
+						"py-2 px-4 rounded-xl flex items-center gap-2 cursor-pointer",
+						"bg-amber-600 hover:bg-amber-700 text-neutral-50"
+					)}
+						onClick={onSave}
+						disabled={isDeleting}
+					>
+						<CheckCheck size={18} />
+						<p className="text-sm">Save changes</p>
+					</button>
+
+				</div>
+			)}
+
 
 			<button className={cn(
 				"py-2 px-4 rounded-xl flex items-center gap-2 cursor-pointer",

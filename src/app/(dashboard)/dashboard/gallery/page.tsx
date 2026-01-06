@@ -35,6 +35,7 @@ const getGalleryItems = cache(
 			.select(`
 			id,
 			image_url,
+			position,
 			collection:collections!inner (
 				id,
 				slug,

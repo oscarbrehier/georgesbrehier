@@ -1,9 +1,13 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
+import { PostgrestError } from "@supabase/supabase-js";
 import { cacheLife, cacheTag } from "next/cache";
 
-export async function getGalleryItems(opts?: { section?: string, range?: number[], collectionId?: string }) {
+export async function getGalleryItems(opts?: { section?: string, range?: number[], collectionId?: string }): Promise<{
+	data: GalleryItem[],
+	error: PostgrestError | null
+}> {
 
 	"use cache"
 
@@ -28,8 +32,11 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 		query = query.range(range[0], range[1]);
 	};
 
-	const res = await query;
+	const { data, error } = await query;
 
-	return res;
+	return {
+		error,
+		data: (data as GalleryItem[]).sort((a, b) => a.position - b.position)
+	};
 
 };

@@ -2,7 +2,7 @@
 
 import { deleteGalleryItem } from "@/app/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
-import { Ellipsis, X } from "lucide-react";
+import { Ellipsis, Grip, X } from "lucide-react";
 import { MouseEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +12,9 @@ export function GalleryItem({
 	isEditMode,
 	onSelect,
 	onDeselect,
-	onDeleted
+	onDeleted,
+	dragAttributes,
+	dragListeners,
 }: {
 	item: GalleryItemWithCollection;
 	isSelected: boolean;
@@ -20,6 +22,8 @@ export function GalleryItem({
 	onSelect: () => void;
 	onDeselect: () => void;
 	onDeleted: () => void;
+	dragAttributes?: any;
+	dragListeners?: any;
 }) {
 
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -67,13 +71,28 @@ export function GalleryItem({
 
 	return (
 
-		<div className="relative flex bg-neutral-200 group">
+		<div className="relative h-full flex bg-neutral-200 group">
 
 			{isEditMode && (
-				<button className={cn(
-					"group-hover:flex hidden size-6",
-					"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 -right-2 z-40 rounded-full items-center justify-center"
-				)}
+				<button
+					{...dragAttributes}
+					{...dragListeners}
+					className={cn(
+						"group-hover:flex hidden size-6",
+						"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 right-6 w z-40 rounded-full items-center justify-center"
+					)}
+					onClick={(e) => e.stopPropagation()}
+				>
+					<Grip size={16} className="text-red-600" />
+				</button>
+			)}
+
+			{isEditMode && (
+				<button
+					className={cn(
+						"group-hover:flex hidden size-6",
+						"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 -right-2 z-40 rounded-full items-center justify-center"
+					)}
 					onClick={handleDeleteItem}
 					disabled={isDeleting}
 				>
@@ -86,12 +105,14 @@ export function GalleryItem({
 					"flex items-center",
 					isSelected && "ring-2 ring-offset-2 ring-blue-600"
 				)}
-				onClick={handleSelect}
-				disabled={!isEditMode || isDeleting}
+				onClick={() => {
+					if (!isEditMode || isDeleting) return;
+					handleSelect();
+				}}
+				aria-disabled={!isEditMode || isDeleting}
 			>
 				<img src={item.image_url} alt={item.title} />
 			</button>
-			
 		</div>
 
 	);
