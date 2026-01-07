@@ -6,7 +6,7 @@ import { roboto } from "@/utils/fonts";
 import { GalleryItem } from "./GalleryItem";
 import { useEffect, useState } from "react";
 import { Toolbar } from "./Toolbar";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -62,11 +62,17 @@ export function GalleryUI({
 }) {
 
 	const router = useRouter();
+	const pathname = usePathname();
+	const currentPath = `${pathname}?section=${section}`;
 
 	const [orderedItems, setOrderedItems] = useState(groupedGalleryItems);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedItems, setSelectedItems] = useState<GalleryItemToDelete[]>([]);
 	const [hasChanges, setHasChanges] = useState(false);
+
+	useEffect(() => {
+		setOrderedItems(groupedGalleryItems);
+	}, [groupedGalleryItems]);
 
 	useEffect(() => {
 		if (!isEditing) setSelectedItems([]);
@@ -131,6 +137,7 @@ export function GalleryUI({
 			<Toolbar
 				isEditing={isEditing}
 				selectedItems={selectedItems}
+				currentPath={currentPath}
 				onEditToggle={() => setIsEditing((v) => !v)}
 				onClearSelected={() => setSelectedItems([])}
 				onSave={handleSaveChanges}
@@ -222,6 +229,7 @@ export function GalleryUI({
 															<GalleryItem
 																item={item}
 																isEditMode={isEditing}
+																currentPath={currentPath}
 																isSelected={selectedItems.some(
 																	(i) => i.id === item.id
 																)}

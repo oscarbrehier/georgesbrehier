@@ -1,13 +1,13 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
-export async function deleteGalleryItem(item: GalleryItemToDelete) {
-	return deleteGalleryItems([item]);
+export async function deleteGalleryItem(item: GalleryItemToDelete, path: string) {
+	return deleteGalleryItems([item], path);
 };
 
-export async function deleteGalleryItems(items: GalleryItemToDelete[]): Promise<{ error: null | string, count: number }> {
+export async function deleteGalleryItems(items: GalleryItemToDelete[], path: string): Promise<{ error: null | string, count: number }> {
 
 	if (!items.length) return { error: null, count: 0 };
 
@@ -22,6 +22,8 @@ export async function deleteGalleryItems(items: GalleryItemToDelete[]): Promise<
 	await Promise.all(
 		items.map(item => revalidateTag(`gallery-collection-${item.collectionId}`, "max"))
 	);
+
+	revalidatePath(path);
 
 	return { error: error?.message ?? null, count: data?.length ?? 0 };
 

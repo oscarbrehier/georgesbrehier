@@ -3,13 +3,14 @@
 import { deleteGalleryItems } from "@/app/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
 import { Ban, CheckCheck, Pencil, PencilOff } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export function Toolbar({
 	isEditing,
 	selectedItems,
+	currentPath,
 	onEditToggle,
 	onClearSelected,
 	onSave,
@@ -17,6 +18,7 @@ export function Toolbar({
 }: {
 	isEditing: boolean;
 	selectedItems: GalleryItemToDelete[];
+	currentPath: string;
 	onEditToggle: () => void;
 	onClearSelected: () => void;
 	onSave: () => void;
@@ -24,6 +26,8 @@ export function Toolbar({
 }) {
 
 	const router = useRouter();
+	const pathname = usePathname();
+
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	async function handleDelete() {
@@ -33,7 +37,7 @@ export function Toolbar({
 
 		try {
 
-			const { count, error } = await deleteGalleryItems(selectedItems);
+			const { count, error } = await deleteGalleryItems(selectedItems, currentPath);
 
 			if (error) {
 
@@ -45,7 +49,7 @@ export function Toolbar({
 
 			}
 
-			toast(`Sucessfully deleted ${count} items`);
+			toast(`Sucessfully deleted ${count} ${count > 1 ? "items" : "item"}`);
 
 			onClearSelected();
 			router.refresh();

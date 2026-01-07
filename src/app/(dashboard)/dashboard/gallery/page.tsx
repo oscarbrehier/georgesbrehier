@@ -2,11 +2,6 @@ import { supabase } from "@/lib/supabase";
 import { redirect, RedirectType } from "next/navigation";
 import { cache } from "react";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
-import { Selector } from "./Selector";
-import { cn } from "@/utils/utils";
-import { roboto } from "@/utils/fonts";
-import { GalleryItem } from "./GalleryItem";
-import { EditModeToggle } from "./EditModeToggle";
 import { GalleryUI } from "./GalleryUI";
 
 const getSections = cache(async () => {

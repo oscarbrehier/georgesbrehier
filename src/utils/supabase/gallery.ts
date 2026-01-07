@@ -22,21 +22,17 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 		.from("works")
 		.select("*")
 		.order("created_at", { ascending: false })
-		.eq("collection_id", collectionId);
+		.order("position", { ascending: true });
 
-	if (section !== "all") {
-		query = query.eq("section", section);
-	};
-
-	if (range && range.length >= 2) {
-		query = query.range(range[0], range[1]);
-	};
+	if (collectionId) query = query.eq("collection_id", collectionId)
+	if (section !== "all") query = query.eq("section", section);
+	if (range && range.length >= 2) query = query.range(range[0], range[1]);
 
 	const { data, error } = await query;
 
 	return {
+		data: data ?? [],
 		error,
-		data: (data as GalleryItem[]).sort((a, b) => a.position - b.position)
 	};
 
 };

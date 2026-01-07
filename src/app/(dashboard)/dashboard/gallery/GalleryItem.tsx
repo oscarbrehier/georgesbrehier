@@ -2,14 +2,15 @@
 
 import { deleteGalleryItem } from "@/app/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
-import { Ellipsis, Grip, X } from "lucide-react";
-import { MouseEvent, useEffect, useState } from "react";
+import { Grip, X } from "lucide-react";
+import { MouseEvent, useState } from "react";
 import { toast } from "sonner";
 
 export function GalleryItem({
 	item,
 	isSelected,
 	isEditMode,
+	currentPath,
 	onSelect,
 	onDeselect,
 	onDeleted,
@@ -19,6 +20,7 @@ export function GalleryItem({
 	item: GalleryItemWithCollection;
 	isSelected: boolean;
 	isEditMode: boolean;
+	currentPath: string;
 	onSelect: () => void;
 	onDeselect: () => void;
 	onDeleted: () => void;
@@ -49,7 +51,7 @@ export function GalleryItem({
 
 		try {
 
-			const { error } = await deleteGalleryItem({ id: item.id, collectionId: item.collection.id });
+			const { error } = await deleteGalleryItem({ id: item.id, collectionId: item.collection.id }, currentPath);
 			if (error) {
 
 				toast("Failed to delete item:", {
