@@ -70,7 +70,7 @@ export default function RootLayout({
 		<html lang="en">
 
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-full bg-neutral-100`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-full bg-background`}
 			>
 				{children}
 				<Toaster />

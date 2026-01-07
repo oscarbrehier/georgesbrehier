@@ -15,7 +15,7 @@ export function CollectionNav({
 
 	return (
 
-		<ul>
+		<ul className="space-y-1">
 
 			{collections.map((collection) => (
 
@@ -25,7 +25,7 @@ export function CollectionNav({
 						href={`/${section}/${collection.slug}`}
 						className={cn(
 							"capitalize",
-							collection.slug === currentCollection ? "text-black" : "text-neutral-600 hover:text-black"
+							collection.slug === currentCollection ? "text-black underline" : "text-neutral-600 hover:text-black"
 						)}
 					>
 						{collection.title}
