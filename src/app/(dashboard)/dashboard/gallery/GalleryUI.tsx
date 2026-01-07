@@ -135,6 +135,7 @@ export function GalleryUI({
 
 
 	return (
+
 		<div className="flex h-full flex-col">
 
 			<Toolbar
@@ -147,7 +148,7 @@ export function GalleryUI({
 				hasChanges={hasChanges}
 			/>
 
-			<div className="flex h-full">
+			<div className="flex h-full pt-6">
 
 				<Selector
 					sections={sections}
@@ -169,7 +170,7 @@ export function GalleryUI({
 								className={cn("space-y-4", idx !== 0 && "mt-10")}
 							>
 
-								<div className="sticky top-0 z-20 bg-neutral-100 py-2 flex items-center space-x-4">
+								<div className="sticky top-0 z-20 bg-background py-2 flex items-center space-x-4">
 
 									<h2
 										className={cn(

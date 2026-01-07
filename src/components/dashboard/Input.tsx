@@ -20,7 +20,7 @@ export function Input({ label, id, sublabel, ...props }: InputProps) {
 			<input
 				id={id}
 				{...props}
-				className={cn("w-full px-4 h-12 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all", props.className)}
+				className={cn("w-full px-4 h-12 rounded-lg border border-neutral-200 bg-background text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all", props.className)}
 			/>
 
 			{

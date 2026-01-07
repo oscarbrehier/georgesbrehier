@@ -268,7 +268,7 @@ export function Upload({
 	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
 
 	return (
-		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10">
+		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10 pb-8">
 
 			<div className={cn(
 				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
@@ -311,9 +311,9 @@ export function Upload({
 						onDragOver={handleDragOver}
 						onDrop={handleDrop}
 						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${isDragging
-							? "border-neutral-400 bg-neutral-100"
+							? "border-neutral-400 bg-background"
 							: "border-neutral-200"
-							} ${formData.images.length > 0 ? "bg-neutral-50" : "bg-neutral-50"}`}
+							}`}
 					>
 
 						<input
@@ -369,7 +369,7 @@ export function Upload({
 
 							<div className="px-12 py-8 text-center">
 
-								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-100 mb-4">
+								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background mb-4">
 									<Cloud className="w-8 h-8 text-neutral-600" />
 								</div>
 
@@ -416,7 +416,7 @@ export function Upload({
 								value={formData.description}
 								onChange={handleInputChange}
 								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-background text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
 							/>
 
 						</div>
@@ -488,7 +488,7 @@ export function Upload({
 
 							{uploadProgress.map((progress, index) => (
 
-								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-neutral-50 border border-neutral-200">
+								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background border border-neutral-200">
 
 									{progress.status === "pending" && (
 										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
