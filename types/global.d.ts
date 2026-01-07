@@ -25,6 +25,7 @@ declare global {
 		title: string;
 		is_default: boolean;
 		slug: string;
+		visible: boolean;
 		seo_title: string,
 		seo_description: string,
 		seo_og_image_url: string,

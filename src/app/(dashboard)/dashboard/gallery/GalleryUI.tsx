@@ -11,6 +11,9 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
+import { Button, ButtonText } from "../../components/Button";
+import { Eye, EyeOff } from "lucide-react";
+import { CollectionVisibilityBtn } from "./CollectionVisibilityBtn";
 
 export function SortableItem({
 	id,
@@ -166,14 +169,22 @@ export function GalleryUI({
 								className={cn("space-y-4", idx !== 0 && "mt-10")}
 							>
 
-								<h2
-									className={cn(
-										"sticky top-0 z-20 bg-neutral-100 py-2 text-5xl",
-										roboto.className
-									)}
-								>
-									{collection.title}
-								</h2>
+								<div className="sticky top-0 z-20 bg-neutral-100 py-2 flex items-center space-x-4">
+
+									<h2
+										className={cn(
+											"text-5xl",
+											roboto.className
+										)}
+									>
+										{collection.title}
+									</h2>
+
+									<CollectionVisibilityBtn
+										collection={collection}
+									/>
+
+								</div>
 
 								<DndContext
 									collisionDetection={closestCenter}

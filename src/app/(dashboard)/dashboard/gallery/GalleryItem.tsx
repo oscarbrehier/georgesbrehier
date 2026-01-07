@@ -3,6 +3,7 @@
 import { deleteGalleryItem } from "@/app/(dashboard)/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
 import { Grip, X } from "lucide-react";
+import Image from "next/image";
 import { MouseEvent, useState } from "react";
 import { toast } from "sonner";
 
@@ -73,7 +74,7 @@ export function GalleryItem({
 
 	return (
 
-		<div className="relative h-full flex bg-neutral-200 group">
+		<div className="relative h-full w-full flex bg-neutral-200 group">
 
 			{isEditMode && (
 				<button
@@ -104,7 +105,7 @@ export function GalleryItem({
 
 			<button
 				className={cn(
-					"flex items-center",
+					"flex items-center w-full h-80",
 					isSelected && "ring-2 ring-offset-2 ring-blue-600"
 				)}
 				onClick={() => {
@@ -113,7 +114,17 @@ export function GalleryItem({
 				}}
 				aria-disabled={!isEditMode || isDeleting}
 			>
-				<img src={item.image_url} alt={item.title} />
+
+				<div className="relative w-full h-full">
+					<Image
+						src={item.image_url}
+						alt="image"
+						fill
+						className="object-contain"
+						quality={50}
+					/>
+				</div>
+
 			</button>
 		</div>
 
