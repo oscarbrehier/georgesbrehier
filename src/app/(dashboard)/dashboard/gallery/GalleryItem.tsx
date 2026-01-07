@@ -1,6 +1,6 @@
 "use client"
 
-import { deleteGalleryItem } from "@/app/actions/deleteGalleryItems";
+import { deleteGalleryItem } from "@/app/(dashboard)/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
 import { Grip, X } from "lucide-react";
 import { MouseEvent, useState } from "react";

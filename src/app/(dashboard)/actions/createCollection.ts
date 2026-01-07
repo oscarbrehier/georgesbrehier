@@ -3,13 +3,13 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-export interface CreateCollectionReturn {
+export interface CollectionFormState {
 	success?: boolean;
 	message?: string;
 	error?: string;
 }
 
-export async function createCollection(prevState: CreateCollectionReturn | undefined, formData: FormData) {
+export async function createCollection(prevState: CollectionFormState | undefined, formData: FormData) {
 
 	const isDefault = formData.get("isDefault") === "on";
 	const sectionId = formData.get("sectionId")?.toString();
@@ -36,7 +36,7 @@ export async function createCollection(prevState: CreateCollectionReturn | undef
 	if (error) {
 
 		if (error.code === "23505") {
-			return { error: `A collection named \`${title}\` already exists.`}
+			return { error: `A collection named \`${title}\` already exists`}
 		};
 
 		return { error: error.message };
@@ -44,6 +44,12 @@ export async function createCollection(prevState: CreateCollectionReturn | undef
 	};
 
 	revalidateTag("collections", "max");
-	return { success: true, message: `Successfully created collection \`${title}\`.` };
+	revalidateTag(`section-${sectionId}-collections`, "max");
+
+	if (isDefault) {
+		revalidateTag(`section-${sectionId}-default-collection`, "max");
+	};
+
+	return { success: true, message: `Successfully created collection \`${title}\`` };
 
 };

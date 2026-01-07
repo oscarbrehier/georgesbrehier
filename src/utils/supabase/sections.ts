@@ -1,6 +1,24 @@
+"use server"
+
 import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from 'next/cache';
 import { fetchSupabase } from "./fetchSupabase";
+
+export async function getSections(): Promise<GallerySection[]> {
+
+	"use cache"
+	cacheTag("sections");
+	cacheLife("hours");
+
+	const { data, error } = await supabase
+		.from("sections")
+		.select("*");
+
+	if (error) return [];
+	return data;
+
+};
+
 
 export async function getSection(slug: string): Promise<GallerySection | null> {
 

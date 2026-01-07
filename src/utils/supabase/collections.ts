@@ -3,20 +3,20 @@ import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchSupabase } from "./fetchSupabase";
 
-export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[] | null> {
+export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[]> {
 
     "use cache"
-	cacheTag(`collections-section-${sectionId}`);
+	cacheTag(`section-${sectionId}-collections`);
 	cacheLife("hours");
 
-	if (!sectionId) return null;
+	if (!sectionId) return [];
 
 	const { data, error } = await supabase
 		.from("collections")
 		.select("*")
 		.eq("section_id", sectionId);
 
-	if (error) return null;
+	if (error) return [];
 	return data;
 
 };

@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { updateGalleryItems } from "@/app/actions/updateGalleryItems";
+import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
 
 export function SortableItem({
 	id,

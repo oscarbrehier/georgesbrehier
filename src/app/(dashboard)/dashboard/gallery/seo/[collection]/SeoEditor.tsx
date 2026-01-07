@@ -1,6 +1,6 @@
 "use client"
 
-import { updateSEO } from "@/app/actions/updateSEO";
+import { updateSEO } from "@/app/(dashboard)/actions/updateSEO";
 import { Input } from "@/components/dashboard/Input";
 import { Select } from "@/components/dashboard/Select";
 import { cn } from "@/utils/utils";

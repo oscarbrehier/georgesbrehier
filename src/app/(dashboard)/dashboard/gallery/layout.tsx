@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 		<div className="min-h-screen w-full px-8 pb-8 pt-18">
 
-			<div className="h-10 flex justify-between items-center px-8 border-b-[1px] border-neutral-200 fixed top-0 left-0 w-full bg-neutral-100 z-[70]">
+			<div className="h-10 flex justify-between items-center px-8 border-b-[1px] border-neutral-200 fixed top-0 left-0 w-full bg-neutral-100 z-[50]">
 
 				<div className="flex space-x-10">
 

@@ -8,6 +8,8 @@ import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
 import { Select } from "@/components/dashboard/Select";
 import { Input } from "@/components/dashboard/Input";
+import { CreateItemDialog } from "@/app/(dashboard)/components/CreateItemDialog";
+import { getSections } from "@/utils/supabase/sections";
 
 interface UploadFormData {
 	title: string
@@ -25,18 +27,20 @@ interface UploadProgress {
 }
 
 export function Upload({
-	sections
+	sections: initialSections
 }: {
 	sections: GallerySection[]
 }) {
 
 	const { formData, setFormData, resetForm } = useUploadFormStore();
 
+	const [sections, setSections] = useState<GallerySection[]>(initialSections);
+	const [collections, setCollections] = useState<GalleryCollection[] | null>(null);
+
 	const [isDragging, setIsDragging] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 	const [error, setError] = useState<string | null>(null);
-	const [collections, setCollections] = useState<GalleryCollection[] | null>(null);
 
 	const handleDragEnter = (e: React.DragEvent) => {
 
@@ -260,6 +264,9 @@ export function Upload({
 
 	};
 
+	const [openSectionDialog, setOpenSectionDialog] = useState(false);
+	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
+
 	return (
 		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10">
 
@@ -271,6 +278,28 @@ export function Upload({
 				<p className="text-neutral-500">Upload single or multiple items to the gallery</p>
 
 			</div>
+
+			<CreateItemDialog
+				type="section"
+				onSuccess={async () => {
+					const sectionsRes = await getSections();
+					setSections(sectionsRes);
+				}}
+				open={openSectionDialog}
+				onOpenChange={setOpenSectionDialog}
+			></CreateItemDialog>
+
+			<CreateItemDialog
+				type="collection"
+				onSuccess={async () => {
+					if (formData.sectionId) {
+						const collectionRes = await getCollectionsBySectionId(formData.sectionId);
+						setCollections(collectionRes);
+					}
+				}}
+				open={openCollectionDialog}
+				onOpenChange={setOpenCollectionDialog}
+			></CreateItemDialog>
 
 			<div className="w-full max-w-4xl">
 
@@ -392,39 +421,62 @@ export function Upload({
 
 						</div>
 
-						<Select
-							label="Section"
-							id="section"
-							name="sectionId"
-							value={formData.sectionId}
-							onChange={handleInputChange}
-						>
-							<option value="">Choose a section</option>
-							{sections.map((section) => (
-								<option
-									key={section.id}
-									className="capitalize"
-									value={section.id}>{section.title}</option>
-							))}
-						</Select>
+						<div>
 
-						<Select
-							label="Collection"
-							id="collection"
-							name="collectionId"
-							value={formData.collectionId}
-							onChange={handleInputChange}
-							disabled={!collections}
-							sublabel={<a href="/dashboard/gallery/new/collection" className="underline cursor-pointer w">Create a new collection</a>}
-						>
-							<option value="">Choose a collection</option>
-							{collections?.map((collection) => (
-								<option
-									key={collection.id}
-									className="capitalize"
-									value={collection.id}>{collection.title}</option>
-							))}
-						</Select>
+							<Select
+								label="Section"
+								id="section"
+								name="sectionId"
+								value={formData.sectionId}
+								onChange={handleInputChange}
+							>
+								<option value="">Choose a section</option>
+								{sections.map((section) => (
+									<option
+										key={section.id}
+										className="capitalize"
+										value={section.id}>{section.title}</option>
+								))}
+							</Select>
+
+							<button
+								type="button"
+								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
+								onClick={() => setOpenSectionDialog(true)}
+							>
+								Create a new section
+							</button>
+
+						</div>
+
+						<div>
+
+							<Select
+								label="Collection"
+								id="collection"
+								name="collectionId"
+								value={formData.collectionId}
+								onChange={handleInputChange}
+								disabled={!collections}
+							>
+								<option value="">Choose a collection</option>
+								{collections?.map((collection) => (
+									<option
+										key={collection.id}
+										className="capitalize"
+										value={collection.id}>{collection.title}</option>
+								))}
+							</Select>
+
+							<button
+								type="button"
+								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
+								onClick={() => setOpenCollectionDialog(true)}
+							>
+								Create a new collection
+							</button>
+
+						</div>
 
 					</div>
 
