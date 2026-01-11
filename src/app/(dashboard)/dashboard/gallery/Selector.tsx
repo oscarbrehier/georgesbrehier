@@ -2,6 +2,8 @@
 
 import { cn } from "@/utils/utils";
 import Link from "next/link";
+import { Button, ButtonText } from "../../components/Button";
+import { Eye } from "lucide-react";
 
 export function Selector({
 	sections,
@@ -17,7 +19,7 @@ export function Selector({
 
 	function scrollTo(collection: string) {
 
-		if (!document) return ;
+		if (!document) return;
 
 		const target = document.getElementById(collection);
 

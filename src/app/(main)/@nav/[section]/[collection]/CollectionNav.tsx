@@ -24,7 +24,7 @@ export function CollectionNav({
 					<Link
 						href={`/${section}/${collection.slug}`}
 						className={cn(
-							"capitalize",
+							"capitalize text-[15px]",
 							collection.slug === currentCollection ? "text-black underline" : "text-neutral-600 hover:text-black"
 						)}
 					>

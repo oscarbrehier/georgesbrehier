@@ -42,7 +42,7 @@ export default async function Layout({
 					<Link
 						key={section.id}
 						href={`/${section.slug}`}
-						className="capitalize"
+						className="capitalize text-[15px]"
 					>
 						{section.title}</Link>
 				))}

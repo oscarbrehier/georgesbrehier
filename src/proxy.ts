@@ -6,13 +6,12 @@ import { getDefaultCollectionBySectionId } from './utils/supabase/collections';
 
 export async function proxy(request: NextRequest) {
 
-	const { pathname } = request.nextUrl;
-	const isAdminRoute = request.nextUrl.pathname.startsWith("/dashboard");
+	const response = await updateSession(request);
 
-	if (isAdminRoute) return await updateSession(request);
+	const { pathname } = request.nextUrl;
 
 	if (pathname.startsWith('/api/') || pathname.startsWith('/_next/')) {
-		return NextResponse.next();
+		return response;
 	};
 
 	if (pathname === '/') {
@@ -21,7 +20,7 @@ export async function proxy(request: NextRequest) {
 
 			const defaultSection = await getDefaultSection();
 			if (defaultSection?.slug) {
-				return NextResponse.redirect(new URL(`/${defaultSection.slug}`, request.url));
+				return NextResponse.redirect(new URL(`/${defaultSection.slug}`, request.url)); 
 			};
 
 		} catch (error) {
@@ -54,15 +53,10 @@ export async function proxy(request: NextRequest) {
 
 	};
 
-	return NextResponse.next();
+	return response;
 
 };
 
 export const config = {
-	matcher: [
-		'/',
-		'/dashboard/:path*',
-		'/:section',
-		'/:section/:collection',
-	]
+	matcher: ['/((?!api|_next|.*\\..*).*)']
 };

@@ -1,8 +1,11 @@
 "use client"
 
+import { useActionState } from "react";
 import { login } from "./actions";
 
 export default function Page() {
+
+	const [state, loginAction] = useActionState(login, null);
 
 	return (
 
@@ -34,13 +37,19 @@ export default function Page() {
 
 					<button
 						className="bg-neutral-400 disabled:bg-neutral-200 h-14 px-6 rounded-md text-neutral-200 disabled:text-neutral-300 text-lg cursor-pointer"
-						formAction={login}
+						formAction={loginAction}
 					>
 						Log in
 					</button>
 
 				</form>
 
+				{state?.error && (
+					<div className="mt-6 flex justify-center">
+						<p className="text-destructive">{state?.error}</p>
+					</div>
+				)}
+				
 			</div>
 
 		</div>

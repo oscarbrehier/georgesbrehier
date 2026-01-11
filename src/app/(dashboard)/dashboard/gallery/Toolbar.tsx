@@ -2,7 +2,7 @@
 
 import { deleteGalleryItems } from "@/app/(dashboard)/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
-import { Ban, CheckCheck, Pencil, PencilOff, Plus } from "lucide-react";
+import { Ban, CheckCheck, Eye, Pencil, PencilOff, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -66,6 +66,16 @@ export function Toolbar({
 		<div className="h-20 w-full flex items-start justify-between gap-4">
 
 			<div className="flex gap-4">
+
+				<a href="/">
+					<Button
+						variant="base"
+						size="sm"
+						Icon={Eye}
+					>
+						<ButtonText>View Website</ButtonText>
+					</Button>
+				</a>
 
 				<CreateItemDialog
 					type="section"
