@@ -43,7 +43,7 @@ export async function createSection(prevState: SectionFormState | undefined, for
 	revalidateTag("sections", "max");
 
 	if (isDefault) {
-		revalidateTag("default-section", "max");
+		revalidateTag("default-section-with-collection", "max");
 	};
 
 	return { success: true, message: `Successfully created section \`${title}\`` };

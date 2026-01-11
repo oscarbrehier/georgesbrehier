@@ -19,6 +19,11 @@ declare global {
 		is_default: boolean;
 		slug: string;
 	};
+
+	interface SectionWithDefaultCollection extends GallerySection {
+		defaultCollection: GalleryCollection
+	};
+
 	interface GalleryCollection {
 		id: string;
 		section_id: string;

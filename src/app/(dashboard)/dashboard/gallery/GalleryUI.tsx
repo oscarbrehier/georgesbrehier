@@ -61,7 +61,7 @@ export function GalleryUI({
 	section: string;
 	sections: any[];
 	collections: GalleryCollection[];
-	groupedGalleryItems: Record<string, GalleryItemWithCollection[]>;
+	groupedGalleryItems: Record<string, GalleryItemWithCollection[]> | null;
 }) {
 
 	const router = useRouter();
@@ -156,134 +156,144 @@ export function GalleryUI({
 					collections={collections}
 				/>
 
-				<div className="flex-1 overflow-y-scroll px-4">
+				{orderedItems ? (
 
-					{collections.map((collection, idx) => {
+					<div className="flex-1 overflow-y-scroll px-4">
 
-						const items = orderedItems[collection.slug]?.sort((a, b) => a.position - b.position);
-						if (!items) return null;
+						{collections.map((collection, idx) => {
 
-						return (
+							const items = orderedItems[collection.slug]?.sort((a, b) => a.position - b.position);
+							if (!items) return null;
 
-							<section
-								key={collection.slug}
-								className={cn("space-y-4", idx !== 0 && "mt-10")}
-							>
+							return (
 
-								<div className="sticky top-0 z-20 bg-background py-2 flex items-center space-x-4">
-
-									<h2
-										className={cn(
-											"text-5xl",
-											roboto.className
-										)}
-									>
-										{collection.title}
-									</h2>
-
-									<CollectionVisibilityBtn
-										collection={collection}
-									/>
-
-								</div>
-
-								<DndContext
-									collisionDetection={closestCenter}
-									onDragEnd={({ active, over }) => {
-
-										if (!over || active.id === over.id) return;
-
-										setOrderedItems((prev) => {
-
-											const list = [...prev[collection.slug]];
-											const oldIndex = list.findIndex((i) => String(i.id) === active.id);
-											const newIndex = list.findIndex((i) => String(i.id) === over.id);
-
-											const newList = arrayMove(list, oldIndex, newIndex);
-											const updatedList = newList.map((item, index) => ({
-												...item,
-												position: index + 1
-											}))
-
-											return {
-												...prev,
-												[collection.slug]: updatedList
-											};
-
-										});
-
-									}}
+								<section
+									key={collection.slug}
+									className={cn("space-y-4", idx !== 0 && "mt-10")}
 								>
-									<SortableContext
-										items={items.map((i) => String(i.id))}
-										strategy={rectSortingStrategy}
+
+									<div className="sticky top-0 z-20 bg-background py-2 flex items-center space-x-4">
+
+										<h2
+											className={cn(
+												"text-5xl",
+												roboto.className
+											)}
+										>
+											{collection.title}
+										</h2>
+
+										<CollectionVisibilityBtn
+											collection={collection}
+										/>
+
+									</div>
+
+									<DndContext
+										collisionDetection={closestCenter}
+										onDragEnd={({ active, over }) => {
+
+											if (!over || active.id === over.id) return;
+
+											setOrderedItems((prev) => {
+
+												const list = [...prev[collection.slug]];
+												const oldIndex = list.findIndex((i) => String(i.id) === active.id);
+												const newIndex = list.findIndex((i) => String(i.id) === over.id);
+
+												const newList = arrayMove(list, oldIndex, newIndex);
+												const updatedList = newList.map((item, index) => ({
+													...item,
+													position: index + 1
+												}))
+
+												return {
+													...prev,
+													[collection.slug]: updatedList
+												};
+
+											});
+
+										}}
 									>
+										<SortableContext
+											items={items.map((i) => String(i.id))}
+											strategy={rectSortingStrategy}
+										>
 
-										<div className="grid grid-cols-6 gap-4">
+											<div className="grid grid-cols-6 gap-4">
 
-											{items.map((item) => (
+												{items.map((item) => (
 
-												<SortableItem
-													key={item.id}
-													id={String(item.id)}
-													disabled={!isEditing}
-												>
+													<SortableItem
+														key={item.id}
+														id={String(item.id)}
+														disabled={!isEditing}
+													>
 
-													{({
-														setNodeRef,
-														attributes,
-														listeners,
-														style,
-													}) => (
+														{({
+															setNodeRef,
+															attributes,
+															listeners,
+															style,
+														}) => (
 
-														<div ref={setNodeRef} style={style}>
+															<div ref={setNodeRef} style={style}>
 
-															<GalleryItem
-																item={item}
-																isEditMode={isEditing}
-																currentPath={currentPath}
-																isSelected={selectedItems.some(
-																	(i) => i.id === item.id
-																)}
-																onSelect={() =>
-																	setSelectedItems((prev) => [
-																		...prev,
-																		{
-																			id: item.id,
-																			collectionId: item.collection.id,
-																		},
-																	])
-																}
-																onDeselect={() =>
-																	setSelectedItems((prev) =>
-																		prev.filter((i) => i.id !== item.id)
-																	)
-																}
-																onDeleted={() => router.refresh()}
-																dragAttributes={attributes}
-																dragListeners={listeners}
-															/>
+																<GalleryItem
+																	item={item}
+																	isEditMode={isEditing}
+																	currentPath={currentPath}
+																	isSelected={selectedItems.some(
+																		(i) => i.id === item.id
+																	)}
+																	onSelect={() =>
+																		setSelectedItems((prev) => [
+																			...prev,
+																			{
+																				id: item.id,
+																				collectionId: item.collection.id,
+																			},
+																		])
+																	}
+																	onDeselect={() =>
+																		setSelectedItems((prev) =>
+																			prev.filter((i) => i.id !== item.id)
+																		)
+																	}
+																	onDeleted={() => router.refresh()}
+																	dragAttributes={attributes}
+																	dragListeners={listeners}
+																/>
 
-														</div>
+															</div>
 
-													)}
+														)}
 
-												</SortableItem>
+													</SortableItem>
 
-											))}
+												))}
 
-										</div>
+											</div>
 
-									</SortableContext>
+										</SortableContext>
 
-								</DndContext>
+									</DndContext>
 
-							</section>
+								</section>
 
-						);
-					})}
+							);
+						})}
 
-				</div>
+					</div>
+
+				) : (
+
+					<div>
+						
+					</div>
+
+				)}
 
 			</div>
 

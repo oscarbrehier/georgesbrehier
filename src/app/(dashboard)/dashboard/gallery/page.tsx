@@ -97,17 +97,13 @@ export default async function Page({
 
 	const galleryItems = await getGalleryItems(section);
 
-	if (!galleryItems) {
-		return null;
-	};
-
-	const groupedGalleryItems = galleryItems.reduce<Record<string, GalleryItemWithCollection[]>>((acc, item) => {
+	const groupedGalleryItems = galleryItems?.reduce<Record<string, GalleryItemWithCollection[]>>((acc, item) => {
 
 		const slug = item.collection.slug;
 		(acc[slug] ||= []).push(item);
 		return acc;
 
-	}, {});
+	}, {}) ?? null;
 
 	return (
 

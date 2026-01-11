@@ -1,14 +1,14 @@
 import { notFound, redirect } from 'next/navigation'
-import { getDefaultSection } from '@/utils/supabase/sections'
+import { getDefaultSectionWithCollection } from '@/utils/supabase/sections'
 
 export default async function Home() {
 
-	const defaultSection = await getDefaultSection();
+	const defaultSection = await getDefaultSectionWithCollection();
 
-	if (defaultSection?.slug) {
-		redirect(`/${defaultSection.slug}`)
-	}
+	if (!defaultSection?.slug || !defaultSection.defaultCollection.slug) {
+		return notFound();
+	};
 
-	return notFound();
+	redirect(`/${defaultSection.slug}/${defaultSection.defaultCollection.slug}`);
 
 };

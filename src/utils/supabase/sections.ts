@@ -37,16 +37,52 @@ export async function getSection(slug: string): Promise<GallerySection | null> {
 
 };
 
-export async function getDefaultSection(): Promise<GallerySection | null> {
+// export async function getSectionWithDefaultCollection(slug: string): Promise<SectionWithDefaultCollection | null> {
+
+// 	"use cache"
+// 	cacheTag(`section-${slug}-default-${collection}`);
+// 	cacheLife("hours");
+
+// 	const { data, error } = await supabase
+// 		.from("sections")
+// 		.select(`
+// 				id,
+// 				slug,
+// 				title,
+// 				defaultCollection:collections!inner(is_default, id, slug, title)
+// 			`)
+// 		.eq("slug", slug)
+// 		.filter("collections.is_default", "eq", true)
+// 		.single();
+
+// 	if (error) {
+// 		console.error("Error fetching default section:", error);
+// 		return null;
+// 	};
+
+// 	const flattened = {
+// 		...data,
+// 		defaultCollection: data.defaultCollection[0] ?? undefined
+// 	};
+
+// 	return flattened;
+
+// };
+
+export async function getDefaultSectionWithCollection(): Promise<SectionWithDefaultCollection | null> {
 
 	"use cache"
-	cacheTag(`default-section`);
+	cacheTag(`default-section-with-collection`);
 	cacheLife("hours");
 
 	const { data, error } = await supabase
 		.from("sections")
-		.select("*")
+		.select(`
+				*,
+  				collections!inner(*)
+			`)
 		.eq("is_default", true)
+		.filter("collections.is_default", "eq", true)
 		.single();
 
 	if (error) {
@@ -54,6 +90,13 @@ export async function getDefaultSection(): Promise<GallerySection | null> {
 		return null;
 	};
 
-	return data;
+	const flattened = {
+		...data,
+		defaultCollection: data.collections[0] ?? undefined
+	};
+
+	delete flattened.collections;
+
+	return flattened;
 
 };

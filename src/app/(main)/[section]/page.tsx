@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
-import { getDefaultSection } from '@/utils/supabase/sections'
+import { getDefaultSectionWithCollection, getSection } from '@/utils/supabase/sections'
 import { getDefaultCollectionBySectionId } from '@/utils/supabase/collections'
 
 export default async function SectionPage({
@@ -8,19 +8,23 @@ export default async function SectionPage({
 	params: Promise<{ section: string }>
 }) {
 
-	const { section } = await params;
-	const defaultSection = await getDefaultSection();
+	const { section: slug } = await params;
+	
+	const section = await getSection(slug);
 
-	if (defaultSection?.slug === section) {
+	if (!section) {
 
-		const defaultCollection = await getDefaultCollectionBySectionId(defaultSection.id);
+		const defaultSection = await getDefaultSectionWithCollection();
 
-		if (defaultCollection?.slug) {
-			redirect(`/${section}/${defaultCollection.slug}`);
-		};
-		
+		if (!defaultSection?.slug || !defaultSection.defaultCollection.slug) return notFound();
+
+		redirect(`${defaultSection.slug}/${defaultSection.defaultCollection.slug}`);
+
 	};
 
-	return notFound();
+	const collection = await getDefaultCollectionBySectionId(section.id);
+	if (!collection) return notFound();
+
+	redirect(`${section.slug}/${collection.slug}`);
 
 };

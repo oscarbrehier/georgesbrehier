@@ -9,7 +9,7 @@ import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
 import { getCollectionMetadata, getDefaultCollectionBySectionId } from "@/utils/supabase/collections";
-import { getDefaultSection, getSection } from "@/utils/supabase/sections";
+import { getDefaultSectionWithCollection, getSection } from "@/utils/supabase/sections";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -129,7 +129,7 @@ export default async function Page({
 	const { section: sectionSlug, collection: collectionSlug } = await params;
 
 	let section = await getSection(sectionSlug);
-	const defaultSectionPromise = getDefaultSection();
+	const defaultSectionPromise = getDefaultSectionWithCollection();
 
 	if (!section) {
 		section = await defaultSectionPromise;
@@ -145,6 +145,10 @@ export default async function Page({
 		collection = await defaultCollectionPromise;
 		if (!collection) return notFound();
 		redirect(`/${section.slug}/${collection.slug}`);
+	};
+
+	if (collection.section.slug !== sectionSlug) {
+		redirect(`/${collection.section.slug}/${collection.slug}`);
 	};
 
 	const { data: galleryItems, error } = await getGalleryItems({ collectionId: collection.id });
