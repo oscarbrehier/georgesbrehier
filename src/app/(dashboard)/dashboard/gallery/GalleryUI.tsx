@@ -83,6 +83,12 @@ export function GalleryUI({
 
 	function checkForChanges() {
 
+		if ((!orderedItems || Object.keys(orderedItems).length === 0) && groupedGalleryItems) {
+			return true;
+		};
+
+		if (!groupedGalleryItems || !orderedItems) return false;
+
 		for (const slug in orderedItems) {
 
 			const originalItems = groupedGalleryItems[slug] || [];
@@ -107,6 +113,8 @@ export function GalleryUI({
 	}, [orderedItems]);
 
 	async function handleSaveChanges() {
+
+		if (!orderedItems || !groupedGalleryItems) return;
 
 		const changes: { id: number; collectionId: string; data: any }[] = [];
 
@@ -196,6 +204,8 @@ export function GalleryUI({
 											if (!over || active.id === over.id) return;
 
 											setOrderedItems((prev) => {
+
+												if (!prev || !prev[collection.slug]) return prev;
 
 												const list = [...prev[collection.slug]];
 												const oldIndex = list.findIndex((i) => String(i.id) === active.id);
@@ -290,7 +300,7 @@ export function GalleryUI({
 				) : (
 
 					<div>
-						
+
 					</div>
 
 				)}

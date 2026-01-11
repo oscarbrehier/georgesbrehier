@@ -152,7 +152,14 @@ export default async function Page({
 	};
 
 	const { data: galleryItems, error } = await getGalleryItems({ collectionId: collection.id });
-	if (error || !galleryItems || galleryItems.length == 0) return notFound();
+
+	if (error || !galleryItems || galleryItems.length == 0) {
+
+		<div className="">
+
+		</div>
+
+	};
 
 	const fullUrl = getFullUrl(`/${section.slug}/${collection.slug}`);
 
