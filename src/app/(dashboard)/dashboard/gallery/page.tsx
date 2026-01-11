@@ -3,24 +3,7 @@ import { redirect, RedirectType } from "next/navigation";
 import { cache } from "react";
 import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { GalleryUI } from "./GalleryUI";
-
-const getSections = cache(async () => {
-
-	const { error, data } = await supabase
-		.from("sections")
-		.select("*");
-
-
-
-	const sections = data?.map(({ title }) => title);
-
-	if (sections && sections.length !== 0 && !error) {
-		return ["all", ...sections];
-	};
-
-	return null;
-
-});
+import { getSections } from "@/utils/supabase/sections";
 
 const getGalleryItems = cache(
 	async (section: string): Promise<GalleryItemWithCollection[] | null> => {
@@ -83,16 +66,22 @@ export default async function Page({
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
 
+	const DEFAULT_SECTION = 'all';
+
 	const params = await searchParams;
 	let section = Array.isArray(params.section) ? params.section[0] : params.section;
 
-
 	const collections = await getCollections(section ?? null);
 
-	const sections = await getSections();
+	const sections = [
+		{ slug: DEFAULT_SECTION, title: 'all' } as GallerySection,
+		...await getSections(),
+	]
 
-	if (!section || !sections?.includes(section)) {
-		redirect(`/dashboard/gallery?section=all`, RedirectType.replace);
+	const validSlugs = new Set(sections.map(s => s.slug))
+
+	if (!section || !validSlugs.has(section)) {
+		redirect(`/dashboard/gallery?section=${DEFAULT_SECTION}`, RedirectType.replace);
 	};
 
 	const galleryItems = await getGalleryItems(section);

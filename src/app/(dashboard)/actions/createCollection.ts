@@ -36,7 +36,7 @@ export async function createCollection(prevState: CollectionFormState | undefine
 	if (error) {
 
 		if (error.code === "23505") {
-			return { error: `A collection named \`${title}\` already exists`}
+			return { error: `A collection named \`${title}\` already exists` }
 		};
 
 		return { error: error.message };
@@ -49,6 +49,8 @@ export async function createCollection(prevState: CollectionFormState | undefine
 	if (isDefault) {
 		revalidateTag(`section-${sectionId}-default-collection`, "max");
 	};
+
+	revalidatePath("/dashboard/gallery", "page");
 
 	return { success: true, message: `Successfully created collection \`${title}\`` };
 

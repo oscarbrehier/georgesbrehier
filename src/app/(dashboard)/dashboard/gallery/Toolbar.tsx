@@ -2,17 +2,19 @@
 
 import { deleteGalleryItems } from "@/app/(dashboard)/actions/deleteGalleryItems";
 import { cn } from "@/utils/utils";
-import { Ban, CheckCheck, Eye, Pencil, PencilOff, Plus } from "lucide-react";
+import { Ban, CheckCheck, Eye, Pencil, PencilOff, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button, ButtonText } from "../../components/Button";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
+import { deleteSection } from "../../actions/deleteSection";
 
 export function Toolbar({
 	isEditing,
 	selectedItems,
 	currentPath,
+	section,
 	onEditToggle,
 	onClearSelected,
 	onSave,
@@ -21,6 +23,7 @@ export function Toolbar({
 	isEditing: boolean;
 	selectedItems: GalleryItemToDelete[];
 	currentPath: string;
+	section: string | null;
 	onEditToggle: () => void;
 	onClearSelected: () => void;
 	onSave: () => void;
@@ -154,9 +157,60 @@ export function Toolbar({
 					<ButtonText>{isEditing ? "Exit Edit Mode" : "Edit"}</ButtonText>
 				</Button>
 
+				{section && (
+					<DeleteSectionButton section={section} />
+				)}
+
 			</div>
 
 		</div>
+
+	);
+
+};
+
+function DeleteSectionButton({
+	section
+}: {
+	section: string;
+}) {
+
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	async function handleDeleteSection() {
+
+		if (isDeleting) return;
+		if (!section) return;
+		if (!confirm(`You are about to permanently delete the "${section}" section. This action cannot be undone. Are you sure you want to proceed?`)) return;
+
+		setIsDeleting(true);
+
+		const { error } = await deleteSection(section);
+
+		if (error) toast("Failed to delete section:", { description: error });
+
+		setIsDeleting(false);
+
+	};
+
+	return (
+
+		<Button
+			className={cn(
+				"bg-red-600 hover:bg-red-700 text-neutral-50 disabled:bg-red-200"
+			)}
+			onClick={handleDeleteSection}
+			disabled={isDeleting}
+			Icon={Trash}
+		>
+			<ButtonText>
+				Delete
+				{" "}
+				<span className="underline">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
+				{" "}
+				collection
+			</ButtonText>
+		</Button>
 
 	);
 

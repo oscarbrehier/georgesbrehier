@@ -2,15 +2,13 @@
 
 import { cn } from "@/utils/utils";
 import Link from "next/link";
-import { Button, ButtonText } from "../../components/Button";
-import { Eye } from "lucide-react";
 
 export function Selector({
 	sections,
 	collections,
 	current
 }: {
-	sections: string[],
+	sections: GallerySection[],
 	collections: GalleryCollection[],
 	current: string
 }) {
@@ -38,13 +36,13 @@ export function Selector({
 				{sections.map((section, idx) => (
 
 					<Link
-						key={`section-${section}-${idx}`}
-						href={`/dashboard/gallery?section=${section}`}
+						key={idx}
+						href={`/dashboard/gallery?section=${section.slug}`}
 						className={cn(
 							"cursor-pointer",
-							current === section ? "text-black" : "text-neutral-500 hover:text-black"
+							current === section.slug ? "text-black underline" : "text-neutral-500 hover:text-black"
 						)}>
-						{section}
+						{section.title}
 					</Link>
 
 				))}

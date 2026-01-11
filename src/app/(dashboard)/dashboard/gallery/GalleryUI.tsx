@@ -59,7 +59,7 @@ export function GalleryUI({
 	groupedGalleryItems,
 }: {
 	section: string;
-	sections: any[];
+	sections: GallerySection[];
 	collections: GalleryCollection[];
 	groupedGalleryItems: Record<string, GalleryItemWithCollection[]> | null;
 }) {
@@ -150,13 +150,14 @@ export function GalleryUI({
 				isEditing={isEditing}
 				selectedItems={selectedItems}
 				currentPath={currentPath}
+				section={section === "all" ? null : section}
 				onEditToggle={() => setIsEditing((v) => !v)}
 				onClearSelected={() => setSelectedItems([])}
 				onSave={handleSaveChanges}
 				hasChanges={hasChanges}
 			/>
 
-			<div className="flex h-full pt-6">
+			<div className="flex h-full pt-6 pb-8">
 
 				<Selector
 					sections={sections}
@@ -299,8 +300,8 @@ export function GalleryUI({
 
 				) : (
 
-					<div>
-
+					<div className="h-full w-full flex items-center justify-center">
+						<p className="text-muted-foreground">This section is empty.</p>
 					</div>
 
 				)}

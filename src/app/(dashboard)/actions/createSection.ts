@@ -1,7 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export interface SectionFormState {
 	success?: boolean;
@@ -45,6 +45,8 @@ export async function createSection(prevState: SectionFormState | undefined, for
 	if (isDefault) {
 		revalidateTag("default-section-with-collection", "max");
 	};
+
+	revalidatePath("/dashboard/gallery", "page");
 
 	return { success: true, message: `Successfully created section \`${title}\`` };
 
