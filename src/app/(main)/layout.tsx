@@ -36,15 +36,18 @@ export default async function Layout({
 
 			</header>
 
-			<div className="pl-44 pt-11.5 w-full fixed top-0 left-0 flex z-60">
+			<div className="pl-44 pt-11.5 w-full fixed top-0 left-0 flex z-60 space-x-4">
 
 				{sections.map((section) => (
+
 					<Link
 						key={section.id}
 						href={`/${section.slug}`}
 						className="capitalize text-[15px]"
 					>
-						{section.title}</Link>
+						{section.title}
+					</Link>
+
 				))}
 
 			</div>

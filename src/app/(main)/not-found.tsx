@@ -14,7 +14,7 @@ export default function NotFound() {
 
 	return (
 
-		<main className="h-screen w-full pl-36 p-8 bg-neutral-100">
+		<main className="h-screen w-full pl-36 p-8 bg-background">
 
 			<div className="w-full h-full flex items-center justify-center">
 
