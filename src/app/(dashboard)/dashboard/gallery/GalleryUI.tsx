@@ -177,7 +177,7 @@ export function GalleryUI({
 							return (
 
 								<section
-									key={collection.slug}
+									key={collection.id}
 									className={cn("space-y-4", idx !== 0 && "mt-10")}
 								>
 

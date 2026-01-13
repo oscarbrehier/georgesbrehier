@@ -10,6 +10,8 @@ import { Select } from "@/components/dashboard/Select";
 import { Input } from "@/components/dashboard/Input";
 import { CreateItemDialog } from "@/app/(dashboard)/components/CreateItemDialog";
 import { getSections } from "@/utils/supabase/sections";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 
 interface UploadFormData {
 	title: string
@@ -24,7 +26,7 @@ interface UploadProgress {
 	filename: string
 	status: "pending" | "uploading" | "success" | "error"
 	error?: string
-}
+};
 
 export function Upload({
 	sections: initialSections
@@ -37,33 +39,9 @@ export function Upload({
 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
 	const [collections, setCollections] = useState<GalleryCollection[] | null>(null);
 
-	const [isDragging, setIsDragging] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 	const [error, setError] = useState<string | null>(null);
-
-	const handleDragEnter = (e: React.DragEvent) => {
-
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(true);
-
-	};
-
-	const handleDragLeave = (e: React.DragEvent) => {
-
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(false);
-
-	};
-
-	const handleDragOver = (e: React.DragEvent) => {
-
-		e.preventDefault();
-		e.stopPropagation();
-
-	};
 
 	const processImages = (files: FileList) => {
 
@@ -95,23 +73,12 @@ export function Upload({
 			imagePreviews: [...formData.imagePreviews, ...previews],
 		});
 
-		setIsDragging(false);
+		drag.resetDrag();
 		setError(null);
 
 	};
 
-	const handleDrop = (e: React.DragEvent) => {
-
-		e.preventDefault();
-		e.stopPropagation();
-
-		const files = e.dataTransfer.files;
-
-		if (files.length > 0) {
-			processImages(files);
-		};
-
-	};
+	const drag = useDragAndDrop(processImages);
 
 	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -154,25 +121,6 @@ export function Upload({
 			[name]: value,
 		});
 
-
-	};
-
-	async function uploadImage(file: File) {
-
-		const formData = new FormData();
-		formData.append("file", file);
-
-		const res = await fetch("/api/gallery/upload", {
-			method: "POST",
-			body: formData
-		});
-
-		if (!res.ok) {
-			throw new Error("Failed to upload image");
-		}
-
-		const data = await res.json();
-		return data.url;
 
 	};
 
@@ -227,13 +175,19 @@ export function Upload({
 
 			try {
 
-				const imageUrl = await uploadImage(file);
+				const { url, error } = await uploadImage(file);
+
+				if (error || !url) {
+					setError(error || "Upload failed");
+					setIsLoading(false);
+					return;
+				};
 
 				const itemTitle = formData.images.length > 1
 					? `${formData.title} - ${i + 1}`
 					: formData.title;
 
-				await uploadToGallery(imageUrl, itemTitle, formData.description, formData.collectionId);
+				await uploadToGallery(url, itemTitle, formData.description, formData.collectionId);
 
 				setUploadProgress((prev) =>
 					prev.map((p, idx) => idx === i ? { ...p, status: "success" } : p)
@@ -306,11 +260,11 @@ export function Upload({
 				<form onSubmit={handleSubmit} className="space-y-8">
 
 					<div
-						onDragEnter={handleDragEnter}
-						onDragLeave={handleDragLeave}
-						onDragOver={handleDragOver}
-						onDrop={handleDrop}
-						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${isDragging
+						onDragEnter={drag.handleDragEnter}
+						onDragLeave={drag.handleDragLeave}
+						onDragOver={drag.handleDragOver}
+						onDrop={drag.handleDrop}
+						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
 							? "border-neutral-400 bg-background"
 							: "border-neutral-200"
 							}`}
