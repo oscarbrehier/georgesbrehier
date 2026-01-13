@@ -1,8 +1,10 @@
 "use client"
 
+import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 import { cn } from "@/utils/utils";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type GalleryItemSubset = Pick<GalleryItem, "id" | "image_url" | "title">;
 
@@ -34,23 +36,16 @@ export function ImageGallery({
 
 		try {
 
-			const formData = new FormData();
-			formData.append("file", file);
+			const { url, error } = await uploadImage(file);
 
-			const res = await fetch("/api/gallery/upload", {
-				method: "POST",
-				body: formData
-			});
-
-			if (!res.ok) {
+			if (!error || !url) {
+				toast("Image upload failed", { description: error });
 				return;
 			};
 
-			const data = await res.json();
-
 			const newItem: GalleryItemSubset = {
 				id: Math.random(),
-				image_url: data.url,
+				image_url: url,
 				title: file.name,
 			};
 

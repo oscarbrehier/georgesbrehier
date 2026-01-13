@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Cloud, Loader2, Check, X, Image as ImageIcon, Plus } from "lucide-react";
+import { Cloud, Loader2, Check, X } from "lucide-react";
 import { getCollectionsBySectionId } from "@/utils/supabase/collections";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
@@ -12,15 +12,7 @@ import { CreateItemDialog } from "@/app/(dashboard)/components/CreateItemDialog"
 import { getSections } from "@/utils/supabase/sections";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
-
-interface UploadFormData {
-	title: string
-	description: string
-	sectionId: string
-	collectionId: string
-	images: File[]
-	imagePreviews: string[]
-}
+import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
 
 interface UploadProgress {
 	filename: string
@@ -124,28 +116,6 @@ export function Upload({
 
 	};
 
-	async function uploadToGallery(imageUrl: string, title: string, description: string, collectionId: string) {
-
-		const res = await fetch("/api/gallery", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				image_url: imageUrl,
-				title,
-				description,
-				collectionId
-			})
-		});
-
-		if (!res.ok) {
-			const data = await res.json();
-			throw new Error(data.error || "Failed to save item to gallery");
-		};
-
-	};
-
 	const handleSubmit = async (e: React.FormEvent) => {
 
 		e.preventDefault();
@@ -173,33 +143,28 @@ export function Upload({
 				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
 			);
 
-			try {
 
-				const { url, error } = await uploadImage(file);
+			const { url, error: imageError } = await uploadImage(file);
 
-				if (error || !url) {
-					setError(error || "Upload failed");
-					setIsLoading(false);
-					return;
-				};
-
-				const itemTitle = formData.images.length > 1
-					? `${formData.title} - ${i + 1}`
-					: formData.title;
-
-				await uploadToGallery(url, itemTitle, formData.description, formData.collectionId);
-
-				setUploadProgress((prev) =>
-					prev.map((p, idx) => idx === i ? { ...p, status: "success" } : p)
-				);
-
-			} catch (err: any) {
-
-				setUploadProgress((prev) =>
-					prev.map((p, idx) => idx === i ? { ...p, status: "error", error: err.message } : p)
-				);
-
+			if (imageError || !url) {
+				setError(imageError || "Upload failed");
+				setIsLoading(false);
+				return;
 			};
+
+			const itemTitle = formData.images.length > 1
+				? `${formData.title} - ${i + 1}`
+				: formData.title;
+
+			const { error: galleryError } = await uploadToGallery(itemTitle, formData.description, url, formData.collectionId);
+
+			setUploadProgress((prev) =>
+				prev.map((p, idx) => idx === i ? {
+					...p,
+					status: galleryError ? "error" : "success",
+					...(galleryError && { error: galleryError })
+				} : p)
+			);
 
 		};
 
