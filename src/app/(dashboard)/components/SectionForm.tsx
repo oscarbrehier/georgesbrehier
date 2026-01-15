@@ -2,27 +2,71 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useActionState, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { createSection, SectionFormState } from "../actions/createSection";
+import { createSection, updateSection } from "../actions/sections";
+import { EditData } from "./CreateItemDialog";
 
+interface FormState {
+	message?: string;
+	error?: string | null;
+	success?: boolean;
+};
 
-const initialState = { message: "", error: "" };
 const initialForm = {
 	sectionTitle: "",
 	isDefault: false
 };
 
-export function NewSectionForm({
-	onSuccess
+export function SectionForm({
+	onSuccess,
+	initialData,
 }: {
 	onSuccess?: () => void;
+	initialData?: EditData;
 }) {
 
-	const [formData, setFormData] = useState(initialForm);
+	const isEditMode = !!initialData;
 
-	const [state, formAction, pending] = useActionState<SectionFormState | undefined, FormData>(createSection, initialState);
+	const [formData, setFormData] = useState({
+		sectionTitle: initialData?.title || "",
+		isDefault: initialData?.is_default || false
+	});
+
+	const [formState, setFormState] = useState<FormState>({});
+	const [pending, setPending] = useState(false);
+
 	const isFormComplete = formData.sectionTitle.trim().length > 0;
+
+	async function handleSubmit(e: FormEvent) {
+
+		e.preventDefault();
+		if (pending) return;
+		setPending(true);
+
+		if (isEditMode) {
+
+			const { error } = await updateSection(initialData.id, {
+				title: formData.sectionTitle,
+				is_default: formData.isDefault
+			});
+
+			setFormState({ error, success: !error, message: !error ? "Updated!" : "" });
+
+		} else {
+
+			const res = await createSection({
+				title: formData.sectionTitle,
+				is_default: formData.isDefault
+			});
+
+			setFormState(res);
+
+		};
+
+		setPending(false);
+
+	};
 
 	function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
 
@@ -44,16 +88,16 @@ export function NewSectionForm({
 	}, [pending]);
 
 	useEffect(() => {
-		if (state?.success && onSuccess) {
+		if (formState.success && onSuccess) {
 			onSuccess?.();
 		};
-	}, [state?.success, onSuccess]);
+	}, [formState.success, onSuccess]);
 
 	return (
 
 		<form
 			className="grid gap-4 w"
-			action={formAction}
+			onSubmit={handleSubmit}
 		>
 
 			<div className="grid w-full max-w-sm items-center gap-3">
@@ -62,7 +106,7 @@ export function NewSectionForm({
 					type="text"
 					id="sectionTitle"
 					name="sectionTitle"
-					placeholder="Title"
+					placeholder={isEditMode ? initialData.title : "Title"}
 					value={formData.sectionTitle}
 					onChange={handleInputChange}
 				/>
@@ -78,18 +122,18 @@ export function NewSectionForm({
 					}}
 				/>
 				<div className="grid gap-2">
-					<Label htmlFor="isDefault">Make default</Label>
+					<Label htmlFor="isDefault">Default</Label>
 				</div>
 			</div>
 
 			<div className="w-full space-y-2">
 
-				{state?.error && (
-					<p className="text-xs text-red-600 text-center">{state.error}</p>
+				{formState.error && (
+					<p className="text-xs text-red-600 text-center">{formState.error}</p>
 				)}
 
-				{state?.success && (
-					<p className="text-xs text-green-600 text-center">{state.message}</p>
+				{formState.success && (
+					<p className="text-xs text-green-600 text-center">{formState.message}</p>
 				)}
 
 				<Button
@@ -102,7 +146,10 @@ export function NewSectionForm({
 						<Loader2 className="w-5 h-5 text-green-600 animate-spin flex-shrink-0" />
 					) : (
 						<span className="truncate">
-							Create section{formData.sectionTitle && `: ${formData.sectionTitle}`}
+							{isEditMode
+								? "Update section"
+								: `Create section${formData.sectionTitle && `: ${formData.sectionTitle}`}`
+							}
 						</span>
 					)}
 

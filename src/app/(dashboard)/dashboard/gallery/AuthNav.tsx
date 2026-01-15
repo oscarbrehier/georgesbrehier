@@ -1,3 +1,5 @@
+"use client"
+
 import { getBaseUrl } from "@/utils/seo";
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";

@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button, ButtonText } from "../../components/Button";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
-import { deleteSection } from "../../actions/deleteSection";
+import { deleteSection } from "../../actions/sections";
 
 export function Toolbar({
 	isEditing,

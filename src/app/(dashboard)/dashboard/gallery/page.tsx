@@ -18,7 +18,7 @@ const getGalleryItems = cache(
 				id,
 				slug,
 				title,
-				visible,
+				is_visible,
 				section:sections!inner (
 					id,
 					slug
@@ -48,7 +48,7 @@ const getCollections = cache(async (section: string | null) => {
 			id,
 			title,
 			slug,
-			visible,
+			is_visible,
 			section:sections!inner (
 				id,
 				slug

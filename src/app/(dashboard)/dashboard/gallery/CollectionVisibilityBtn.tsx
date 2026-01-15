@@ -10,7 +10,7 @@ export function CollectionVisibilityBtn({
 	collection: GalleryCollection;
 }) {
 
-	const [isVisible, setIsVisible] = useState(collection.visible);
+	const [isVisible, setIsVisible] = useState(collection.is_visible);
 	const [isPending, setIsPending] = useState(false);
 
 	async function toggleVisibility() {

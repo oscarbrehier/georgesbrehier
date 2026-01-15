@@ -4,6 +4,7 @@ declare global {
 		url: string;
 		title: string;
 	};
+
 	interface GalleryItem {
 		id: number;
 		title: string;
@@ -13,11 +14,14 @@ declare global {
 		position: number;
 		created_at: string;
 	};
+
 	interface GallerySection {
 		id: string;
 		title: string;
 		is_default: boolean;
 		slug: string;
+		is_visible: boolean;
+		position: number;
 	};
 
 	interface SectionWithDefaultCollection extends GallerySection {
@@ -30,7 +34,7 @@ declare global {
 		title: string;
 		is_default: boolean;
 		slug: string;
-		visible: boolean;
+		is_visible: boolean;
 		seo_title: string,
 		seo_description: string,
 		seo_og_image_url: string,

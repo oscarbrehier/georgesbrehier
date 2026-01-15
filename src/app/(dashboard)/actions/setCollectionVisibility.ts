@@ -7,7 +7,7 @@ export async function setCollectionVisibility(collectionId: string, visible: boo
 
 	const { error } = await supabase
 		.from("collections")
-		.update({ visible })
+		.update({ is_visible: visible })
 		.eq("id", collectionId);
 
 	revalidateTag(`gallery-collection-${collectionId}`, "max");

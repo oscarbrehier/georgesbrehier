@@ -41,16 +41,16 @@ export function SortableItem({
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
+		};
+
+		return children({
+			setNodeRef,
+			attributes,
+			listeners,
+			style,
+		});
+
 	};
-
-	return children({
-		setNodeRef,
-		attributes,
-		listeners,
-		style,
-	});
-
-};
 
 export function GalleryUI({
 	section,
