@@ -6,9 +6,10 @@ import { Ban, CheckCheck, Eye, Pencil, PencilOff, Plus, Trash } from "lucide-rea
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button, ButtonText } from "../../components/Button";
-import { CreateItemDialog } from "../../components/CreateItemDialog";
-import { deleteSection } from "../../actions/sections";
+import { Button, ButtonText } from "./Button";
+import { CreateItemDialog } from "./CreateItemDialog";
+import { deleteSection } from "../actions/sections";
+import { QuickActions } from "./QuickActions";
 
 export function Toolbar({
 	isEditing,
@@ -72,47 +73,7 @@ export function Toolbar({
 			"2lg:gap-0 w gap-2"
 		)}>
 
-			<div className="flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2">
-
-				<a href="/">
-					<Button
-						variant="base"
-						size="sm"
-						Icon={Eye}
-					>
-						<ButtonText>View Website</ButtonText>
-					</Button>
-				</a>
-
-				<CreateItemDialog
-					type="section"
-				>
-					<Button
-						className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
-						Icon={Plus}
-						size="sm"
-					>
-						<ButtonText>
-							Create new Section
-						</ButtonText>
-					</Button>
-				</CreateItemDialog>
-
-				<CreateItemDialog
-					type="collection"
-				>
-					<Button
-						className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
-						Icon={Plus}
-						size="sm"
-					>
-						<ButtonText>
-							Create new Collection
-						</ButtonText>
-					</Button>
-				</CreateItemDialog>
-
-			</div>
+			<QuickActions />
 
 			<div className="flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2">
 

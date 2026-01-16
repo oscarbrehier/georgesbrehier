@@ -7,6 +7,7 @@ import { NavigatorItem } from "./NavigatorItem";
 import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
 import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
+import { QuickActions } from "../../components/QuickActions";
 
 export interface NavigableItem {
 	id: string;
@@ -14,13 +15,14 @@ export interface NavigableItem {
 	title: string;
 	position?: number;
 	is_visible: boolean;
-	is_default?: boolean;
+	is_default: boolean;
 };
 
 interface NavigatorProps<T extends NavigableItem> {
 	items: T[];
 	title: string;
 	basePath: string;
+	type: "section" | "collection";
 	onSave: (changes: { id: string; position: number }[]) => Promise<{ error?: string | null }>;
 	onUpdateField: (id: string, data: Partial<T>) => Promise<{ error?: string | null }>;
 };
@@ -29,6 +31,7 @@ export function NavigatorUI<T extends NavigableItem>({
 	items,
 	title,
 	basePath,
+	type,
 	onSave,
 	onUpdateField
 }: NavigatorProps<T>) {
@@ -71,6 +74,8 @@ export function NavigatorUI<T extends NavigableItem>({
 
 			</div>
 
+			<QuickActions className="mb-4" />
+
 			<DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
 
 				if (!over || active.id === over.id) return;
@@ -88,7 +93,7 @@ export function NavigatorUI<T extends NavigableItem>({
 
 				<SortableContext items={orderedItems.map(i => i.id)} strategy={rectSortingStrategy}>
 
-					<div className="flex-1 w-full overflow-y-scroll grid 2xl:grid-cols-2 gap-4 auto-rows-max">
+					<div className="flex-1 w-full overflow-y-scroll grid 2xl:grid-cols-1 gap-4 auto-rows-max p-0.5 w">
 
 						{orderedItems.map((item) => (
 
@@ -99,6 +104,7 @@ export function NavigatorUI<T extends NavigableItem>({
 									<div ref={sortable.setNodeRef} style={sortable.style}>
 										<NavigatorItem
 											item={item}
+											type={type}
 											basePath={basePath}
 											dragAttributes={sortable.attributes}
 											dragListeners={sortable.listeners}

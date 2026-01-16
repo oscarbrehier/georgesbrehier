@@ -1,7 +1,7 @@
 "use client"
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { Toolbar } from "../../../gallery/Toolbar";
+import { Toolbar } from "../../../../components/Toolbar";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { SortableItem } from "../../../gallery/GalleryUI";
 import { GalleryItem } from "../../../gallery/GalleryItem";

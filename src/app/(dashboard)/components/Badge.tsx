@@ -7,7 +7,7 @@ type BadgeProps = HTMLAttributes<HTMLDivElement> & {
 	variant?: "base"
 };
 
-export function Badge({ children, className, size = "md", variant, ...props }: BadgeProps) {
+export function Badge({ children, className, size = "sm", variant = "base", ...props }: BadgeProps) {
 
 	return (
 		<div

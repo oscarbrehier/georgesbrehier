@@ -56,7 +56,7 @@ export function CreateItemDialog({
 				</DialogHeader>
 
 				{type === "section" && <SectionForm onSuccess={handleSuccess} initialData={initialData} />}
-				{type === "collection" && <NewCollectionForm onSuccess={handleSuccess} />}
+				{type === "collection" && <NewCollectionForm onSuccess={handleSuccess} initialData={initialData} />}
 
 			</DialogContent>
 

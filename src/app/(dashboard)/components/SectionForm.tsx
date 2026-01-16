@@ -29,7 +29,7 @@ export function SectionForm({
 	const isEditMode = !!initialData;
 
 	const [formData, setFormData] = useState({
-		sectionTitle: initialData?.title || "",
+		sectionTitle: "",
 		isDefault: initialData?.is_default || false
 	});
 
@@ -101,7 +101,7 @@ export function SectionForm({
 		>
 
 			<div className="grid w-full max-w-sm items-center gap-3">
-				<Label htmlFor="sectionTitle">Section Title</Label>
+				<Label htmlFor="sectionTitle">Title</Label>
 				<Input
 					type="text"
 					id="sectionTitle"

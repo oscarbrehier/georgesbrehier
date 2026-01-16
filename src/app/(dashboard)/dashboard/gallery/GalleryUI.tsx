@@ -5,7 +5,7 @@ import { cn } from "@/utils/utils";
 import { roboto } from "@/utils/fonts";
 import { GalleryItem } from "./GalleryItem";
 import { useEffect, useState } from "react";
-import { Toolbar } from "./Toolbar";
+import { Toolbar } from "../../components/Toolbar";
 import { usePathname, useRouter } from "next/navigation";
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";

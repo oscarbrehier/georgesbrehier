@@ -13,6 +13,7 @@ export default async function Page() {
 			<NavigatorUI
 				title="Sections"
 				items={sections}
+				type="section"
 				basePath="sections"
 				onSave={updateSectionPositions}
 				onUpdateField={updateSection}

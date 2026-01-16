@@ -11,8 +11,6 @@ export default async function Page({
 	const { section: sectionSlug } = await params;
 	const collections = await getCollectionBySection(sectionSlug)
 
-	console.log(collections)
-
 	return (
 
 
@@ -21,6 +19,7 @@ export default async function Page({
 			<NavigatorUI
 				title={sectionSlug}
 				items={collections}
+				type="collection"
 				basePath={sectionSlug}
 				onSave={updateSectionPositions}
 				onUpdateField={updateSection}

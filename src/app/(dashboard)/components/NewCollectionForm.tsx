@@ -7,6 +7,7 @@ import { getSections } from "@/utils/supabase/sections";
 import { useActionState, useEffect, useState } from "react";
 import { createCollection, CollectionFormState } from "../actions/createCollection";
 import { Loader2 } from "lucide-react";
+import { EditData } from "./CreateItemDialog";
 
 
 const initialState = { message: "", error: "" };
@@ -17,9 +18,11 @@ const initialForm = {
 };
 
 export function NewCollectionForm({
-	onSuccess
+	onSuccess,
+	initialData
 }: {
 	onSuccess?: () => void;
+	initialData?: EditData;
 }) {
 
 	const [sections, setSections] = useState<GallerySection[]>([]);
@@ -79,7 +82,7 @@ export function NewCollectionForm({
 				onValueChange={(value) => {
 					setFormData(prev => ({ ...prev, sectionId: value }));
 				}}
-				value={formData.sectionId}
+				value={initialData?.section_id ?? formData.sectionId}
 			>
 				<SelectTrigger className="w-full">
 					<SelectValue placeholder="Select a section" />
