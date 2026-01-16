@@ -102,7 +102,7 @@ export function CollectionsUI({
 
 	return (
 
-		<div className="h-full flex flex-col px-8 pb-8">
+		<div className="h-[calc(100vh-8rem)] flex flex-col px-8 pb-8">
 
 			<div className="flex items-center justify-between mb-10">
 				<h1 className="text-4xl">{section}</h1>

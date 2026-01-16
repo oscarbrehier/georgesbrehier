@@ -27,14 +27,14 @@ export default function Layout({
 	const basePath = "/dashboard";
 
 	const navItems = [
-		{ href: "/gallery", label: "gallery" },
+		{ href: "/sections", label: "sections" },
 		{ href: "/gallery/upload", label: "upload" },
 		{ href: "/gallery/seo", label: "seo" },
 	];
 
 	return (
 
-		<div className="h-screen w-full px-8 pb-8 pt-24 bg-dashboard">
+		<div className="min-h-screen w-full px-8 pb-8 pt-24 bg-dashboard">
 
 			<div className={cn(
 				"w-full fixed top-0 left-0 z-50 px-8 space-y-2",

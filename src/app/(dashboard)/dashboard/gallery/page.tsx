@@ -35,7 +35,7 @@ const getGalleryItems = cache(
 
 		return data;
 
-	});
+});
 
 const getCollections = cache(async (section: string | null) => {
 

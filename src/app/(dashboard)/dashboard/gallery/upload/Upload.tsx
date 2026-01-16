@@ -230,7 +230,7 @@ export function Upload({
 						onDragOver={drag.handleDragOver}
 						onDrop={drag.handleDrop}
 						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
-							? "border-neutral-400 bg-background"
+							? "border-neutral-400 bg-dashboard"
 							: "border-neutral-200"
 							}`}
 					>
@@ -288,7 +288,7 @@ export function Upload({
 
 							<div className="px-12 py-8 text-center">
 
-								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background mb-4">
+								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dashboard mb-4">
 									<Cloud className="w-8 h-8 text-neutral-600" />
 								</div>
 
@@ -335,7 +335,7 @@ export function Upload({
 								value={formData.description}
 								onChange={handleInputChange}
 								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-background text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
 							/>
 
 						</div>
@@ -407,7 +407,7 @@ export function Upload({
 
 							{uploadProgress.map((progress, index) => (
 
-								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background border border-neutral-200">
+								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dashboard border border-neutral-200">
 
 									{progress.status === "pending" && (
 										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
