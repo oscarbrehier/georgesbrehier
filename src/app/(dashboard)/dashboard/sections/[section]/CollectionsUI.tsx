@@ -188,7 +188,10 @@ export function CollectionsUI({
 											strategy={rectSortingStrategy}
 										>
 
-											<div className="grid grid-cols-8 gap-4">
+											<div className={cn(
+												"grid gap-4",
+												"2xl:grid-cols-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2"
+											)}>
 
 												{items.map((item) => (
 

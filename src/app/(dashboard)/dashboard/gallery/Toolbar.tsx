@@ -66,9 +66,13 @@ export function Toolbar({
 
 	return (
 
-		<div className="h-20 w-full flex items-start justify-between gap-4">
+		<div className={cn(
+			"h-auto pb-8 w-full flex justify-between",
+			"2lg:flex-row flex-col 2lg:items-center items-end",
+			"2lg:gap-0 w gap-2"
+		)}>
 
-			<div className="flex gap-4">
+			<div className="flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2">
 
 				<a href="/">
 					<Button
@@ -110,7 +114,7 @@ export function Toolbar({
 
 			</div>
 
-			<div className="flex gap-4">
+			<div className="flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2">
 
 				{
 					isEditing && selectedItems.length > 0 && (
