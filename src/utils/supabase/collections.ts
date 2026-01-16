@@ -3,34 +3,72 @@ import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchSupabase } from "./fetchSupabase";
 
+
+export async function getCollectionBySection(identifier: string): Promise<GalleryCollection[]> {
+
+    "use cache"
+    cacheTag(`section-${identifier}-collections`);
+    cacheLife("hours");
+
+    if (!identifier) return [];
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+    let sectionId = identifier;
+
+    if (!isUuid) {
+
+        const { data: section, error: sError } = await supabase
+            .from("sections")
+            .select("id")
+            .eq("slug", identifier)
+            .single();
+
+        if (sError || !section) return [];
+        sectionId = section.id;
+
+    };
+
+    const { data, error } = await supabase
+        .from("collections")
+        .select("*")
+        .eq("section_id", sectionId);
+
+    if (error) {
+        return [];
+    };
+
+    return data as GalleryCollection[];
+
+};
+
 export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[]> {
 
     "use cache"
-	cacheTag(`section-${sectionId}-collections`);
-	cacheLife("hours");
+    cacheTag(`section-${sectionId}-collections`);
+    cacheLife("hours");
 
-	if (!sectionId) return [];
+    if (!sectionId) return [];
 
-	const { data, error } = await supabase
-		.from("collections")
-		.select("*")
-		.eq("section_id", sectionId);
+    const { data, error } = await supabase
+        .from("collections")
+        .select("*")
+        .eq("section_id", sectionId);
 
-	if (error) return [];
-	return data;
+    if (error) return [];
+    return data;
 
 };
 
 export async function getCollectionMetadata(collection: string): Promise<GalleryCollectionWithSection | null> {
 
-	"use cache"
-	cacheTag(`collection-metadata-${collection}`);
-	cacheLife("hours");
+    "use cache"
+    cacheTag(`collection-metadata-${collection}`);
+    cacheLife("hours");
 
-	return await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ "slug": collection },
-		`
+    return await fetchSupabase<GalleryCollectionWithSection>(
+        "collections",
+        { "slug": collection },
+        `
             id,
             slug,
             title,
@@ -51,21 +89,21 @@ export async function getCollectionMetadata(collection: string): Promise<Gallery
                 title
             )
         `,
-		true
-	);
+        true
+    );
 
 };
 
 export async function getDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     "use cache"
-	cacheTag(`section-${sectionId}-default-collection`);
-	cacheLife("hours");
+    cacheTag(`section-${sectionId}-default-collection`);
+    cacheLife("hours");
 
-	return await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ section_id: sectionId, is_default: true },
-		`
+    return await fetchSupabase<GalleryCollectionWithSection>(
+        "collections",
+        { section_id: sectionId, is_default: true },
+        `
             id,
             slug,
             title,
@@ -75,7 +113,7 @@ export async function getDefaultCollectionBySectionId(sectionId: string): Promis
                 slug
             )
         `,
-		true
-	);
+        true
+    );
 
 };

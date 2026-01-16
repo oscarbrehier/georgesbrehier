@@ -9,6 +9,7 @@ import { Button, ButtonText } from "../../components/Button";
 import { CheckCheck } from "lucide-react";
 import { updateSectionPositions } from "../../actions/sections";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function SectionsUI({
 	sections
@@ -47,11 +48,13 @@ export function SectionsUI({
 
 	return (
 
-		<>
+		<div className="h-full flex flex-col px-8 pb-8">
 
 			<div className="mb-10 flex items-center justify-between">
 
-				<h1 className="text-5xl">Sections</h1>
+				<div className="flex items-center justify-between">
+					<h1 className="text-4xl">Sections</h1>
+				</div>
 
 				<div>
 
@@ -97,7 +100,7 @@ export function SectionsUI({
 					items={orderedItems.map(s => s.id)}
 					strategy={rectSortingStrategy}
 				>
-					<div className="flex-1 w-full overflow-y-scroll grid grid-cols-2 gap-4 items-start content-start auto-rows-max">
+					<div className="flex-1 w-full overflow-y-scroll grid 2xl:grid-cols-2 gap-4 items-start content-start auto-rows-max">
 
 						{orderedItems.map((section) => (
 
@@ -136,7 +139,7 @@ export function SectionsUI({
 
 			</DndContext>
 
-		</>
+		</div>
 
 	);
 

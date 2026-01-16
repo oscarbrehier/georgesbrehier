@@ -1,10 +1,9 @@
 import React, { Suspense } from "react";
 import { Metadata } from "next";
-
-
 import Link from "next/link";
 import { cn } from "@/utils/utils";
 import { AuthNav } from "./gallery/AuthNav";
+import Breadcrumbs from "./Breadcrumbs";
 
 export const metadata: Metadata = {
 	title: "Dashboard",
@@ -35,42 +34,51 @@ export default function Layout({
 
 	return (
 
-		<div className="h-screen w-full px-8 pb-8 pt-18 bg-neutral-50">
+		<div className="h-screen w-full px-8 pb-8 pt-24 bg-dashboard">
 
 			<div className={cn(
-				"fixed top-0 left-0 z-50",
-				"h-10 px-8 w-full",
-				"flex justify-between items-center",
-				"bg-neutral-50 border-b border-neutral-200"
+				"w-full fixed top-0 left-0 z-50 px-8 space-y-2",
 			)}>
 
-				<div className="flex space-x-10">
+				<div className={cn(
+					"h-10 w-full",
+					"flex justify-between items-center",
+					"bg-dashboard border-b border-neutral-200"
+				)}>
 
-					{navItems.map((item) => {
+					<div className="flex space-x-10">
 
-						const fullHref = `${basePath}${item.href}`;
-						const isActive = true;
+						{navItems.map((item) => {
 
-						return (
-							<Link
-								key={item.href}
-								href={fullHref}
-								className={cn(
-									"cursor-pointer",
-									isActive ? "text-black" : "text-neutral-500 hover:text-black"
-								)}
-							>
-								{item.label}
-							</Link>
-						);
+							const fullHref = `${basePath}${item.href}`;
+							const isActive = true;
 
-					})}
+							return (
+								<Link
+									key={item.href}
+									href={fullHref}
+									className={cn(
+										"cursor-pointer",
+										isActive ? "text-black" : "text-neutral-500 hover:text-black"
+									)}
+								>
+									{item.label}
+								</Link>
+							);
+
+						})}
+
+					</div>
+
+					<div>
+						<AuthNav />
+					</div>
 
 				</div>
 
-				<div>
-					<AuthNav />
-				</div>
+				<Suspense>
+					<Breadcrumbs />
+				</Suspense>
 
 			</div>
 

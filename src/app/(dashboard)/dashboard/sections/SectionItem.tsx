@@ -7,6 +7,7 @@ import { SectionUpdatePayload, updateSection } from "../../actions/sections";
 import { toast } from "sonner";
 import { MouseEvent } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function SectionItem({
 	section,
@@ -17,6 +18,7 @@ export function SectionItem({
 	dragAttributes?: any;
 	dragListeners?: any;
 }) {
+
 
 	async function updateValue(e: MouseEvent<HTMLButtonElement>, key: keyof SectionUpdatePayload, value: any) {
 
@@ -36,17 +38,31 @@ export function SectionItem({
 
 		<div
 			className={cn(
-				"h-auto bg-neutral-100 rounded-xl w-full flex items-center space-x-6 p-6 group",
+				"relative h-auto bg-neutral-100 rounded-xl w-full flex items-center space-x-6 p-6 group cursor-pointer",
 				"border-l-6",
 				section.is_visible ? borderColor : "opacity-70 hover:opacity-100"
 			)}
 		>
 
-			<Grip
+			<Link
+				href={`sections/${section.slug}`}
+				className="absolute inset-0 z-0"
+				aria-label={section.title}
+			/>
+
+			<div
+				className="relative z-10"
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+				}}
 				{...dragAttributes}
 				{...dragListeners}
-				className="text-neutral-400 hover:text-neutral-950 cursor-grab active:cursor-grabbing"
-			/>
+			>
+				<Grip
+					className="text-neutral-400 hover:text-neutral-950 cursor-grab active:cursor-grabbing"
+				/>
+			</div>
 
 			<div className="w-full flex flex-col">
 

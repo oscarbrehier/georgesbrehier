@@ -1,65 +1,23 @@
-"use client";
+"use client"
 
-import { Selector } from "./Selector";
-import { cn } from "@/utils/utils";
-import { roboto } from "@/utils/fonts";
-import { GalleryItem } from "./GalleryItem";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { Toolbar } from "../../gallery/Toolbar";
+import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { SortableItem } from "../../gallery/GalleryUI";
+import { GalleryItem } from "../../gallery/GalleryItem";
 import { useEffect, useState } from "react";
-import { Toolbar } from "./Toolbar";
 import { usePathname, useRouter } from "next/navigation";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import { SortableContext, useSortable, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/utils";
+import { roboto } from "@/utils/fonts";
+import { CollectionVisibilityBtn } from "../../gallery/CollectionVisibilityBtn";
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
-import { Button, ButtonText } from "../../components/Button";
-import { Eye, EyeOff } from "lucide-react";
-import { CollectionVisibilityBtn } from "./CollectionVisibilityBtn";
 
-export function SortableItem({
-	id,
-	disabled,
-	children,
-}: {
-	id: string;
-	disabled: boolean;
-	children: (args: {
-		setNodeRef: (el: HTMLElement | null) => void;
-		attributes: any;
-		listeners: any;
-		style: React.CSSProperties;
-	}) => React.ReactNode;
-}) {
-
-	const {
-		setNodeRef,
-		attributes,
-		listeners,
-		transform,
-		transition,
-	} = useSortable({ id, disabled });
-
-	const style = {
-		transform: CSS.Transform.toString(transform),
-		transition,
-	};
-
-	return children({
-		setNodeRef,
-		attributes,
-		listeners,
-		style,
-	});
-
-};
-
-export function GalleryUI({
+export function CollectionsUI({
 	section,
-	sections,
 	collections,
-	groupedGalleryItems,
+	groupedGalleryItems
 }: {
 	section: string;
-	sections: GallerySection[];
 	collections: GalleryCollection[];
 	groupedGalleryItems: Record<string, GalleryItemWithCollection[]> | null;
 }) {
@@ -144,7 +102,11 @@ export function GalleryUI({
 
 	return (
 
-		<div className="flex h-full flex-col">
+		<div className="h-full flex flex-col px-8 pb-8">
+
+			<div className="flex items-center justify-between mb-10">
+				<h1 className="text-4xl">{section}</h1>
+			</div>
 
 			<Toolbar
 				isEditing={isEditing}
@@ -157,17 +119,11 @@ export function GalleryUI({
 				hasChanges={hasChanges}
 			/>
 
-			<div className="flex h-full pt-6 pb-8">
-
-				<Selector
-					sections={sections}
-					current={section}
-					collections={collections}
-				/>
+			<div className="flex h-full overflow-y-scroll">
 
 				{orderedItems ? (
 
-					<div className="flex-1 overflow-y-scroll px-4">
+					<div className="flex-1">
 
 						{collections.map((collection, idx) => {
 
@@ -181,11 +137,11 @@ export function GalleryUI({
 									className={cn("space-y-4", idx !== 0 && "mt-10")}
 								>
 
-									<div className="sticky top-0 z-20 bg-background py-2 flex items-center space-x-4">
+									<div className="sticky top-0 z-20 bg-dashboard py-2 flex items-center space-x-4">
 
 										<h2
 											className={cn(
-												"text-5xl",
+												"text-3xl",
 												roboto.className
 											)}
 										>
@@ -232,7 +188,7 @@ export function GalleryUI({
 											strategy={rectSortingStrategy}
 										>
 
-											<div className="grid grid-cols-6 gap-4">
+											<div className="grid grid-cols-8 gap-4">
 
 												{items.map((item) => (
 
