@@ -23,7 +23,8 @@ interface UploadProgress {
 export function Upload({
 	sections: initialSections
 }: {
-	sections: GallerySection[]
+	sections: GallerySection[];
+	target?: { sectionId: string | null, collectionId: string | null };
 }) {
 
 	const { formData, setFormData, resetForm } = useUploadFormStore();

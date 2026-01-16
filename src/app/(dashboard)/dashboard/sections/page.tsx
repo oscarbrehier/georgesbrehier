@@ -1,5 +1,6 @@
 import { getSections } from "@/utils/supabase/sections";
-import { SectionsUI } from "./SectionsUI";
+import { NavigatorUI } from "./NavigatorUI";
+import { updateSection, updateSectionPositions } from "../../actions/sections";
 
 export default async function Page() {
 
@@ -9,7 +10,13 @@ export default async function Page() {
 
 		<div className="h-full w-full flex flex-col">
 
-			<SectionsUI sections={sections} />
+			<NavigatorUI
+				title="Sections"
+				items={sections}
+				basePath="sections"
+				onSave={updateSectionPositions}
+				onUpdateField={updateSection}
+			/>
 
 		</div>
 

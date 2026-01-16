@@ -6,9 +6,9 @@ import { fetchSupabase } from "./fetchSupabase";
 
 export async function getCollectionBySection(identifier: string): Promise<GalleryCollection[]> {
 
-    "use cache"
-    cacheTag(`section-${identifier}-collections`);
-    cacheLife("hours");
+    // "use cache"
+    // cacheTag(`section-${identifier}-collections`);
+    // cacheLife("hours");
 
     if (!identifier) return [];
 
@@ -27,6 +27,8 @@ export async function getCollectionBySection(identifier: string): Promise<Galler
         sectionId = section.id;
 
     };
+
+    console.log(sectionId)
 
     const { data, error } = await supabase
         .from("collections")

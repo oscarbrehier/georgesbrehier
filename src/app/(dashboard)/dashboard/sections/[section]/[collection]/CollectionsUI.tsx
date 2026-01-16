@@ -1,17 +1,17 @@
 "use client"
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { Toolbar } from "../../gallery/Toolbar";
+import { Toolbar } from "../../../gallery/Toolbar";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { SortableItem } from "../../gallery/GalleryUI";
-import { GalleryItem } from "../../gallery/GalleryItem";
+import { SortableItem } from "../../../gallery/GalleryUI";
+import { GalleryItem } from "../../../gallery/GalleryItem";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { roboto } from "@/utils/fonts";
-import { CollectionVisibilityBtn } from "../../gallery/CollectionVisibilityBtn";
+import { CollectionVisibilityBtn } from "../../../gallery/CollectionVisibilityBtn";
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
-import { Selector } from "../../gallery/Selector";
+import { Selector } from "../../../gallery/Selector";
 import { Badge } from "@/app/(dashboard)/components/Badge";
 
 export function CollectionsUI({
