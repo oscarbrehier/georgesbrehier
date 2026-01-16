@@ -8,6 +8,7 @@ import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
 import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { QuickActions } from "../../components/QuickActions";
+import { useRouter } from "next/navigation";
 
 export interface NavigableItem {
 	id: string;
@@ -36,6 +37,8 @@ export function NavigatorUI<T extends NavigableItem>({
 	onUpdateField
 }: NavigatorProps<T>) {
 
+	const router = useRouter();
+
 	const [orderedItems, setOrderedItems] = useState(items);
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -55,6 +58,8 @@ export function NavigatorUI<T extends NavigableItem>({
 
 		if (error) toast.error("Update failed", { description: error });
 		else toast.success("Positions updated");
+
+		router.refresh();
 
 	};
 

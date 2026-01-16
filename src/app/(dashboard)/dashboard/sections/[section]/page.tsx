@@ -1,6 +1,6 @@
 import { getCollectionBySection, getCollectionsBySectionId } from "@/utils/supabase/collections";
 import { NavigatorUI } from "../NavigatorUI";
-import { updateSection, updateSectionPositions } from "@/app/(dashboard)/actions/sections";
+import { updateCollection, updateCollectionPositions } from "@/app/(dashboard)/actions/collections";
 
 export default async function Page({
 	params
@@ -21,8 +21,8 @@ export default async function Page({
 				items={collections}
 				type="collection"
 				basePath={sectionSlug}
-				onSave={updateSectionPositions}
-				onUpdateField={updateSection}
+				onSave={updateCollectionPositions}
+				onUpdateField={updateCollection}
 			/>
 
 		</div>
