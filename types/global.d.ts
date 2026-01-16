@@ -24,6 +24,23 @@ declare global {
 		position: number;
 	};
 
+	interface GalleryCollectionWithItems extends GalleryItem {
+		works: GalleryItem;
+	};
+
+	interface GallerySectionTree {
+		id: string;
+		slug: string;
+		collections: {
+			id: string;
+			slug: string;
+			title: string;
+			is_default: boolean;
+			is_visible: boolean;
+			works: GalleryItem[];
+		}[];
+	};
+
 	interface SectionWithDefaultCollection extends GallerySection {
 		defaultCollection: GalleryCollection
 	};

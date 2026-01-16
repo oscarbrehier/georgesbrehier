@@ -96,7 +96,7 @@ export function SectionForm({
 	return (
 
 		<form
-			className="grid gap-4 w"
+			className="grid gap-4"
 			onSubmit={handleSubmit}
 		>
 

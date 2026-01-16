@@ -8,7 +8,7 @@ import VerticalGallery from "@/components/vertical_gallery/Gallery";
 import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
-import { getCollectionMetadata, getDefaultCollectionBySectionId } from "@/utils/supabase/collections";
+import { getCollectionMetadata, getCachedDefaultCollectionBySectionId } from "@/utils/supabase/collections";
 import { getDefaultSectionWithCollection, getSection } from "@/utils/supabase/sections";
 
 type Props = {
@@ -137,7 +137,7 @@ export default async function Page({
 	};
 
 	const collectionPromise = getCollectionMetadata(collectionSlug);
-	const defaultCollectionPromise = getDefaultCollectionBySectionId(section.id);
+	const defaultCollectionPromise = getCachedDefaultCollectionBySectionId(section.id);
 
 	let collection = await collectionPromise;
 

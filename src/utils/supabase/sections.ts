@@ -19,7 +19,6 @@ export async function getSections(): Promise<GallerySection[]> {
 
 };
 
-
 export async function getSection(slug: string): Promise<GallerySection | null> {
 
 	"use cache"
@@ -98,5 +97,37 @@ export async function getDefaultSectionWithCollection(): Promise<SectionWithDefa
 	delete flattened.collections;
 
 	return flattened;
+
+};
+
+export async function getSectionTree(value: string, type: "id" | "slug"): Promise<GallerySectionTree | null> {
+
+	const { data, error } = await supabase
+		.from("sections")
+		.select(`
+			id,
+			slug,
+			collections (
+        		id,
+				title,
+				slug,
+				is_default,
+				is_visible,
+        		works (
+          			*
+        		)
+      		)
+		`)
+		.eq(type, value)
+		.single();
+
+	if (error) {
+
+		console.error("Error fetching full section tree:", error);
+		return null;
+
+	};
+
+	return data;
 
 };

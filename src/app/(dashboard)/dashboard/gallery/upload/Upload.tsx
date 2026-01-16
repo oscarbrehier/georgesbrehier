@@ -414,15 +414,15 @@ export function Upload({
 									)}
 
 									{progress.status === "uploading" && (
-										<Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />
+										<Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
 									)}
 
 									{progress.status === "success" && (
-										<Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+										<Check className="w-5 h-5 text-green-600 shrink-0" />
 									)}
 
 									{progress.status === "error" && (
-										<X className="w-5 h-5 text-red-600 flex-shrink-0" />
+										<X className="w-5 h-5 text-red-600 shrink-0" />
 									)}
 
 									<div className="flex-1 min-w-0">

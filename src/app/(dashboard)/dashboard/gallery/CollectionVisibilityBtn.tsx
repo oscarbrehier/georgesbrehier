@@ -7,7 +7,7 @@ import { toast } from "sonner";
 export function CollectionVisibilityBtn({
 	collection
 }: {
-	collection: GalleryCollection;
+	collection: { id: string; is_visible: boolean };
 }) {
 
 	const [isVisible, setIsVisible] = useState(collection.is_visible);

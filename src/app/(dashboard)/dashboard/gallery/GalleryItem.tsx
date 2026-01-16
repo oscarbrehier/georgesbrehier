@@ -18,7 +18,7 @@ export function GalleryItem({
 	dragAttributes,
 	dragListeners,
 }: {
-	item: GalleryItemWithCollection;
+	item: GalleryItem & { collection: { id: string; title: string }};
 	isSelected: boolean;
 	isEditMode: boolean;
 	currentPath: string;

@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { getDefaultSectionWithCollection, getSection } from '@/utils/supabase/sections'
-import { getDefaultCollectionBySectionId } from '@/utils/supabase/collections'
+import { getCachedDefaultCollectionBySectionId } from '@/utils/supabase/collections'
 
 export default async function SectionPage({
 	params,
@@ -22,7 +22,7 @@ export default async function SectionPage({
 
 	};
 
-	const collection = await getDefaultCollectionBySectionId(section.id);
+	const collection = await getCachedDefaultCollectionBySectionId(section.id);
 	if (!collection) return notFound();
 
 	redirect(`${section.slug}/${collection.slug}`);

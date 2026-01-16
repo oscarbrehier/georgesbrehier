@@ -42,7 +42,7 @@ export default function Breadcrumbs({
 											</Link>
 											<DropdownMenuSeparator />
 											{sections.map((section) => (
-												<Link href={`${href}/${section.slug}`}>
+												<Link key={section.id} href={`${href}/${section.slug}`}>
 													<DropdownMenuItem key={section.id}>
 														{section.title}
 													</DropdownMenuItem>

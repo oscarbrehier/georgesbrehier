@@ -1,6 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase"
+import { createSlug } from "@/utils/utils";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -16,8 +17,6 @@ interface SectionCreatePaylod {
 	title: string;
 	is_default: boolean;
 };
-
-const createSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
 export async function createSection(data: SectionCreatePaylod) {
 
@@ -56,7 +55,7 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 	let payload: SectionUpdatePayload = { ...data };
 
 	if (data.title) {
-		payload.slug = data.title?.toLocaleLowerCase().replace(/ /g, "-");
+		payload.slug = createSlug(data.title);
 	};
 
 	if (data.is_default) {

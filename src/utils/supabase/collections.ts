@@ -94,11 +94,17 @@ export async function getCollectionMetadata(collection: string): Promise<Gallery
 
 };
 
-export async function getDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
+export async function getCachedDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     "use cache"
     cacheTag(`section-${sectionId}-default-collection`);
     cacheLife("hours");
+
+    return await getDefaultCollectionBySectionId(sectionId);
+
+};
+
+export async function getDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     return await fetchSupabase<GalleryCollectionWithSection>(
         "collections",

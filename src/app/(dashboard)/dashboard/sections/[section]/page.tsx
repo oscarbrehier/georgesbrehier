@@ -2,10 +2,11 @@ import { getCollectionBySection } from "@/utils/supabase/collections";
 import { CollectionsUI } from "./CollectionsUI";
 import { supabase } from "@/lib/supabase";
 import { cache } from "react";
-import Link from "next/link";
+import { getSectionTree, getSection } from "@/utils/supabase/sections";
+import { notFound } from "next/navigation";
 
 const getGalleryItems = cache(
-	async (section: string): Promise<GalleryItemWithCollection[] | null> => {
+	async (sectionId: string): Promise<GalleryItemWithCollection[] | null> => {
 
 		let query = supabase
 			.from("works")
@@ -25,9 +26,7 @@ const getGalleryItems = cache(
 			)	
 		`)
 
-		if (section !== "all") {
-			query.eq("collection.section.slug", section);
-		};
+		query.eq("collection.section.id", sectionId);
 
 		const { error, data } = await query.returns<GalleryItemWithCollection[]>();
 		if (error || !data || data.length === 0) return null;
@@ -42,24 +41,15 @@ export default async function Page({
 	params: Promise<{ section: string }>
 }) {
 
-	const { section } = await params;
-	const collections = await getCollectionBySection(section);
-	const galleryItems = await getGalleryItems(section);
+	const { section: slug } = await params;
 
-	const groupedGalleryItems = galleryItems?.reduce<Record<string, GalleryItemWithCollection[]>>((acc, item) => {
-
-		const slug = item.collection.slug;
-		(acc[slug] ||= []).push(item);
-		return acc;
-
-	}, {}) ?? null;
+	const sectionTree = await getSectionTree(slug, "slug");
+	if (!sectionTree) return notFound();
 
 	return (
 
 		<CollectionsUI
-			section={section}
-			collections={collections}
-			groupedGalleryItems={groupedGalleryItems}
+			sectionTree={sectionTree}
 		/>
 
 	);

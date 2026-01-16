@@ -44,7 +44,7 @@ export function CreateItemDialog({
 				{children}
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-[425px] bg-dashboard">
 
 				<DialogHeader>
 					<DialogTitle>

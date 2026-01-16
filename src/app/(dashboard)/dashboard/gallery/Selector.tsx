@@ -7,7 +7,7 @@ export function Selector({
 	collections,
 	current
 }: {
-	collections: GalleryCollection[],
+	collections: { title: string }[],
 	current: string
 }) {
 
@@ -34,7 +34,8 @@ export function Selector({
 					<button
 						onClick={() => scrollTo(collection.title)}
 						key={`${collection.title}-${idx}`}
-						className="text-black cursor-pointer"
+						className="text-black cursor-pointer text-sm w-full text-left truncate"
+						title={collection.title}
 					>
 						{collection.title}
 					</button>
