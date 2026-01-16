@@ -118,6 +118,10 @@ export async function updateSectionPositions(changes: { id: string; position: nu
 	});
 
 	if (error) return { error: error.message };
+
+	revalidateTag("sections", "max");
+	revalidatePath("/dashboard/sections", "page");
+
 	return { error: null };
 
 };
