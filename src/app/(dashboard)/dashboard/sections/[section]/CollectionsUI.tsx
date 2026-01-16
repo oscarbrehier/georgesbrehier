@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { roboto } from "@/utils/fonts";
 import { CollectionVisibilityBtn } from "../../gallery/CollectionVisibilityBtn";
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
+import { Selector } from "../../gallery/Selector";
 
 export function CollectionsUI({
 	section,
@@ -119,11 +120,16 @@ export function CollectionsUI({
 				hasChanges={hasChanges}
 			/>
 
-			<div className="flex h-full overflow-y-scroll">
+			<div className="flex h-full overflow-y-scroll ">
+
+				<Selector
+					current={section}
+					collections={collections}
+				/>
 
 				{orderedItems ? (
 
-					<div className="flex-1">
+					<div className="ml-36 flex-1 w-full">
 
 						{collections.map((collection, idx) => {
 

@@ -160,7 +160,6 @@ export function GalleryUI({
 			<div className="flex h-full pt-6 pb-8">
 
 				<Selector
-					sections={sections}
 					current={section}
 					collections={collections}
 				/>

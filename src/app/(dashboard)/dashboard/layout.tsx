@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cn } from "@/utils/utils";
 import { AuthNav } from "./gallery/AuthNav";
 import Breadcrumbs from "./Breadcrumbs";
+import { getSections } from "@/utils/supabase/sections";
 
 export const metadata: Metadata = {
 	title: "Dashboard",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 	}
 };
 
-export default function Layout({
+export default async function Layout({
 	children
 }: {
 	children: React.ReactNode
@@ -31,6 +32,8 @@ export default function Layout({
 		{ href: "/gallery/upload", label: "upload" },
 		{ href: "/gallery/seo", label: "seo" },
 	];
+
+	const sections = await getSections();
 
 	return (
 
@@ -77,7 +80,7 @@ export default function Layout({
 				</div>
 
 				<Suspense>
-					<Breadcrumbs />
+					<Breadcrumbs sections={sections} />
 				</Suspense>
 
 			</div>

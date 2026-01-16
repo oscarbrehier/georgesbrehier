@@ -74,7 +74,10 @@ export function GalleryItem({
 
 	return (
 
-		<div className="relative h-full w-full flex bg-neutral-200 group">
+		<div
+			id={item.collection.title}
+			className="relative h-full w-full flex bg-neutral-200 group"
+		>
 
 			{isEditMode && (
 				<button
