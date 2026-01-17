@@ -153,6 +153,7 @@ function DeleteSectionButton({
 
 		const sectionId = await getSectionId(section);
 		if (!sectionId) {
+			toast("Failed to delete section");
 			setIsDeleting(false);
 			return null;
 		};

@@ -10,7 +10,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 	variant?: "base"
 };
 
-export function Button({ children, Icon, className, size = "md", variant, ...props }: ButtonProps) {
+export function Button({ children, Icon, className, size = "md", variant = "base", ...props }: ButtonProps) {
 
 	const iconSize = size === "md" ? "18" : "14";
 
