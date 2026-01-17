@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { Cloud, Loader2, Check, X } from "lucide-react";
-import { getCollectionsBySectionId } from "@/utils/supabase/collections";
+import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
 import { Select } from "@/components/dashboard/Select";
@@ -98,7 +98,7 @@ export function Upload({
 
 		if (name === "sectionId") {
 
-			const collectionsRes = await getCollectionsBySectionId(value);
+			const collectionsRes = await getCollectionsBySection(value);
 			setCollections(collectionsRes ?? null);
 
 			setFormData({
@@ -213,7 +213,7 @@ export function Upload({
 				type="collection"
 				onSuccess={async () => {
 					if (formData.sectionId) {
-						const collectionRes = await getCollectionsBySectionId(formData.sectionId);
+						const collectionRes = await getCollectionsBySection(formData.sectionId);
 						setCollections(collectionRes);
 					}
 				}}

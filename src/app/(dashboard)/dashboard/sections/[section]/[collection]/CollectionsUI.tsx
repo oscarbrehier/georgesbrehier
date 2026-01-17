@@ -128,7 +128,10 @@ export function CollectionsUI({
 									</div>
 
 									<CollectionVisibilityBtn
-										collection={collection}
+										collection={{
+											...collection,
+											section_id: sectionTree.id
+										}}
 									/>
 
 								</div>

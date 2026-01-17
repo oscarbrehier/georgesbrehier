@@ -3,47 +3,23 @@ import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchSupabase } from "./fetchSupabase";
 
-
-export async function getCollectionBySection(identifier: string): Promise<GalleryCollection[]> {
+export async function getCollectionId(slug: string): Promise<string | null> {
 
     "use cache"
-    cacheTag(`section-${identifier}-collections`);
-    cacheLife("hours");
-
-    if (!identifier) return [];
-
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
-    let sectionId = identifier;
-
-    if (!isUuid) {
-
-        const { data: section, error: sError } = await supabase
-            .from("sections")
-            .select("id")
-            .eq("slug", identifier)
-            .single();
-
-        if (sError || !section) return [];
-        sectionId = section.id;
-
-    };
-
-    console.log(sectionId)
+    cacheTag(`lookup-collection-${slug}`);
+    cacheLife("days");
 
     const { data, error } = await supabase
         .from("collections")
-        .select("*")
-        .eq("section_id", sectionId);
+        .select("id")
+        .eq("slug", slug)
+        .single();
 
-    if (error) {
-        return [];
-    };
-
-    return data as GalleryCollection[];
+    return error ? null : data.id;
 
 };
 
-export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[]> {
+export async function getCollectionsBySection(sectionId: string): Promise<GalleryCollection[]> {
 
     "use cache"
     cacheTag(`section-${sectionId}-collections`);
@@ -61,15 +37,15 @@ export async function getCollectionsBySectionId(sectionId: string): Promise<Gall
 
 };
 
-export async function getCollectionMetadata(collection: string): Promise<GalleryCollectionWithSection | null> {
+export async function getCollectionMetadata(collectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     "use cache"
-    cacheTag(`collection-metadata-${collection}`);
+    cacheTag(`collection-${collectionId}-metadata`);
     cacheLife("hours");
 
     return await fetchSupabase<GalleryCollectionWithSection>(
         "collections",
-        { "slug": collection },
+        { "id": collectionId },
         `
             id,
             slug,
@@ -99,7 +75,7 @@ export async function getCollectionMetadata(collection: string): Promise<Gallery
 export async function getCachedDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     "use cache"
-    cacheTag(`section-${sectionId}-default-collection`);
+    cacheTag(`section-${sectionId}-collections`);
     cacheLife("hours");
 
     return await getDefaultCollectionBySectionId(sectionId);

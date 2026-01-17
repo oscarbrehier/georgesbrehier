@@ -5,10 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSections } from "@/utils/supabase/sections";
 import { useActionState, useEffect, useState } from "react";
-import { createCollection, CollectionFormState } from "../actions/createCollection";
 import { Loader2 } from "lucide-react";
 import { EditData } from "./CreateItemDialog";
-
+import { CollectionFormState, createCollection } from "../actions/collections";
 
 const initialState = { message: "", error: "" };
 const initialForm = {

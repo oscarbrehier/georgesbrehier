@@ -39,10 +39,7 @@ export async function createSection(data: SectionCreatePaylod) {
 	if (error) return { error: error.message };
 
 	revalidateTag("sections", "max");
-
-	if (data.is_default) {
-		revalidateTag("default-section-with-collection", "max");
-	};
+	if (data.is_default) revalidateTag("site-home", "max");
 
 	revalidatePath("/dashboard/gallery", "page");
 
@@ -52,6 +49,12 @@ export async function createSection(data: SectionCreatePaylod) {
 
 export async function updateSection(sectionId: string, data: Omit<SectionUpdatePayload, "slug">): Promise<{ error: string | null }> {
 
+	const { data: oldData } = await supabase
+		.from("sections")
+		.select("slug, section_id")
+		.eq("id", sectionId)
+		.single();
+
 	let payload: SectionUpdatePayload = { ...data };
 
 	if (data.title) {
@@ -60,30 +63,31 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 
 	if (data.is_default) {
 
-		const { error: resetError } = await supabase
+		await supabase
 			.from("sections")
 			.update({ is_default: false })
-			.neq("id", sectionId);
+			.neq("id", sectionId)
+			.eq("is_default", true);
 
-		if (resetError) {
-			return { error: resetError.message }
-		};
+		revalidateTag("site-home", "max");
 
 	};
 
-	const { error } = await supabase
+	const { data: updatedSection, error } = await supabase
 		.from("sections")
 		.update(payload)
-		.eq("id", sectionId);
+		.eq("id", sectionId)
+		.select("slug")
+		.single();
 
 	if (error) return { error: error.message };
 
 
 	revalidateTag("sections", "max");
+	revalidateTag(`section-${sectionId}`, "max");
 
-	if (data.is_default) {
-		revalidateTag("default-section-with-collection", "max");
-	};
+	if (oldData?.slug) revalidateTag(`lookup-section-${oldData.slug}`, "max");
+	if (updatedSection.slug) revalidateTag(`lookup-section-${updatedSection.slug}`, "max");
 
 	revalidatePath("/");
 	revalidatePath("/dashboard/sections");
@@ -92,26 +96,29 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 
 };
 
-export async function deleteSection(slug: string): Promise<{ error: string | null }> {
+export async function deleteSection(sectionId: string): Promise<{ error: string | null }> {
 
 	const { data, error } = await supabase
 		.from("sections")
 		.delete()
-		.eq("slug", slug)
-		.select("id");
+		.eq("id", sectionId)
+		.select("slug")
+		.single();
 
 	if (error) return { error: error.message };
 
-	if (!data || data.length === 0) {
-		return { error: `Section \`${slug}\` not found.` };
-	};
-
 	revalidateTag("sections", "max");
-	redirect("/dashboard/gallery?section=all");
+	revalidateTag(`section-${sectionId}`, "max");
+
+	if (data.slug) revalidateTag(`lookup-section-${data.slug}`, "max");
+
+	redirect("/dashboard/sections");
 
 };
 
-export async function updateSectionPositions(changes: { id: string; position: number }[]): Promise<{ error: string | null }> {
+export async function updateSectionPositions(
+	changes: { id: string; position: number }[]
+): Promise<{ error: string | null }> {
 
 	const { error } = await supabase.rpc("update_section_positions", {
 		payload: changes
@@ -120,6 +127,7 @@ export async function updateSectionPositions(changes: { id: string; position: nu
 	if (error) return { error: error.message };
 
 	revalidateTag("sections", "max");
+
 	revalidatePath("/dashboard/sections", "page");
 
 	return { error: null };

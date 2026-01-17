@@ -20,6 +20,6 @@ export async function updateGalleryItems(items: { id: number, collectionId: stri
 		})
 	);
 
-	updatedCollections.forEach((slug) => revalidateTag(`gallery-collection-${slug}`, "max"));
+	updatedCollections.forEach((collectionId) => revalidateTag(`collection-${collectionId}-gallery`, "max"));
 
 };

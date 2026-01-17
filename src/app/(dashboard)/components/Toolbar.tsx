@@ -10,6 +10,7 @@ import { Button, ButtonText } from "./Button";
 import { CreateItemDialog } from "./CreateItemDialog";
 import { deleteSection } from "../actions/sections";
 import { QuickActions } from "./QuickActions";
+import { getSectionId } from "@/utils/supabase/sections";
 
 export function Toolbar({
 	isEditing,
@@ -150,7 +151,13 @@ function DeleteSectionButton({
 
 		setIsDeleting(true);
 
-		const { error } = await deleteSection(section);
+		const sectionId = await getSectionId(section);
+		if (!sectionId) {
+			setIsDeleting(false);
+			return null;
+		};
+
+		const { error } = await deleteSection(sectionId);
 
 		if (error) toast("Failed to delete section:", { description: error });
 

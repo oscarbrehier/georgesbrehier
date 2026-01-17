@@ -1,13 +1,13 @@
 import { Eye, EyeOff } from "lucide-react";
 import { Button, ButtonText } from "../../components/Button";
 import { useState } from "react";
-import { setCollectionVisibility } from "../../actions/setCollectionVisibility";
 import { toast } from "sonner";
+import { setCollectionVisibility } from "../../actions/collections";
 
 export function CollectionVisibilityBtn({
 	collection
 }: {
-	collection: { id: string; is_visible: boolean };
+	collection: { id: string; section_id: string; is_visible: boolean };
 }) {
 
 	const [isVisible, setIsVisible] = useState(collection.is_visible);
@@ -20,7 +20,7 @@ export function CollectionVisibilityBtn({
 
 		try {
 
-			await setCollectionVisibility(collection.id, !isVisible);
+			await setCollectionVisibility(collection.id, collection.section_id, !isVisible);
 			setIsVisible(!isVisible);
 
 		} catch (err) {

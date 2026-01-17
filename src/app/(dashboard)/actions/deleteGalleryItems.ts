@@ -20,7 +20,7 @@ export async function deleteGalleryItems(items: GalleryItemToDelete[], path: str
 		.select("id");
 
 	await Promise.all(
-		items.map(item => revalidateTag(`gallery-collection-${item.collectionId}`, "max"))
+		items.map(item => revalidateTag(`collection-${item.collectionId}-gallery`, "max"))
 	);
 
 	revalidatePath(path);

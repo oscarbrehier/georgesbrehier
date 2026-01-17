@@ -1,6 +1,8 @@
-import { getCollectionBySection, getCollectionsBySectionId } from "@/utils/supabase/collections";
 import { NavigatorUI } from "../NavigatorUI";
 import { updateCollection, updateCollectionPositions } from "@/app/(dashboard)/actions/collections";
+import { getCollectionsBySection } from "@/utils/supabase/collections";
+import { getSectionId } from "@/utils/supabase/sections";
+import { notFound } from "next/navigation";
 
 export default async function Page({
 	params
@@ -9,7 +11,11 @@ export default async function Page({
 }) {
 
 	const { section: sectionSlug } = await params;
-	const collections = await getCollectionBySection(sectionSlug)
+
+	const sectionId = await getSectionId(sectionSlug);
+	if (!sectionId) return notFound();
+
+	const collections = await getCollectionsBySection(sectionId)
 
 	return (
 

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 export interface NavigableItem {
 	id: string;
+	section_id?: string;
 	slug: string;
 	title: string;
 	position?: number;
@@ -24,7 +25,7 @@ interface NavigatorProps<T extends NavigableItem> {
 	title: string;
 	basePath: string;
 	type: "section" | "collection";
-	onSave: (changes: { id: string; position: number }[]) => Promise<{ error?: string | null }>;
+	onSave: (changes: { id: string; position: number, section_id?: string }[]) => Promise<{ error?: string | null }>;
 	onUpdateField: (id: string, data: Partial<T>) => Promise<{ error?: string | null }>;
 };
 
@@ -53,7 +54,12 @@ export function NavigatorUI<T extends NavigableItem>({
 
 		e.preventDefault();
 
-		const changes = orderedItems.map((item, index) => ({ id: item.id, position: index + 1 }));
+		const changes = orderedItems.map((item, index) => ({ 
+			id: item.id,
+			position: index + 1,
+			...(item?.section_id && { sectionId: item.section_id })
+		}));
+
 		const { error } = await onSave(changes);
 
 		if (error) toast.error("Update failed", { description: error });
