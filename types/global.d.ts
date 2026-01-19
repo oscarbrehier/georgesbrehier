@@ -24,6 +24,13 @@ declare global {
 		position: number;
 	};
 
+	interface SectionNavItem {
+		id: string;
+		title: string;
+		slug: string;
+		position: number;
+	};
+
 	interface GalleryCollectionWithItems extends GalleryItem {
 		works: GalleryItem;
 	};
@@ -63,6 +70,7 @@ declare global {
 		seo_canonical_url: null,
 		seo_robots: string;
 	};
+
 	interface GalleryCollectionSEO {
 		seo_title: string,
 		seo_description: string,
@@ -75,9 +83,20 @@ declare global {
 		seo_canonical_url: null,
 		seo_robots: string
 	};
+
+	interface CollectionNavItem {
+		id: string;
+		section_id: string;
+		title: string;
+		slug: string;
+		position: number;
+		is_default: boolean;
+	};
+
 	interface GalleryCollectionWithSection extends GalleryCollection {
 		section: GallerySection
 	};
+
 	interface GalleryItemWithCollection extends GalleryItem {
 		collection: GalleryCollection;
 	};

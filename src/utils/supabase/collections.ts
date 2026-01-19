@@ -37,6 +37,22 @@ export async function getCollectionsBySection(sectionId: string): Promise<Galler
 
 };
 
+export async function getActiveCollections(sectionId: string): Promise<CollectionNavItem[]> {
+
+    const { data, error } = await supabase
+        .from("active_collections_nav")
+        .select("*")
+        .eq("section_id", sectionId)
+        .order("position", { ascending: true });
+
+    if (error) {
+        return [];
+    };
+
+    return data;
+
+};
+
 export async function getCollectionMetadata(collectionId: string): Promise<GalleryCollectionWithSection | null> {
 
     "use cache"

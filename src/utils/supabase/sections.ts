@@ -35,6 +35,25 @@ export async function getSections(): Promise<GallerySection[]> {
 
 };
 
+export async function getNavSections(): Promise<SectionNavItem[]> {
+
+	"use cache"
+	cacheTag("sections");
+	cacheLife("hours");
+
+	const { data, error } = await supabase
+		.from("public_navigation")
+		.select("*")
+		.order("position", { ascending: true });
+		
+	if (error) {
+		return [];
+	};
+
+	return data;
+
+};
+
 export async function getSection(sectionId: string): Promise<GallerySection | null> {
 
 	"use cache"
