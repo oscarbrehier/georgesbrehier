@@ -29,7 +29,7 @@ export function SectionForm({
 	const isEditMode = !!initialData;
 
 	const [formData, setFormData] = useState({
-		sectionTitle: "",
+		sectionTitle: initialData?.title ?? "",
 		isDefault: initialData?.is_default || false
 	});
 
@@ -143,7 +143,7 @@ export function SectionForm({
 				>
 
 					{pending ? (
-						<Loader2 className="w-5 h-5 text-green-600 animate-spin flex-shrink-0" />
+						<Loader2 className="w-5 h-5 text-green-600 animate-spin shrink-0" />
 					) : (
 						<span className="truncate">
 							{isEditMode

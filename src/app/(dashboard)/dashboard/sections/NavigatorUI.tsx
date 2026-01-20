@@ -54,7 +54,7 @@ export function NavigatorUI<T extends NavigableItem>({
 
 		e.preventDefault();
 
-		const changes = orderedItems.map((item, index) => ({ 
+		const changes = orderedItems.map((item, index) => ({
 			id: item.id,
 			position: index + 1,
 			...(item?.section_id && { sectionId: item.section_id })
@@ -85,7 +85,9 @@ export function NavigatorUI<T extends NavigableItem>({
 
 			</div>
 
-			<QuickActions className="mb-4" />
+			<QuickActions
+				className="mb-4"
+			/>
 
 			<DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
 

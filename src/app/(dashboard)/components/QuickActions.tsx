@@ -1,12 +1,14 @@
 import { Eye, Plus } from "lucide-react";
 import { Button, ButtonText } from "./Button";
-import { CreateItemDialog } from "./CreateItemDialog";
+import { CreateItemDialog, EditData } from "./CreateItemDialog";
 import { cn } from "@/utils/utils";
 
 export function QuickActions({
-	className
+	className,
+	initialData
 }: {
 	className?: string;
+	initialData?: EditData;
 }) {
 
 	return (
@@ -28,6 +30,7 @@ export function QuickActions({
 
 			<CreateItemDialog
 				type="section"
+				initialData={initialData}
 			>
 				<Button
 					className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
@@ -42,6 +45,7 @@ export function QuickActions({
 
 			<CreateItemDialog
 				type="collection"
+				initialData={initialData}
 			>
 				<Button
 					className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"

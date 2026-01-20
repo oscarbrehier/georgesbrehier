@@ -4,14 +4,14 @@ import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle } from 
 import dynamic from "next/dynamic";
 
 const SectionForm = dynamic(() => import("./SectionForm").then(mod => mod.SectionForm));
-const NewCollectionForm = dynamic(() => import("./NewCollectionForm").then(mod => mod.NewCollectionForm));
+const CollectionForm = dynamic(() => import("./CollectionForm").then(mod => mod.CollectionForm));
 
 export interface EditData {
 	id: string;
 	title: string;
 	is_default: boolean;
 	[key: string]: any;
-}
+};
 
 export function CreateItemDialog({
 	type,
@@ -56,7 +56,7 @@ export function CreateItemDialog({
 				</DialogHeader>
 
 				{type === "section" && <SectionForm onSuccess={handleSuccess} initialData={initialData} />}
-				{type === "collection" && <NewCollectionForm onSuccess={handleSuccess} initialData={initialData} />}
+				{type === "collection" && <CollectionForm onSuccess={handleSuccess} initialData={initialData} />}
 
 			</DialogContent>
 

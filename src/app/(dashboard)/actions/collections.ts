@@ -18,19 +18,6 @@ export interface CollectionFormState {
 	error?: string;
 };
 
-async function hasDefaultCollection(sectionId: string): Promise<boolean> {
-
-	const { count, error } = await supabase
-		.from("collections")
-		.select("id", { count: 'exact', head: true })
-		.eq("section_id", sectionId)
-		.eq("is_default", true);
-
-	if (error) return false;
-	return (count ?? 0) > 0;
-
-};
-
 export async function updateCollectionPositions(
 	changes: { id: string; position: number; sectionId?: string }[]
 ): Promise<{ error: string | null }> {
@@ -61,9 +48,24 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	const { data: oldData } = await supabase
 		.from("collections")
-		.select("slug, section_id")
+		.select("slug, section_id, is_default")
 		.eq("id", collectionId)
 		.single();
+
+	if (!oldData) return { error: "Collection not found" };
+
+	if (data.is_default === false && oldData?.is_default === true) {
+
+		const { count } = await supabase
+			.from("collections")
+			.select("*", { count: 'exact', head: true })
+			.eq("section_id", oldData.section_id);
+
+		if (count && count <= 1) {
+			return { error: "This is the only collection in the section. It must remain the default." };
+		};
+
+	};
 
 	let payload: CollectionUpdatePayload = { ...data };
 	if (data.title) {
@@ -74,22 +76,34 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 		.from("collections")
 		.update(payload)
 		.eq("id", collectionId)
-		.select("section_id, slug")
+		.select("section_id, is_default, slug")
 		.single();
 
 	if (error) return { error: error.message };
 	const sectionId = updatedCollection.section_id;
 
-	if (data.is_default) {
+	if (data.is_default === false && oldData.is_default === true) {
 
-		await supabase
+		const { data: nextBest } = await supabase
 			.from("collections")
-			.update({ is_default: false })
+			.select("id")
 			.eq("section_id", sectionId)
-			.neq("id", collectionId);
+			.neq("id", collectionId)
+			.order("position", { ascending: true })
+			.limit(1)
+			.single();
 
+		if (nextBest) {
+			await supabase
+				.from("collections")
+				.update({ is_default: true })
+				.eq("id", nextBest.id);
+		};
+
+	};
+
+	if (data.is_default === true || (data.is_default === false && oldData.is_default === true)) {
 		revalidateTag("site-home", "max");
-
 	};
 
 	revalidateTag(`section-${sectionId}-collections`, "max");
@@ -105,44 +119,31 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 };
 
-export async function createCollection(prevState: CollectionFormState | undefined, formData: FormData) {
-
-	const sectionId = formData.get("sectionId")?.toString();
-	const rawTitle = formData.get("collectionTitle")?.toString().trim();
+export async function createCollection({
+	sectionId,
+	title: rawTitle,
+	is_default
+}: {
+	sectionId: string;
+	title: string;
+	is_default: boolean;
+}) {
 
 	if (!sectionId || !rawTitle) return { error: "Collection title and Section ID are required." };
 
-	const title = rawTitle?.toLocaleLowerCase();
+	const title = rawTitle.trim().toLocaleLowerCase();
 	const slug = createSlug(title);
-	const isExplicitDefault = formData.get("isDefault") === "on";
 
-	let shouldBeDefault = isExplicitDefault;
-
-	if (shouldBeDefault) {
-
-		const { error } = await supabase
-			.from("collections")
-			.update({ is_default: false })
-			.eq("section_id", sectionId)
-			.eq("is_default", true);
-
-		if (error) return { error: error.message };
-
-	} else {
-
-		const exists = await hasDefaultCollection(sectionId);
-		if (!exists) shouldBeDefault = true;
-
-	};
-
-	const { error: insertError } = await supabase
+	const { data: newCol, error: insertError } = await supabase
 		.from("collections")
 		.insert({
 			title,
 			slug,
 			section_id: sectionId,
-			is_default: shouldBeDefault
-		});
+			is_default
+		})
+		.select("is_default")
+		.single();
 
 	if (insertError) {
 
@@ -154,12 +155,17 @@ export async function createCollection(prevState: CollectionFormState | undefine
 
 	};
 
+	const actualDefault = newCol.is_default;
+
 	revalidateTag(`section-${sectionId}-collections`, "max");
-	if (shouldBeDefault) revalidateTag("site-home", "max");
+	if (actualDefault) revalidateTag("site-home", "max");
 
 	revalidatePath("/dashboard/gallery", "page");
 
-	return { success: true, message: `Successfully created "${title}"${shouldBeDefault ? " as the section default" : ""}.` };
+	return {
+		success: true,
+		message: `Successfully created "${title}"${actualDefault ? " as the section default" : ""}.`
+	};
 
 };
 
@@ -174,5 +180,51 @@ export async function setCollectionVisibility(collectionId: string, sectionId: s
 	revalidateTag(`collection-${collectionId}-gallery`, "max");
 
 	if (error) throw new Error(error.message);
+
+};
+
+export async function deleteCollection(collectionId: string, sectionId: string): Promise<{ error: string | null }> {
+	
+	const { data: colToDelete } = await supabase
+		.from("collections")
+		.select("is_default, slug")
+		.eq("id", collectionId)
+		.single();
+
+	if (!colToDelete) return { error: "Collection not found" };
+
+	const { error: deleteError } = await supabase
+		.from("collections")
+		.delete()
+		.eq("id", collectionId);
+
+	if (deleteError) return { error: deleteError.message };
+
+	if (colToDelete.is_default) {
+
+		const { data: nextBest } = await supabase
+			.from("collections")
+			.select("id")
+			.eq("section_id", sectionId)
+			.order("position", { ascending: true })
+			.limit(1)
+			.single();
+
+		if (nextBest) {
+			await supabase
+				.from("collections")
+				.update({ is_default: true })
+				.eq("id", nextBest.id);
+		};
+
+		revalidateTag("site-home", "max");
+	
+	};
+
+	revalidateTag(`section-${sectionId}-collections`, "max");
+	revalidateTag(`lookup-collection-${colToDelete.slug}`, "max");
+	revalidatePath(`/dashboard/sections/${sectionId}`);
+
+	return { error: null };
 
 };
