@@ -26,7 +26,7 @@ interface NavigatorProps<T extends NavigableItem> {
 	basePath: string;
 	type: "section" | "collection";
 	onSave: (changes: { id: string; position: number, section_id?: string }[]) => Promise<{ error?: string | null }>;
-	onUpdateField: (id: string, data: Partial<T>) => Promise<{ error?: string | null }>;
+	updateFn: (id: string, data: Partial<T>) => Promise<{ error?: string | null }>;
 };
 
 export function NavigatorUI<T extends NavigableItem>({
@@ -35,7 +35,7 @@ export function NavigatorUI<T extends NavigableItem>({
 	basePath,
 	type,
 	onSave,
-	onUpdateField
+	updateFn
 }: NavigatorProps<T>) {
 
 	const router = useRouter();
@@ -66,6 +66,13 @@ export function NavigatorUI<T extends NavigableItem>({
 		else toast.success("Positions updated");
 
 		router.refresh();
+
+	};
+
+	async function handleUpdate(id: string, data: Partial<T>) {
+
+		const { error } = await updateFn(id, data);
+		if (error) toast.error(error);
 
 	};
 
@@ -121,7 +128,7 @@ export function NavigatorUI<T extends NavigableItem>({
 											basePath={basePath}
 											dragAttributes={sortable.attributes}
 											dragListeners={sortable.listeners}
-											onUpdate={onUpdateField}
+											onUpdate={handleUpdate}
 										/>
 									</div>
 

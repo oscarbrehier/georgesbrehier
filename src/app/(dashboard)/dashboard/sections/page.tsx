@@ -16,7 +16,7 @@ export default async function Page() {
 				type="section"
 				basePath="sections"
 				onSave={updateSectionPositions}
-				onUpdateField={updateSection}
+				updateFn={updateSection}
 			/>
 
 		</div>

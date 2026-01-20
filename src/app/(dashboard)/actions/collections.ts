@@ -54,16 +54,29 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	if (!oldData) return { error: "Collection not found" };
 
-	if (data.is_default === false && oldData?.is_default === true) {
+	const isHidingDefault = (data.is_visible === false && oldData.is_default === true);
+	const isUnsettingDefault = (data.is_default === false && oldData.is_default === true);
 
-		const { count } = await supabase
+	if (isHidingDefault || isUnsettingDefault) {
+
+		const { data: nextBest } = await supabase
 			.from("collections")
-			.select("*", { count: 'exact', head: true })
-			.eq("section_id", oldData.section_id);
+			.select("id")
+			.eq("section_id", oldData.section_id)
+			.neq("id", collectionId)
+			.order("is_visible", { ascending: false })
+			.order("position", { ascending: true })
+			.limit(1)
+			.maybeSingle();
 
-		if (count && count <= 1) {
-			return { error: "This is the only collection in the section. It must remain the default." };
-		};
+		if (!nextBest) {
+			return { error: "This is the only collection in this section. It must remain visible and default." };
+		}
+
+		await supabase
+			.from("collections")
+			.update({ is_default: true })
+			.eq("id", nextBest.id);
 
 	};
 
@@ -89,6 +102,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 			.select("id")
 			.eq("section_id", sectionId)
 			.neq("id", collectionId)
+			.order("is_visible", { ascending: false })
 			.order("position", { ascending: true })
 			.limit(1)
 			.single();
@@ -102,9 +116,9 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	};
 
-	if (data.is_default === true || (data.is_default === false && oldData.is_default === true)) {
-		revalidateTag("site-home", "max");
-	};
+	if (data.is_default === true || isUnsettingDefault || isHidingDefault) {
+        revalidateTag("site-home", "max");
+    };
 
 	revalidateTag(`section-${sectionId}-collections`, "max");
 	revalidateTag(`collection-${collectionId}-metadata`, "max");
@@ -184,7 +198,7 @@ export async function setCollectionVisibility(collectionId: string, sectionId: s
 };
 
 export async function deleteCollection(collectionId: string, sectionId: string): Promise<{ error: string | null }> {
-	
+
 	const { data: colToDelete } = await supabase
 		.from("collections")
 		.select("is_default, slug")
@@ -206,6 +220,7 @@ export async function deleteCollection(collectionId: string, sectionId: string):
 			.from("collections")
 			.select("id")
 			.eq("section_id", sectionId)
+			.order("is_visible", { ascending: false })
 			.order("position", { ascending: true })
 			.limit(1)
 			.single();
@@ -218,7 +233,7 @@ export async function deleteCollection(collectionId: string, sectionId: string):
 		};
 
 		revalidateTag("site-home", "max");
-	
+
 	};
 
 	revalidateTag(`section-${sectionId}-collections`, "max");

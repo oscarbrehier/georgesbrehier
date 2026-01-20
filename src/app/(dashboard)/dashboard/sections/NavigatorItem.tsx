@@ -19,7 +19,7 @@ export function NavigatorItem<T extends NavigableItem>({
 	type: "section" | "collection";
 	dragAttributes: any;
 	dragListeners: any;
-	onUpdate: (id: string, data: any) => Promise<{ error?: string | null }>;
+	onUpdate: (id: string, data: any) => void;
 }) {
 
 	const borderColor = item.is_default ? "border-amber-400" : "border-blue-400";
@@ -69,8 +69,7 @@ export function NavigatorItem<T extends NavigableItem>({
 							variant="base"
 							size="sm"
 							Icon={SquareArrowUp}
-							// onClick={(e) => updateValue(e, "is_default", true)}
-							onClick={(e) => console.log("hello")}
+							onClick={(e) => onUpdate(item.id, { is_default: true })}
 						>
 							<ButtonText>Make default</ButtonText>
 						</Button>

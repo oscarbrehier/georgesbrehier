@@ -10,7 +10,7 @@ export interface SectionUpdatePayload {
 	slug?: string;
 	is_default?: boolean;
 	is_visible?: boolean;
-	order?: number;
+	position?: number;
 };
 
 interface SectionCreatePaylod {
@@ -22,24 +22,19 @@ export async function createSection(data: SectionCreatePaylod) {
 
 	const slug = createSlug(data.title)
 
-	if (data.is_default) {
-
-		await supabase
-			.from("sections")
-			.update({ is_default: false })
-			.eq("is_default", true);
-
-	};
-
-	const { error } = await supabase
+	const { data: newSection, error } = await supabase
 		.from("sections")
-		.insert({ ...data, slug });
+		.insert({ ...data, slug })
+		.select("is_default")
+		.single();
 
 	if (error?.code === "23505") return { error: "A section with this title already exists." };
 	if (error) return { error: error.message };
 
+	const actualDefault = newSection.is_default;
+
 	revalidateTag("sections", "max");
-	if (data.is_default) revalidateTag("site-home", "max");
+	if (actualDefault) revalidateTag("site-home", "max");
 
 	revalidatePath("/dashboard/gallery", "page");
 
@@ -51,9 +46,36 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 
 	const { data: oldData } = await supabase
 		.from("sections")
-		.select("slug, section_id")
+		.select("slug, is_default")
 		.eq("id", sectionId)
 		.single();
+
+	if (!oldData) return { error: "Section not found" };
+
+	const isHidingDefault = data.is_visible === false && oldData.is_default === true;
+	const isUnsettingDefault = data.is_default === false && oldData.is_default === true;
+
+	if (isHidingDefault || isUnsettingDefault) {
+
+		const { data: nextBest } = await supabase
+			.from("sections")
+			.select("id")
+			.neq("id", sectionId)
+			.order("is_visible", { ascending: false })
+			.order("position", { ascending: true })
+			.limit(1)
+			.maybeSingle();
+
+		if (!nextBest) {
+			return { error: "This is the only section. It must remain visible and default." };
+		}
+
+		await supabase
+			.from("sections")
+			.update({ is_default: true })
+			.eq("id", nextBest.id);
+
+	};
 
 	let payload: SectionUpdatePayload = { ...data };
 
@@ -61,30 +83,22 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 		payload.slug = createSlug(data.title);
 	};
 
-	if (data.is_default) {
-
-		await supabase
-			.from("sections")
-			.update({ is_default: false })
-			.neq("id", sectionId)
-			.eq("is_default", true);
-
-		revalidateTag("site-home", "max");
-
-	};
-
 	const { data: updatedSection, error } = await supabase
 		.from("sections")
 		.update(payload)
 		.eq("id", sectionId)
-		.select("slug")
+		.select("slug, is_default")
 		.single();
 
 	if (error) return { error: error.message };
 
+	if (data.is_default === true || isUnsettingDefault || isHidingDefault) {
+		revalidateTag("site-home", "max");
+	};
 
 	revalidateTag("sections", "max");
 	revalidateTag(`section-${sectionId}`, "max");
+
 
 	if (oldData?.slug) revalidateTag(`lookup-section-${oldData.slug}`, "max");
 	if (updatedSection.slug) revalidateTag(`lookup-section-${updatedSection.slug}`, "max");
@@ -98,19 +112,44 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 
 export async function deleteSection(sectionId: string): Promise<{ error: string | null }> {
 
-	const { data, error } = await supabase
+	const { data: section } = await supabase
+		.from("sections")
+		.select("is_default, slug")
+		.eq("id", sectionId)
+		.single();
+
+	if (!section) return { error: "Section not found" };
+
+	const { error } = await supabase
 		.from("sections")
 		.delete()
-		.eq("id", sectionId)
-		.select("slug")
-		.single();
+		.eq("id", sectionId);
 
 	if (error) return { error: error.message };
 
-	revalidateTag("sections", "max");
-	revalidateTag(`section-${sectionId}`, "max");
+	if (section.is_default) {
 
-	if (data.slug) revalidateTag(`lookup-section-${data.slug}`, "max");
+		const { data: nextBest } = await supabase
+			.from("sections")
+			.select("id")
+			.order("is_visible", { ascending: false })
+			.order("position", { ascending: true })
+			.limit(1)
+			.single();
+
+		if (nextBest) {
+			await supabase
+				.from("sections")
+				.update({ is_default: true })
+				.eq("id", nextBest.id);
+		};
+
+		revalidateTag("site-home", "max");
+
+	};
+
+	revalidateTag("sections", "max");
+	revalidateTag(`lookup-section-${section.slug}`, "max");
 
 	redirect("/dashboard/sections");
 

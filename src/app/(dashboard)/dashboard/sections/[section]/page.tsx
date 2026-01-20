@@ -52,7 +52,7 @@ export default async function Page({
 				type="collection"
 				basePath={sectionSlug}
 				onSave={updateCollectionPositions}
-				onUpdateField={updateCollection}
+				updateFn={updateCollection}
 			/>
 
 		</div>
