@@ -5,6 +5,7 @@ import Link from "next/link";
 import { NavigableItem } from "./NavigatorUI";
 import { Badge } from "../../components/Badge";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function NavigatorItem<T extends NavigableItem>({
 	item,
@@ -22,6 +23,9 @@ export function NavigatorItem<T extends NavigableItem>({
 	onUpdate: (id: string, data: any) => void;
 }) {
 
+
+	const isVisible = !item.parent_hidden && item.is_visible;
+
 	const borderColor = item.is_default ? "border-amber-400" : "border-blue-400";
 
 	return (
@@ -29,7 +33,7 @@ export function NavigatorItem<T extends NavigableItem>({
 		<div className={cn(
 			"relative bg-neutral-100 rounded-xl w-full flex items-center space-x-6 p-6 group border-l-6",
 			"outline-1 outline-neutral-200",
-			item.is_visible ? borderColor : "opacity-70 hover:opacity-100"
+			isVisible ? borderColor : "opacity-70 hover:opacity-100"
 		)}>
 
 			<Link href={`${basePath}/${item.slug}`} className="absolute inset-0 z-0" />
@@ -47,11 +51,17 @@ export function NavigatorItem<T extends NavigableItem>({
 						<p className="text-neutral-500 text-sm">/{item.slug}</p>
 					</div>
 
-					<div className="flex space-x-2">
+					<div className="flex space-x-2 ">
 
 						<Badge>
-							{item?.is_visible ? "Visible" : "Hidden"}
+							{isVisible ? "Visible" : "Hidden"}
 						</Badge>
+
+						{item.parent_hidden && (
+                            <Badge variant="destructive">
+                                Section Hidden
+                            </Badge>
+                        )}
 
 						{item?.is_default && (
 							<Badge>Default</Badge>
@@ -76,12 +86,24 @@ export function NavigatorItem<T extends NavigableItem>({
 
 					)}
 
-					<Button
-						variant="base" size="sm" Icon={item.is_visible ? EyeOff : Eye}
-						onClick={() => onUpdate(item.id, { is_visible: !item.is_visible })}
-					>
-						<ButtonText>{item.is_visible ? "Hide" : "Show"}</ButtonText>
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="base" size="sm" Icon={isVisible ? EyeOff : Eye}
+								onClick={() => onUpdate(item.id, { is_visible: !item.is_visible })}
+								disabled={item.parent_hidden}
+							>
+								<ButtonText>{isVisible ? "Hide" : "Show"}</ButtonText>
+							</Button>
+						</TooltipTrigger>
+						{item.parent_hidden && (
+							<TooltipContent>
+								<p className="w-full max-w-96 text-center">
+									You can't show this collection because its section is hidden. Please update the section settings first.
+								</p>
+							</TooltipContent>
+						)}
+					</Tooltip>
 
 					<CreateItemDialog
 						type={type}

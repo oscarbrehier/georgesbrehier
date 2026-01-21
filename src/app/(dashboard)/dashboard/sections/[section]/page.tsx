@@ -1,9 +1,8 @@
 import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
 import { NavigatorUI } from "../NavigatorUI";
 import { updateCollection, updateCollectionPositions } from "@/app/(dashboard)/actions/collections";
-import { getCollectionsBySection } from "@/utils/supabase/collections";
+import { getCollectionsBySection, getCollectionsWithSectionState } from "@/utils/supabase/collections";
 import { getSectionId } from "@/utils/supabase/sections";
-import { notFound } from "next/navigation";
 
 export default async function Page({
 	params
@@ -39,7 +38,7 @@ export default async function Page({
 
 	};
 
-	const collections = await getCollectionsBySection(sectionId)
+	const collections = await getCollectionsWithSectionState(sectionId);
 
 	return (
 

@@ -111,6 +111,7 @@ export async function getSectionTree(value: string, type: "id" | "slug"): Promis
 		.select(`
 			id,
 			slug,
+			is_visible,
 			collections (
         		id,
 				title,

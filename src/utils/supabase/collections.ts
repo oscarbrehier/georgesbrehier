@@ -117,3 +117,25 @@ export async function getDefaultCollectionBySectionId(sectionId: string): Promis
     );
 
 };
+
+export async function getCollectionsWithSectionState(sectionId: string): Promise<(GalleryCollection & { parent_hidden: boolean })[]> {
+
+    if (!sectionId) return [];
+
+    const { data, error } = await supabase
+        .from("collections")
+        .select(`
+            *,
+            sections:section_id (
+                is_visible
+            )    
+        `)
+        .eq("section_id", sectionId);
+
+    if (error) return [];
+    return data.map((col) => ({
+        ...col,
+        parent_hidden: !col.sections?.is_visible
+    }));
+
+};

@@ -79,7 +79,10 @@ export function CollectionsUI({
 				selectedItems={selectedItems}
 				currentPath={currentPath}
 				section={sectionTree.slug}
-				onEditToggle={() => setIsEditing((v) => !v)}
+				onEditToggle={() => {
+					setIsEditing((v) => !v);
+					setSelectedItems([]);
+				}}
 				onClearSelected={() => setSelectedItems([])}
 				onSave={handleSaveChanges}
 				hasChanges={hasChanges}
@@ -105,16 +108,17 @@ export function CollectionsUI({
 
 								<div className="sticky top-0 z-20 bg-dashboard py-2 flex items-center space-x-8 w">
 
-									<div className="flex items-center space-x-4">
+									<h2
+										className={cn(
+											"text-3xl mr-4",
+											roboto.className
+										)}
+									>
+										{collection.title}
+									</h2>
 
-										<h2
-											className={cn(
-												"text-3xl",
-												roboto.className
-											)}
-										>
-											{collection.title}
-										</h2>
+									<div className="flex items-center space-x-2">
+
 
 										{collection.is_default && (
 											<Badge
@@ -125,14 +129,29 @@ export function CollectionsUI({
 											</Badge>
 										)}
 
+										{!sectionTree.is_visible && (
+											<Badge variant="destructive">
+												Section Hidden
+											</Badge>
+										)}
+										
+										{!collection.is_visible && (
+											<Badge variant="destructive">
+												Collection Hidden
+											</Badge>
+										)}
+
+
 									</div>
 
-									<CollectionVisibilityBtn
-										collection={{
-											...collection,
-											section_id: sectionTree.id
-										}}
-									/>
+									{sectionTree.is_visible && (
+										<CollectionVisibilityBtn
+											collection={{
+												...collection,
+												section_id: sectionTree.id
+											}}
+										/>
+									)}
 
 								</div>
 
@@ -186,7 +205,9 @@ export function CollectionsUI({
 															<div ref={setNodeRef} style={style}>
 
 																<GalleryItem
-																	item={{ ...work, collection: { id: collection.id, title: collection.title } }}
+																	item={{ ...work, collection, 
+																		parent_hidden: !sectionTree.is_visible 
+																	}}
 																	isEditMode={isEditing}
 																	currentPath={currentPath}
 																	isSelected={selectedItems.some(

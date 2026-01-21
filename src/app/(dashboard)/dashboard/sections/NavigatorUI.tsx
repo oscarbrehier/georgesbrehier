@@ -15,9 +15,10 @@ export interface NavigableItem {
 	section_id?: string;
 	slug: string;
 	title: string;
-	position?: number;
 	is_visible: boolean;
 	is_default: boolean;
+	position: number;
+	parent_hidden?: boolean;
 };
 
 interface NavigatorProps<T extends NavigableItem> {

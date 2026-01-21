@@ -76,7 +76,7 @@ export function Toolbar({
 
 			<QuickActions />
 
-			<div className="flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2">
+			<div className="flex sm:flex-row flex-col sm:items-start items-end gap-2">
 
 				{
 					isEditing && selectedItems.length > 0 && (
@@ -87,6 +87,7 @@ export function Toolbar({
 								className={"bg-red-600 hover:bg-red-700 text-neutral-50"}
 								onClick={handleDelete}
 								disabled={selectedItems.length === 0 || isDeleting}
+								size="sm"
 								Icon={Ban}
 							>
 								<ButtonText>Delete {selectedItems.length} {selectedItems.length === 1 ? "Item" : "Items"}</ButtonText>
@@ -102,6 +103,7 @@ export function Toolbar({
 
 						<Button
 							className="bg-amber-600 hover:bg-amber-700 text-neutral-50"
+							size="sm"
 							onClick={onSave}
 							disabled={isDeleting}
 							Icon={CheckCheck}
@@ -117,6 +119,7 @@ export function Toolbar({
 					className={cn(
 						isEditing ? "bg-blue-600 hover:bg-blue-700 text-neutral-50" : "bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
 					)}
+					size="sm"
 					onClick={() => onEditToggle()}
 					Icon={isEditing ? PencilOff : Pencil}
 				>
@@ -172,15 +175,16 @@ function DeleteSectionButton({
 			className={cn(
 				"bg-red-600 hover:bg-red-700 text-neutral-50 disabled:bg-red-200"
 			)}
+			size="sm"
 			onClick={handleDeleteSection}
 			disabled={isDeleting}
 			Icon={Trash}
 		>
 			<ButtonText>
 				Delete
-				{" "}
-				<span className="underline">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
-				{" "}
+				"
+				<span className="">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
+				"
 				collection
 			</ButtonText>
 		</Button>

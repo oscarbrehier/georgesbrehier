@@ -38,6 +38,7 @@ declare global {
 	interface GallerySectionTree {
 		id: string;
 		slug: string;
+		is_visible;
 		collections: {
 			id: string;
 			slug: string;
@@ -59,6 +60,7 @@ declare global {
 		is_default: boolean;
 		slug: string;
 		is_visible: boolean;
+		position: number;
 		seo_title: string,
 		seo_description: string,
 		seo_og_image_url: string,

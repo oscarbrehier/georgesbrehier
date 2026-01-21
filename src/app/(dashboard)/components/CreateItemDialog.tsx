@@ -2,6 +2,7 @@
 
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 
 const SectionForm = dynamic(() => import("./SectionForm").then(mod => mod.SectionForm));
 const CollectionForm = dynamic(() => import("./CollectionForm").then(mod => mod.CollectionForm));
@@ -18,8 +19,8 @@ export function CreateItemDialog({
 	children,
 	initialData,
 	onSuccess,
-	open,
-	onOpenChange,
+	open: controlledOpen,
+	onOpenChange: setControlledOpen,
 }: {
 	type: "section" | "collection";
 	initialData?: EditData;
@@ -29,16 +30,36 @@ export function CreateItemDialog({
 	onOpenChange?: (state: boolean) => void;
 }) {
 
+	const [internalOpen, setInternalOpen] = useState(false);
+
+	const isControlled = controlledOpen !== undefined;
+	const isOpen = isControlled ? controlledOpen : internalOpen;
+
 	const isEditMode = !!initialData;
 
+	function handleOpenChange(val: boolean) {
+
+		if (isControlled) {
+			setControlledOpen?.(val);
+		} else {
+			setInternalOpen(val);
+		};
+
+	};
+
 	function handleSuccess() {
-		onOpenChange?.(false);
+
 		onSuccess?.();
+
+		setTimeout(() => {
+			handleOpenChange(false);			
+		}, 2000);
+
 	};
 
 	return (
 
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={isOpen} onOpenChange={handleOpenChange}>
 
 			<DialogTrigger asChild>
 				{children}

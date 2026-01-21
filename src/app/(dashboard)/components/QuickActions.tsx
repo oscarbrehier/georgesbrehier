@@ -14,7 +14,7 @@ export function QuickActions({
 	return (
 
 		<div className={cn(
-			"flex sm:flex-row flex-col sm:items-start items-end 2lg:gap-x-4 gap-2",
+			"flex sm:flex-row flex-col sm:items-start items-end gap-2",
 			className
 		)}>
 
