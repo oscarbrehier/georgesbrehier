@@ -1,6 +1,7 @@
 "use client"
 
 import { Dialog, DialogHeader, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { UI_LABELS } from "@/utils/constants";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
@@ -71,7 +72,7 @@ export function CreateItemDialog({
 					<DialogTitle>
 						{isEditMode
 							? `Edit ${type}: ${initialData.title}`
-							: `Create new ${type}`
+							: `Create new ${UI_LABELS[type].singular}`
 						}
 					</DialogTitle>
 				</DialogHeader>

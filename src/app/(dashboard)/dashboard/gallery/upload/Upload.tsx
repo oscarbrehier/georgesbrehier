@@ -13,6 +13,7 @@ import { getSections } from "@/utils/supabase/sections";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
+import { UI_LABELS } from "@/utils/constants";
 
 interface UploadProgress {
 	filename: string
@@ -344,7 +345,7 @@ export function Upload({
 						<div>
 
 							<Select
-								label="Section"
+								label={UI_LABELS.section.singular}
 								id="section"
 								name="sectionId"
 								value={formData.sectionId}
@@ -364,7 +365,7 @@ export function Upload({
 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
 								onClick={() => setOpenSectionDialog(true)}
 							>
-								Create a new section
+								Create a new {UI_LABELS.section.singular}
 							</button>
 
 						</div>
@@ -372,7 +373,7 @@ export function Upload({
 						<div>
 
 							<Select
-								label="Collection"
+								label={UI_LABELS.collection.capitalized}
 								id="collection"
 								name="collectionId"
 								value={formData.collectionId}
@@ -393,7 +394,7 @@ export function Upload({
 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
 								onClick={() => setOpenCollectionDialog(true)}
 							>
-								Create a new collection
+								Create a new {UI_LABELS.collection.singular}
 							</button>
 
 						</div>

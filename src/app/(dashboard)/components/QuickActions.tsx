@@ -2,6 +2,7 @@ import { Eye, Plus } from "lucide-react";
 import { Button, ButtonText } from "./Button";
 import { CreateItemDialog, EditData } from "./CreateItemDialog";
 import { cn } from "@/utils/utils";
+import { UI_LABELS } from "@/utils/constants";
 
 export function QuickActions({
 	className,
@@ -38,7 +39,7 @@ export function QuickActions({
 					size="sm"
 				>
 					<ButtonText>
-						Create new Section
+						Create new {UI_LABELS.section.capitalized}
 					</ButtonText>
 				</Button>
 			</CreateItemDialog>
@@ -53,7 +54,7 @@ export function QuickActions({
 					size="sm"
 				>
 					<ButtonText>
-						Create new Collection
+						Create new {UI_LABELS.collection.capitalized}
 					</ButtonText>
 				</Button>
 			</CreateItemDialog>

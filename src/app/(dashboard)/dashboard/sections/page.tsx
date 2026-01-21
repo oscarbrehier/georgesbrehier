@@ -1,6 +1,7 @@
 import { getSections } from "@/utils/supabase/sections";
 import { NavigatorUI } from "./NavigatorUI";
 import { updateSection, updateSectionPositions } from "../../actions/sections";
+import { UI_LABELS } from "@/utils/constants";
 
 export default async function Page() {
 
@@ -11,7 +12,7 @@ export default async function Page() {
 		<div className="h-full w-full flex flex-col">
 
 			<NavigatorUI
-				title="Sections"
+				title={UI_LABELS.section.capPlural}
 				items={sections}
 				type="section"
 				basePath="sections"

@@ -3,6 +3,7 @@ import { Button, ButtonText } from "../../components/Button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { setCollectionVisibility } from "../../actions/collections";
+import { UI_LABELS } from "@/utils/constants";
 
 export function CollectionVisibilityBtn({
 	collection
@@ -26,7 +27,7 @@ export function CollectionVisibilityBtn({
 		} catch (err) {
 
 			const message = err instanceof Error ? err.message : "Unknown error";
-			toast("Failed to change collection visibility", { description: message });
+			toast(`Failed to change ${UI_LABELS.collection.singular} visibility`, { description: message });
 
 		} finally {
 			setIsPending(false);

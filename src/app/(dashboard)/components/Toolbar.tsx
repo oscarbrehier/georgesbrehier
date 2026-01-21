@@ -11,6 +11,7 @@ import { CreateItemDialog } from "./CreateItemDialog";
 import { deleteSection } from "../actions/sections";
 import { QuickActions } from "./QuickActions";
 import { getSectionId } from "@/utils/supabase/sections";
+import { UI_LABELS } from "@/utils/constants";
 
 export function Toolbar({
 	isEditing,
@@ -150,20 +151,20 @@ function DeleteSectionButton({
 
 		if (isDeleting) return;
 		if (!section) return;
-		if (!confirm(`You are about to permanently delete the "${section}" section. This action cannot be undone. Are you sure you want to proceed?`)) return;
+		if (!confirm(`You are about to permanently delete the "${section}" ${UI_LABELS.section.singular}. This action cannot be undone. Are you sure you want to proceed?`)) return;
 
 		setIsDeleting(true);
 
 		const sectionId = await getSectionId(section);
 		if (!sectionId) {
-			toast("Failed to delete section");
+			toast(`Failed to delete ${UI_LABELS.section.singular}`);
 			setIsDeleting(false);
 			return null;
 		};
 
 		const { error } = await deleteSection(sectionId);
 
-		if (error) toast("Failed to delete section:", { description: error });
+		if (error) toast(`Failed to delete ${UI_LABELS.section.singular}:`, { description: error });
 
 		setIsDeleting(false);
 
@@ -185,7 +186,8 @@ function DeleteSectionButton({
 				"
 				<span className="">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
 				"
-				collection
+				{" "}
+				{UI_LABELS.collection.singular}
 			</ButtonText>
 		</Button>
 

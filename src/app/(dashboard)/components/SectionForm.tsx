@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { createSection, updateSection } from "../actions/sections";
 import { EditData } from "./CreateItemDialog";
+import { UI_LABELS } from "@/utils/constants";
 
 interface FormState {
 	message?: string;
@@ -137,8 +138,8 @@ export function SectionForm({
 					) : (
 						<span className="truncate">
 							{isEditMode
-								? "Update section"
-								: `Create section${formData.sectionTitle && `: ${formData.sectionTitle}`}`
+								? `Update ${UI_LABELS.section.singular}`
+								: `Create ${UI_LABELS.section.singular}${formData.sectionTitle && `: ${formData.sectionTitle}`}`
 							}
 						</span>
 					)}

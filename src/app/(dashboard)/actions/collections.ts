@@ -1,6 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase";
+import { UI_LABELS } from "@/utils/constants";
 import { createSlug } from "@/utils/utils";
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -52,7 +53,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 		.eq("id", collectionId)
 		.single();
 
-	if (!oldData) return { error: "Collection not found" };
+	if (!oldData) return { error: `${UI_LABELS.collection.capitalized} not found` };
 
 	const isHidingDefault = (data.is_visible === false && oldData.is_default === true);
 	const isUnsettingDefault = (data.is_default === false && oldData.is_default === true);
@@ -70,7 +71,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 			.maybeSingle();
 
 		if (!nextBest) {
-			return { error: "This is the only collection in this section. It must remain visible and default." };
+			return { error: `This is the only ${UI_LABELS.collection.singular} in this ${UI_LABELS.section.singular}. It must remain visible and default.` };
 		}
 
 		await supabase
@@ -96,7 +97,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 		if (error.code === '23505') {
 			return {
-				error: `A collection named "${payload.title}" already exists in this section. Please give this collection a different name.`
+				error: `A ${UI_LABELS.collection.singular} named "${payload.title}" already exists in this ${UI_LABELS.section.singular}. Please give this ${UI_LABELS.collection.singular} a different name.`
 			};
 		};
 
@@ -154,7 +155,7 @@ export async function createCollection({
 	is_default: boolean;
 }) {
 
-	if (!sectionId || !rawTitle) return { error: "Collection title and Section ID are required." };
+	if (!sectionId || !rawTitle) return { error: `${UI_LABELS.collection.capitalized} title and ${UI_LABELS.section.singular} ID are required.` };
 
 	const title = rawTitle.trim().toLocaleLowerCase();
 	const slug = createSlug(title);
@@ -173,7 +174,7 @@ export async function createCollection({
 	if (insertError) {
 
 		if (insertError.code === "23505") {
-			return { error: `A collection named "${rawTitle}" already exists in this section. Please give this collection a different name.` }
+			return { error: `A ${UI_LABELS.collection.singular} named "${rawTitle}" already exists in this ${UI_LABELS.section.singular}. Please give this ${UI_LABELS.collection.singular} a different name.` }
 		};
 
 		return { error: insertError.message };
@@ -189,7 +190,7 @@ export async function createCollection({
 
 	return {
 		success: true,
-		message: `Successfully created "${title}"${actualDefault ? " as the section default" : ""}.`
+		message: `Successfully created "${title}"${actualDefault ? ` as the ${UI_LABELS.section.singular} default` : ""}.`
 	};
 
 };
@@ -216,7 +217,7 @@ export async function deleteCollection(collectionId: string, sectionId: string):
 		.eq("id", collectionId)
 		.single();
 
-	if (!colToDelete) return { error: "Collection not found" };
+	if (!colToDelete) return { error: `${UI_LABELS.collection.capitalized} not found` };
 
 	const { error: deleteError } = await supabase
 		.from("collections")

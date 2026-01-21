@@ -6,6 +6,7 @@ import { NavigableItem } from "./NavigatorUI";
 import { Badge } from "../../components/Badge";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { UI_LABELS } from "@/utils/constants";
 
 export function NavigatorItem<T extends NavigableItem>({
 	item,
@@ -59,7 +60,7 @@ export function NavigatorItem<T extends NavigableItem>({
 
 						{item.parent_hidden && (
                             <Badge variant="destructive">
-                                Section Hidden
+                                {UI_LABELS.section.capitalized} Hidden
                             </Badge>
                         )}
 
@@ -99,7 +100,7 @@ export function NavigatorItem<T extends NavigableItem>({
 						{item.parent_hidden && (
 							<TooltipContent>
 								<p className="w-full max-w-96 text-center">
-									You can't show this collection because its section is hidden. Please update the section settings first.
+									You can't show this {UI_LABELS.collection.singular} because its {UI_LABELS.section.singular} is hidden. Please update the {UI_LABELS.section.singular} settings first.
 								</p>
 							</TooltipContent>
 						)}

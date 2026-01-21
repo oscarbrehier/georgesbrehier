@@ -2,6 +2,7 @@
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { UI_LABELS } from "@/utils/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment } from "react/jsx-runtime";
@@ -33,7 +34,7 @@ export default function Breadcrumbs({
 
 								<BreadcrumbItem>
 									<DropdownMenu>
-										<DropdownMenuTrigger>sections</DropdownMenuTrigger>
+										<DropdownMenuTrigger>{UI_LABELS.section.plural}</DropdownMenuTrigger>
 										<DropdownMenuContent align="start">
 											<Link href={href}>
 												<DropdownMenuItem>

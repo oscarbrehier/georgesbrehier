@@ -8,6 +8,7 @@ import { FormEvent, useActionState, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { EditData } from "./CreateItemDialog";
 import { createCollection, updateCollection } from "../actions/collections";
+import { UI_LABELS } from "@/utils/constants";
 
 interface FormState {
 	message?: string;
@@ -131,7 +132,7 @@ export function CollectionForm({
 					id="section"
 				>
 					<SelectGroup>
-						<SelectLabel>Sections</SelectLabel>
+						<SelectLabel>{UI_LABELS.section.capPlural}</SelectLabel>
 						{sections.map((section) => (
 							<SelectItem
 								key={section.id}
@@ -145,7 +146,7 @@ export function CollectionForm({
 			</Select>
 
 			<div className="grid w-full max-w-sm items-center gap-3">
-				<Label htmlFor="collectionTitle">Collection Title</Label>
+				<Label htmlFor="collectionTitle">{UI_LABELS.collection.capitalized} Title</Label>
 				<Input
 					type="text"
 					id="collectionTitle"
@@ -183,8 +184,8 @@ export function CollectionForm({
 					) : (
 						<span className="truncate">
 							{isEditMode
-								? "Update collection"
-								: `Create collection${formData.collectionTitle && `: ${formData.collectionTitle}`}`
+								? `Update ${UI_LABELS.collection.singular}`
+								: `Create ${UI_LABELS.collection.singular}${formData.collectionTitle && `: ${formData.collectionTitle}`}`
 							}
 						</span>
 					)}

@@ -10,6 +10,7 @@ import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
 import { getCollectionMetadata, getCachedDefaultCollectionBySectionId, getCollectionId } from "@/utils/supabase/collections";
 import { getDefaultSectionWithCollection, getSection, getSectionId } from "@/utils/supabase/sections";
+import { UI_LABELS } from "@/utils/constants";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -173,7 +174,7 @@ export default async function Page({
 		"@context": "https://schema.org",
 		"@type": "ImageGallery",
 		"name": `${collection.title} - ${section.title}`,
-		"description": `Gallery collection: ${collection.title} by Georges Bréhier`,
+		"description": `Gallery ${UI_LABELS.collection.singular}: ${collection.title} by Georges Bréhier`,
 		"url": fullUrl,
 		"author": {
 			"@type": "Person",

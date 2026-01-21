@@ -13,6 +13,7 @@ import { CollectionVisibilityBtn } from "../../../gallery/CollectionVisibilityBt
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
 import { Selector } from "../../../gallery/Selector";
 import { Badge } from "@/app/(dashboard)/components/Badge";
+import { UI_LABELS } from "@/utils/constants";
 
 export function CollectionsUI({
 	sectionTree,
@@ -137,7 +138,7 @@ export function CollectionsUI({
 										
 										{!collection.is_visible && (
 											<Badge variant="destructive">
-												Collection Hidden
+												{UI_LABELS.collection.capitalized} Hidden
 											</Badge>
 										)}
 
@@ -243,7 +244,7 @@ export function CollectionsUI({
 											</div> : (
 
 												<div className="h-20 w-full flex items-center justify-center">
-													<p className="text-muted-foreground">This collection is empty. Upload some work to get started.</p>
+													<p className="text-muted-foreground">This {UI_LABELS.collection.singular} is empty. Upload some work to get started.</p>
 												</div>
 
 											)}
@@ -261,7 +262,7 @@ export function CollectionsUI({
 				) : (
 
 					<div className="h-full w-full flex items-center justify-center">
-						<p className="text-muted-foreground">Empty sections are hidden from the public site.</p>
+						<p className="text-muted-foreground">Empty {UI_LABELS.section.plural} are hidden from the public site.</p>
 					</div>
 
 				)}

@@ -1,6 +1,7 @@
 "use server"
 
 import { supabase } from "@/lib/supabase"
+import { UI_LABELS } from "@/utils/constants";
 import { createSlug } from "@/utils/utils";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
@@ -28,7 +29,7 @@ export async function createSection(data: SectionCreatePaylod) {
 		.select("is_default")
 		.single();
 
-	if (error?.code === "23505") return { error: `The title "${data.title}" is already being used for another section. Please choose a unique name for this section.` };
+	if (error?.code === "23505") return { error: `The title "${data.title}" is already being used for another ${UI_LABELS.section.singular}. Please choose a unique name for this ${UI_LABELS.section.singular}.` };
 	if (error) return { error: error.message };
 
 	const actualDefault = newSection.is_default;
@@ -50,7 +51,7 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 		.eq("id", sectionId)
 		.single();
 
-	if (!oldData) return { error: "Section not found" };
+	if (!oldData) return { error: `${UI_LABELS.section.capitalized} not found` };
 
 	const isHidingDefault = data.is_visible === false && oldData.is_default === true;
 	const isUnsettingDefault = data.is_default === false && oldData.is_default === true;
@@ -67,7 +68,7 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 			.maybeSingle();
 
 		if (!nextBest) {
-			return { error: "This is the only section. It must remain visible and default." };
+			return { error: `This is the only ${UI_LABELS.section.singular}. It must remain visible and default.` };
 		}
 
 		await supabase
@@ -94,7 +95,7 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 
 		if (error.code === '23505') {
 			return {
-				error: `The title "${payload.title}" is already being used for another section. Please choose a unique name for this section.`
+				error: `The title "${payload.title}" is already being used for another ${UI_LABELS.section.singular}. Please choose a unique name for this ${UI_LABELS.section.singular}.`
 			};
 		};
 	
@@ -128,7 +129,7 @@ export async function deleteSection(sectionId: string): Promise<{ error: string 
 		.eq("id", sectionId)
 		.single();
 
-	if (!section) return { error: "Section not found" };
+	if (!section) return { error: `${UI_LABELS.section.capitalized} not found` };
 
 	const { error } = await supabase
 		.from("sections")

@@ -28,7 +28,7 @@ export default async function Layout({
 	const basePath = "/dashboard";
 
 	const navItems = [
-		{ href: "/sections", label: "sections" },
+		{ href: "/sections", label: "volumes" },
 		{ href: "/gallery/upload", label: "upload" },
 		{ href: "/gallery/seo", label: "seo" },
 	];
