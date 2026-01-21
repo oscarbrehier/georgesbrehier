@@ -7,7 +7,7 @@ import { getSections } from "@/utils/supabase/sections";
 import { FormEvent, useActionState, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { EditData } from "./CreateItemDialog";
-import { CollectionFormState, createCollection, updateCollection } from "../actions/collections";
+import { createCollection, updateCollection } from "../actions/collections";
 
 interface FormState {
 	message?: string;
@@ -15,7 +15,6 @@ interface FormState {
 	success?: boolean;
 };
 
-const initialState = { message: "", error: "" };
 const initialForm = {
 	sectionId: "",
 	collectionTitle: "",
@@ -79,7 +78,7 @@ export function CollectionForm({
 
 		setFormData(prev => ({
 			...prev,
-			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value.toLocaleLowerCase()
+			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value
 		}));
 
 	};
@@ -101,22 +100,20 @@ export function CollectionForm({
 
 	useEffect(() => {
 
-		if (pending) {
-			setFormData(initialForm);
+		if (formState.success) {
+			
+			if (onSuccess) onSuccess();
+
+			if (!isEditMode) setFormData(initialForm);
+
 		};
 
-	}, [pending]);
-
-	useEffect(() => {
-		if (formState.success && onSuccess) {
-			onSuccess?.();
-		};
-	}, [formState.success, onSuccess]);
+	}, [formState.success, onSuccess, isEditMode]);
 
 	return (
 
 		<form
-			className="grid gap-4 w"
+			className="grid gap-4"
 			onSubmit={handleSubmit}
 		>
 
@@ -173,15 +170,7 @@ export function CollectionForm({
 				</div>
 			</div>
 
-			<div className="w-full space-y-2">
-
-				{formState?.error && (
-					<p className="text-xs text-red-600 text-center">{formState.error}</p>
-				)}
-
-				{formState?.success && (
-					<p className="text-xs text-green-600 text-center">{formState.message}</p>
-				)}
+			<div className="w-full space-y-4">
 
 				<Button
 					type="submit"
@@ -201,6 +190,14 @@ export function CollectionForm({
 					)}
 
 				</Button>
+
+				{formState?.error && (
+					<p className="text-xs text-red-600 text-center">{formState.error}</p>
+				)}
+
+				{formState?.success && (
+					<p className="text-xs text-green-600 text-center">{formState.message}</p>
+				)}
 
 			</div>
 

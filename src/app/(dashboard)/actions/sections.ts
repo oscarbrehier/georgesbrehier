@@ -28,7 +28,7 @@ export async function createSection(data: SectionCreatePaylod) {
 		.select("is_default")
 		.single();
 
-	if (error?.code === "23505") return { error: "A section with this title already exists." };
+	if (error?.code === "23505") return { error: `The title "${data.title}" is already being used for another section. Please choose a unique name for this section.` };
 	if (error) return { error: error.message };
 
 	const actualDefault = newSection.is_default;
@@ -90,7 +90,17 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 		.select("slug, is_default")
 		.single();
 
-	if (error) return { error: error.message };
+	if (error) {
+
+		if (error.code === '23505') {
+			return {
+				error: `The title "${payload.title}" is already being used for another section. Please choose a unique name for this section.`
+			};
+		};
+	
+		return { error: error.message };
+	
+	};
 
 	if (data.is_default === true || isUnsettingDefault || isHidingDefault) {
 		revalidateTag("site-home", "max");

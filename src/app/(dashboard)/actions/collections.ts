@@ -92,7 +92,18 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 		.select("section_id, is_default, slug")
 		.single();
 
-	if (error) return { error: error.message };
+	if (error) {
+
+		if (error.code === '23505') {
+			return {
+				error: `A collection named "${payload.title}" already exists in this section. Please give this collection a different name.`
+			};
+		};
+
+		return { error: error.message };
+
+	};
+
 	const sectionId = updatedCollection.section_id;
 
 	if (data.is_default === false && oldData.is_default === true) {
@@ -117,8 +128,8 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 	};
 
 	if (data.is_default === true || isUnsettingDefault || isHidingDefault) {
-        revalidateTag("site-home", "max");
-    };
+		revalidateTag("site-home", "max");
+	};
 
 	revalidateTag(`section-${sectionId}-collections`, "max");
 	revalidateTag(`collection-${collectionId}-metadata`, "max");
@@ -162,7 +173,7 @@ export async function createCollection({
 	if (insertError) {
 
 		if (insertError.code === "23505") {
-			return { error: `A collection named \`${title}\` already exists` }
+			return { error: `A collection named "${rawTitle}" already exists in this section. Please give this collection a different name.` }
 		};
 
 		return { error: insertError.message };

@@ -81,17 +81,15 @@ export function SectionForm({
 
 	useEffect(() => {
 
-		if (pending) {
-			setFormData(initialForm);
+		if (formState.success) {
+
+			if (onSuccess) onSuccess();
+
+			if (!isEditMode) setFormData(initialForm);
+
 		};
 
-	}, [pending]);
-
-	useEffect(() => {
-		if (formState.success && onSuccess) {
-			onSuccess?.();
-		};
-	}, [formState.success, onSuccess]);
+	}, [formState.success, onSuccess, isEditMode]);
 
 	return (
 
@@ -126,15 +124,7 @@ export function SectionForm({
 				</div>
 			</div>
 
-			<div className="w-full space-y-2">
-
-				{formState.error && (
-					<p className="text-xs text-red-600 text-center">{formState.error}</p>
-				)}
-
-				{formState.success && (
-					<p className="text-xs text-green-600 text-center">{formState.message}</p>
-				)}
+			<div className="w-full space-y-4">
 
 				<Button
 					type="submit"
@@ -154,6 +144,14 @@ export function SectionForm({
 					)}
 
 				</Button>
+
+				{formState.error && (
+					<p className="text-xs text-red-600 text-center">{formState.error}</p>
+				)}
+
+				{formState.success && (
+					<p className="text-xs text-green-600 text-center">{formState.message}</p>
+				)}
 
 			</div>
 
