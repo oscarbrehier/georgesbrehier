@@ -3,7 +3,7 @@
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Toolbar } from "../../../../components/Toolbar";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { SortableItem } from "../../../gallery/GalleryUI";
+import { SortableItem } from "../../../gallery/SortableItem";
 import { GalleryItem } from "../../../gallery/GalleryItem";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
