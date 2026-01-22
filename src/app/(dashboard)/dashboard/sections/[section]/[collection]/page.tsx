@@ -5,10 +5,10 @@ import { notFound } from "next/navigation";
 export default async function Page({
 	params
 }: {
-	params: Promise<{ section: string }>
+	params: Promise<{ section: string; collection: string; }>
 }) {
 
-	const { section: sectionSlug } = await params;
+	const { section: sectionSlug, collection: collectionSlug } = await params;
 
 	const sectionTree = await getSectionTree(sectionSlug, "slug");
 	if (!sectionTree) return notFound();
@@ -17,6 +17,7 @@ export default async function Page({
 
 		<CollectionsUI
 			sectionTree={sectionTree}
+			active={collectionSlug}
 		/>
 
 	);

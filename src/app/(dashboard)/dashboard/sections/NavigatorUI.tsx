@@ -9,6 +9,7 @@ import { CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { QuickActions } from "../../components/QuickActions";
 import { useRouter } from "next/navigation";
+import { UI_LABELS } from "@/utils/constants";
 
 export interface NavigableItem {
 	id: string;
@@ -88,7 +89,10 @@ export function NavigatorUI<T extends NavigableItem>({
 				<h1 className="text-4xl">{title}</h1>
 
 				{hasChanges && (
-					<Button className="bg-amber-600 text-neutral-50" onClick={handleSave} Icon={CheckCheck}>
+					<Button
+						className="bg-amber-600 hover:bg-amber-700 text-neutral-50"
+						onClick={handleSave}
+						Icon={CheckCheck}>
 						<ButtonText>Save positions</ButtonText>
 					</Button>
 				)}
@@ -100,53 +104,61 @@ export function NavigatorUI<T extends NavigableItem>({
 				upload={{ sectionId }}
 			/>
 
-			<DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
+			{items.length >= 1 ? (
+				<DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
 
-				if (!over || active.id === over.id) return;
+					if (!over || active.id === over.id) return;
 
-				setOrderedItems((prev) => {
+					setOrderedItems((prev) => {
 
-					const oldIndex = prev.findIndex((i) => i.id === active.id);
-					const newIndex = prev.findIndex((i) => i.id === over.id);
+						const oldIndex = prev.findIndex((i) => i.id === active.id);
+						const newIndex = prev.findIndex((i) => i.id === over.id);
 
-					return arrayMove(prev, oldIndex, newIndex);
+						return arrayMove(prev, oldIndex, newIndex);
 
-				});
+					});
 
-			}}>
+				}}>
 
-				<SortableContext items={orderedItems.map(i => i.id)} strategy={rectSortingStrategy}>
+					<SortableContext items={orderedItems.map(i => i.id)} strategy={rectSortingStrategy}>
 
-					<div className="flex-1 w-full overflow-y-scroll grid 2xl:grid-cols-1 gap-4 auto-rows-max p-0.5 w">
+						<div className="flex-1 w-full overflow-y-scroll grid 2xl:grid-cols-1 gap-4 auto-rows-max p-0.5 w">
 
-						{orderedItems.map((item) => (
+							{orderedItems.map((item) => (
 
-							<SortableItem key={item.id} id={item.id} disabled={false}>
+								<SortableItem key={item.id} id={item.id} disabled={false}>
 
-								{(sortable) => (
+									{(sortable) => (
 
-									<div ref={sortable.setNodeRef} style={sortable.style}>
-										<NavigatorItem
-											item={item}
-											type={type}
-											basePath={basePath}
-											dragAttributes={sortable.attributes}
-											dragListeners={sortable.listeners}
-											onUpdate={handleUpdate}
-										/>
-									</div>
+										<div ref={sortable.setNodeRef} style={sortable.style}>
+											<NavigatorItem
+												item={item}
+												type={type}
+												basePath={basePath}
+												dragAttributes={sortable.attributes}
+												dragListeners={sortable.listeners}
+												onUpdate={handleUpdate}
+											/>
+										</div>
 
-								)}
+									)}
 
-							</SortableItem>
+								</SortableItem>
 
-						))}
+							))}
 
-					</div>
+						</div>
 
-				</SortableContext>
+					</SortableContext>
 
-			</DndContext>
+				</DndContext>
+			) : (
+
+				<div className="h-20 w-full flex items-center justify-center">
+					<p>Empty</p>
+				</div>
+
+			)}
 
 		</div>
 

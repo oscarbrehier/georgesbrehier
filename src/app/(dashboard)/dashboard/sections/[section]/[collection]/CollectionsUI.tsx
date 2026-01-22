@@ -20,8 +20,10 @@ import Link from "next/link";
 
 export function CollectionsUI({
 	sectionTree,
+	active,
 }: {
 	sectionTree: GallerySectionTree;
+	active?: string;
 }) {
 
 	const router = useRouter();
@@ -32,6 +34,15 @@ export function CollectionsUI({
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedItems, setSelectedItems] = useState<GalleryItemToDelete[]>([]);
 	const [hasChanges, setHasChanges] = useState(false);
+
+	useEffect(() => {
+
+		if (!active) return;
+
+		const target = document.getElementById(active);
+		target?.scrollIntoView({ behavior: "smooth" });
+
+	}, [active]);
 
 	useEffect(() => {
 		setCollections(sectionTree.collections);
@@ -133,7 +144,7 @@ export function CollectionsUI({
 											</ButtonText>
 										</Button>
 									</Link>
-									
+
 									<div className="flex items-center space-x-2">
 
 

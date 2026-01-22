@@ -40,7 +40,6 @@ export default async function Page({
 	};
 
 	const collections = await getCollectionsWithSectionState(sectionId);
-	console.log(collections)
 
 	return (
 
