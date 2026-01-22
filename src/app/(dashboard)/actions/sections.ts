@@ -162,7 +162,7 @@ export async function deleteSection(sectionId: string): Promise<{ error: string 
 	revalidateTag("sections", "max");
 	revalidateTag(`lookup-section-${section.slug}`, "max");
 
-	redirect("/dashboard/sections");
+	return { error: null };
 
 };
 

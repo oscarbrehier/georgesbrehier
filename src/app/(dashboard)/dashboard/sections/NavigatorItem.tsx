@@ -1,12 +1,17 @@
 import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
 import { cn } from "@/utils/utils";
-import { Eye, EyeOff, Grip, Pen, SquareArrowUp } from "lucide-react";
+import { Eye, EyeOff, Grip, Loader2, Pen, SquareArrowUp, Trash } from "lucide-react";
 import Link from "next/link";
 import { NavigableItem } from "./NavigatorUI";
 import { Badge } from "../../components/Badge";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { UI_LABELS } from "@/utils/constants";
+import { MouseEvent, useState } from "react";
+import { deleteSection } from "../../actions/sections";
+import { deleteCollection } from "../../actions/collections";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function NavigatorItem<T extends NavigableItem>({
 	item,
@@ -23,7 +28,6 @@ export function NavigatorItem<T extends NavigableItem>({
 	dragListeners: any;
 	onUpdate: (id: string, data: any) => void;
 }) {
-
 
 	const isVisible = !item.parent_hidden && item.is_visible;
 
@@ -59,10 +63,10 @@ export function NavigatorItem<T extends NavigableItem>({
 						</Badge>
 
 						{item.parent_hidden && (
-                            <Badge variant="destructive">
-                                {UI_LABELS.section.capitalized} Hidden
-                            </Badge>
-                        )}
+							<Badge variant="destructive">
+								{UI_LABELS.section.capitalized} Hidden
+							</Badge>
+						)}
 
 						{item?.is_default && (
 							<Badge>Default</Badge>
@@ -115,11 +119,90 @@ export function NavigatorItem<T extends NavigableItem>({
 						</Button>
 					</CreateItemDialog>
 
+					<DeleteButton
+						type={type}
+						item={item as any}
+					/>
+
 				</div>
 
 			</div>
 
 		</div>
+
+	);
+
+};
+
+type DeleteButtonProps =
+	| { type: "section"; item: { title: string; id: string; } }
+	| { type: "collection"; item: { title: string; id: string; section_id: string } };
+
+function DeleteButton({
+	type,
+	item
+}: DeleteButtonProps) {
+
+	const router = useRouter();
+
+	const [isLoading, setIsLoading] = useState(false);
+
+	async function handleDelete(e: MouseEvent<HTMLButtonElement>) {
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (isLoading) return;
+
+		const sectionWarning = `Are you sure? Deleting "${item.title}" will permanently remove ALL associated ${UI_LABELS.collection.plural}. Your actual work will remain but will stay unassigned.`;
+		const collectionWarning = `Are you sure you want to delete the "${item.title}" ${UI_LABELS.collection.singular}? Artwork inside will become unassigned.`;
+
+		const message = type === "section" ? sectionWarning : collectionWarning;
+
+		if (!window.confirm(message)) return;
+
+		setIsLoading(true);
+
+		try {
+
+			let error;
+
+			if (type === "section") {
+
+				const { error: sectionError } = await deleteSection(item.id);
+				error = sectionError;
+
+			} else {
+
+				const { error: collectionError } = await deleteCollection(item.id, item.section_id);
+				error = collectionError;
+
+			};
+
+			if (error) {
+				toast("Deletion failed", { description: error });
+			} else {
+				router.refresh();
+			};
+
+		} catch (err) {
+			toast("An unexpected error occurred");
+		} finally {
+			setIsLoading(false);
+		};
+
+	};
+
+	return (
+
+		<Button
+			variant="destructive"
+			size="icon"
+			Icon={isLoading ? Loader2 : Trash}
+			loading={isLoading}
+			onClick={handleDelete}
+			disabled={isLoading}
+		/>
 
 	);
 
