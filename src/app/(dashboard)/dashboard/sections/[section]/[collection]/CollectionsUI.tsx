@@ -14,6 +14,9 @@ import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems
 import { Selector } from "../../../gallery/Selector";
 import { Badge } from "@/app/(dashboard)/components/Badge";
 import { UI_LABELS } from "@/utils/constants";
+import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
+import { CloudUpload } from "lucide-react";
+import Link from "next/link";
 
 export function CollectionsUI({
 	sectionTree,
@@ -118,6 +121,19 @@ export function CollectionsUI({
 										{collection.title}
 									</h2>
 
+									<Link
+										href={`/dashboard/gallery/upload?section=${sectionTree.id}&collection=${collection.id}`}
+									>
+										<Button
+											size="sm"
+											Icon={CloudUpload}
+										>
+											<ButtonText>
+												Upload
+											</ButtonText>
+										</Button>
+									</Link>
+									
 									<div className="flex items-center space-x-2">
 
 
@@ -130,12 +146,13 @@ export function CollectionsUI({
 											</Badge>
 										)}
 
+
 										{!sectionTree.is_visible && (
 											<Badge variant="destructive">
 												Section Hidden
 											</Badge>
 										)}
-										
+
 										{!collection.is_visible && (
 											<Badge variant="destructive">
 												{UI_LABELS.collection.capitalized} Hidden
@@ -206,8 +223,9 @@ export function CollectionsUI({
 															<div ref={setNodeRef} style={style}>
 
 																<GalleryItem
-																	item={{ ...work, collection, 
-																		parent_hidden: !sectionTree.is_visible 
+																	item={{
+																		...work, collection,
+																		parent_hidden: !sectionTree.is_visible
 																	}}
 																	isEditMode={isEditing}
 																	currentPath={currentPath}

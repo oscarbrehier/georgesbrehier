@@ -26,6 +26,7 @@ interface NavigatorProps<T extends NavigableItem> {
 	title: string;
 	basePath: string;
 	type: "section" | "collection";
+	sectionId?: string;
 	onSave: (changes: { id: string; position: number, section_id?: string }[]) => Promise<{ error?: string | null }>;
 	updateFn: (id: string, data: Partial<T>) => Promise<{ error?: string | null }>;
 };
@@ -35,6 +36,7 @@ export function NavigatorUI<T extends NavigableItem>({
 	title,
 	basePath,
 	type,
+	sectionId,
 	onSave,
 	updateFn
 }: NavigatorProps<T>) {
@@ -95,6 +97,7 @@ export function NavigatorUI<T extends NavigableItem>({
 
 			<QuickActions
 				className="mb-4"
+				upload={{ sectionId }}
 			/>
 
 			<DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {

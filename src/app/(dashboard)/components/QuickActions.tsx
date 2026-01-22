@@ -1,15 +1,18 @@
-import { Eye, Plus } from "lucide-react";
+import { CloudUpload, Eye, Plus } from "lucide-react";
 import { Button, ButtonText } from "./Button";
 import { CreateItemDialog, EditData } from "./CreateItemDialog";
 import { cn } from "@/utils/utils";
 import { UI_LABELS } from "@/utils/constants";
+import Link from "next/link";
 
 export function QuickActions({
 	className,
-	initialData
+	initialData,
+	upload = {},
 }: {
 	className?: string;
 	initialData?: EditData;
+	upload?: { sectionId?: string };
 }) {
 
 	return (
@@ -58,6 +61,23 @@ export function QuickActions({
 					</ButtonText>
 				</Button>
 			</CreateItemDialog>
+
+			{upload.sectionId && (
+
+				<Link
+					href={`/dashboard/gallery/upload?section=${upload.sectionId}`}
+				>
+					<Button
+						size="sm"
+						Icon={CloudUpload}
+					>
+						<ButtonText>
+							Upload
+						</ButtonText>
+					</Button>
+				</Link>
+
+			)}
 
 		</div>
 

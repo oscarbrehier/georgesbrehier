@@ -8,9 +8,9 @@ export default async function Page({
 	params: Promise<{ section: string }>
 }) {
 
-	const { section: slug } = await params;
+	const { section: sectionSlug } = await params;
 
-	const sectionTree = await getSectionTree(slug, "slug");
+	const sectionTree = await getSectionTree(sectionSlug, "slug");
 	if (!sectionTree) return notFound();
 
 	return (

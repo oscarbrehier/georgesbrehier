@@ -47,6 +47,7 @@ export default async function Page({
 		<div className="h-full w-full flex flex-col">
 
 			<NavigatorUI
+				sectionId={sectionId}
 				title={sectionSlug}
 				items={collections}
 				type="collection"

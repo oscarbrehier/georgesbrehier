@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cloud, Loader2, Check, X } from "lucide-react";
 import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { useUploadFormStore } from "@/stores/useUploadForm";
@@ -22,20 +22,47 @@ interface UploadProgress {
 };
 
 export function Upload({
-	sections: initialSections
+	sections: initialSections,
+	target,
 }: {
 	sections: GallerySection[];
-	target?: { sectionId: string | null, collectionId: string | null };
+	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
 }) {
 
 	const { formData, setFormData, resetForm } = useUploadFormStore();
 
 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
-	const [collections, setCollections] = useState<GalleryCollection[] | null>(null);
+	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+
+		if (target?.sectionId) {
+
+			setFormData({
+				sectionId: target?.sectionId ?? "",
+				collectionId: target?.collectionId ?? ""
+			});
+			
+		} else {
+
+			setFormData({
+				sectionId: "",
+				collectionId: ""
+			});
+
+		};
+
+		if (target?.collections) {
+			setCollections(target.collections);
+		} else if (!target?.sectionId) {
+			setCollections(null);
+		};
+
+	}, [target, setFormData]);
 
 	const processImages = (files: FileList) => {
 
@@ -103,8 +130,8 @@ export function Upload({
 			setCollections(collectionsRes ?? null);
 
 			setFormData({
-				collectionId: "",
 				sectionId: value,
+				collectionId: "",
 			});
 
 			return;
@@ -345,7 +372,7 @@ export function Upload({
 						<div>
 
 							<Select
-								label={UI_LABELS.section.singular}
+								label={UI_LABELS.section.capitalized}
 								id="section"
 								name="sectionId"
 								value={formData.sectionId}
