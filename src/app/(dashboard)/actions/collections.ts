@@ -186,7 +186,7 @@ export async function createCollection({
 	revalidateTag(`section-${sectionId}-collections`, "max");
 	if (actualDefault) revalidateTag("site-home", "max");
 
-	revalidatePath("/dashboard/gallery", "page");
+	revalidatePath("/dashboard", "page");
 
 	return {
 		success: true,

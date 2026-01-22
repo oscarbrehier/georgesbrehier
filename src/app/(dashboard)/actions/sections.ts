@@ -37,7 +37,7 @@ export async function createSection(data: SectionCreatePaylod) {
 	revalidateTag("sections", "max");
 	if (actualDefault) revalidateTag("site-home", "max");
 
-	revalidatePath("/dashboard/gallery", "page");
+	revalidatePath("/dashboard", "page");
 
 	return { success: true, message: `Created \`${data.title}\`` };
 

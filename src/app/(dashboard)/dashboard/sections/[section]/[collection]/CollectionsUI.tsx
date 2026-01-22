@@ -3,15 +3,15 @@
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Toolbar } from "../../../../components/Toolbar";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { SortableItem } from "../../../gallery/SortableItem";
-import { GalleryItem } from "../../../gallery/GalleryItem";
+import { SortableItem } from "../../../../components/SortableItem";
+import { GalleryItem } from "../../../../components/GalleryItem";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { roboto } from "@/utils/fonts";
-import { CollectionVisibilityBtn } from "../../../gallery/CollectionVisibilityBtn";
+import { CollectionVisibilityBtn } from "../../../../components/CollectionVisibilityBtn";
 import { updateGalleryItems } from "@/app/(dashboard)/actions/updateGalleryItems";
-import { Selector } from "../../../gallery/Selector";
+import { Selector } from "../../../../components/Selector";
 import { Badge } from "@/app/(dashboard)/components/Badge";
 import { UI_LABELS } from "@/utils/constants";
 import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
@@ -122,7 +122,7 @@ export function CollectionsUI({
 									</h2>
 
 									<Link
-										href={`/dashboard/gallery/upload?section=${sectionTree.id}&collection=${collection.id}`}
+										href={`/dashboard/upload?section=${sectionTree.id}&collection=${collection.id}`}
 									>
 										<Button
 											size="sm"

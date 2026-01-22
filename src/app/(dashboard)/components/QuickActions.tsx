@@ -65,7 +65,7 @@ export function QuickActions({
 			{upload.sectionId && (
 
 				<Link
-					href={`/dashboard/gallery/upload?section=${upload.sectionId}`}
+					href={`/dashboard/upload?section=${upload.sectionId}`}
 				>
 					<Button
 						size="sm"

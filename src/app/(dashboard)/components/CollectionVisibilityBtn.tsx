@@ -1,8 +1,8 @@
 import { Eye, EyeOff } from "lucide-react";
-import { Button, ButtonText } from "../../components/Button";
+import { Button, ButtonText } from "./Button";
 import { useState } from "react";
 import { toast } from "sonner";
-import { setCollectionVisibility } from "../../actions/collections";
+import { setCollectionVisibility } from "../actions/collections";
 import { UI_LABELS } from "@/utils/constants";
 
 export function CollectionVisibilityBtn({

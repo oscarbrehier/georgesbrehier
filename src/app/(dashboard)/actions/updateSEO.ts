@@ -19,7 +19,7 @@ export async function updateSEO(collection: string, data: GalleryCollectionSEO):
 		return { error: error.message };
 	};
 	
-	revalidatePath(`/dashboard/gallery/${collection}`);
+	revalidatePath(`/dashboard/${collection}`);
 	return { success: true };
 
 };

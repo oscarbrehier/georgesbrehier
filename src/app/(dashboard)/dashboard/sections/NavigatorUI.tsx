@@ -2,7 +2,7 @@
 import { MouseEvent, useEffect, useState } from "react";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { arrayMove, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { SortableItem } from "../gallery/SortableItem";
+import { SortableItem } from "../../components/SortableItem";
 import { NavigatorItem } from "./NavigatorItem";
 import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
 import { CheckCheck } from "lucide-react";

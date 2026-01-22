@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { cn } from "@/utils/utils";
-import { AuthNav } from "./gallery/AuthNav";
+import { AuthNav } from "../components/AuthNav";
 import Breadcrumbs from "./Breadcrumbs";
 import { getSections } from "@/utils/supabase/sections";
 
@@ -29,8 +29,8 @@ export default async function Layout({
 
 	const navItems = [
 		{ href: "/sections", label: "volumes" },
-		{ href: "/gallery/upload", label: "upload" },
-		{ href: "/gallery/seo", label: "seo" },
+		{ href: "/upload", label: "upload" },
+		{ href: "/seo", label: "seo" },
 	];
 
 	const sections = await getSections();
