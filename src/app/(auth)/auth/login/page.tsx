@@ -1,11 +1,12 @@
 "use client"
 
 import { useActionState } from "react";
-import { login } from "./actions";
+import { login } from "../actions";
+import { Loader2 } from "lucide-react";
 
 export default function Page() {
 
-	const [state, loginAction] = useActionState(login, null);
+	const [state, loginAction, isPending] = useActionState(login, null);
 
 	return (
 
@@ -36,10 +37,17 @@ export default function Page() {
 					/>
 
 					<button
-						className="bg-neutral-400 disabled:bg-neutral-200 h-14 px-6 rounded-md text-neutral-200 disabled:text-neutral-300 text-lg cursor-pointer"
+						className="bg-neutral-400 disabled:bg-neutral-200 h-14 px-6 rounded-md text-neutral-50 disabled:text-neutral-500 text-lg cursor-pointer"
 						formAction={loginAction}
+						disabled={isPending}
 					>
-						Log in
+						{
+							isPending ? (
+								<Loader2 className="animate-spin shrink-0" />
+							) : (
+								<span>Log in</span>
+							)
+						}
 					</button>
 
 				</form>

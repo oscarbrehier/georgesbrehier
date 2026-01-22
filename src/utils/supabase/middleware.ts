@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
 
 
 	const pathname = request.nextUrl.pathname;
-	const isAdminRoute = pathname.startsWith("/dashboard");
+	const isAdminRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/auth");
 
 	if (!isAdminRoute) return response;
 
@@ -41,13 +41,13 @@ export async function updateSession(request: NextRequest) {
 
 	if (
 		!user &&
-		!pathname.startsWith('/dashboard/auth/login') &&
-		!pathname.startsWith('/dashboard/auth') &&
+		!pathname.startsWith('/auth/login') &&
+		!pathname.startsWith('/auth') &&
 		!pathname.startsWith('/dashboard/error')
 	) {
 
 		const url = request.nextUrl.clone();
-		url.pathname = "/dashboard/auth/login";
+		url.pathname = "/auth/login";
 
 		return NextResponse.redirect(url);
 
