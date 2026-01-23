@@ -13,7 +13,6 @@ export default async function Layout({
 	nav?: React.ReactNode;
 }>) {
 
-	// const sections = await getSections();
 	const navItems = await getNavSections();
 
 	return (

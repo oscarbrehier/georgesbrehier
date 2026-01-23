@@ -19,6 +19,16 @@ export const metadata: Metadata = {
 	}
 };
 
+async function BreadcrumbsWrapper() {
+
+	const sections = await getSections();
+
+	return (
+		<Breadcrumbs sections={sections} />
+	);
+
+};
+
 export default async function Layout({
 	children
 }: {
@@ -32,8 +42,6 @@ export default async function Layout({
 		{ href: "/upload", label: "upload" },
 		{ href: "/seo", label: "seo" },
 	];
-
-	const sections = await getSections();
 
 	return (
 
@@ -80,7 +88,7 @@ export default async function Layout({
 				</div>
 
 				<Suspense>
-					<Breadcrumbs sections={sections} />
+					<BreadcrumbsWrapper />
 				</Suspense>
 
 			</div>

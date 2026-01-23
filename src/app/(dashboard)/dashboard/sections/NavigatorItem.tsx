@@ -7,7 +7,7 @@ import { Badge } from "../../components/Badge";
 import { CreateItemDialog } from "../../components/CreateItemDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { UI_LABELS } from "@/utils/constants";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useState, useTransition } from "react";
 import { deleteSection } from "../../actions/sections";
 import { deleteCollection } from "../../actions/collections";
 import { toast } from "sonner";
@@ -138,57 +138,38 @@ type DeleteButtonProps =
 	| { type: "section"; item: { title: string; id: string; } }
 	| { type: "collection"; item: { title: string; id: string; section_id: string } };
 
-function DeleteButton({
-	type,
-	item
-}: DeleteButtonProps) {
+function DeleteButton({ type, item }: DeleteButtonProps) {
 
 	const router = useRouter();
-
-	const [isLoading, setIsLoading] = useState(false);
+	const [isPending, startTransition] = useTransition();
 
 	async function handleDelete(e: MouseEvent<HTMLButtonElement>) {
 
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (isLoading) return;
+		if (isPending) return;
 
 		const sectionWarning = `Are you sure? Deleting "${item.title}" will permanently remove ALL associated ${UI_LABELS.collection.plural}. Your actual work will remain but will stay unassigned.`;
 		const collectionWarning = `Are you sure you want to delete the "${item.title}" ${UI_LABELS.collection.singular}? Artwork inside will become unassigned.`;
 
 		const message = type === "section" ? sectionWarning : collectionWarning;
-
 		if (!window.confirm(message)) return;
 
-		setIsLoading(true);
+		const { error } = type === "section"
+			? await deleteSection(item.id)
+			: await deleteCollection(item.id, (item as any).section_id);
 
-		try {
+		if (error) {
+			toast("Deletion failed", { description: error });
+		} else {
 
-			let error;
-
-			if (type === "section") {
-
-				const { error: sectionError } = await deleteSection(item.id);
-				error = sectionError;
-
-			} else {
-
-				const { error: collectionError } = await deleteCollection(item.id, item.section_id);
-				error = collectionError;
-
-			};
-
-			if (error) {
-				toast("Deletion failed", { description: error });
-			} else {
+			startTransition(() => {
 				router.refresh();
-			};
+			});
 
-		} catch (err) {
-			toast("An unexpected error occurred");
-		} finally {
-			setIsLoading(false);
+			toast.success("Deleted!");
+
 		};
 
 	};
@@ -198,10 +179,9 @@ function DeleteButton({
 		<Button
 			variant="destructive"
 			size="icon"
-			Icon={isLoading ? Loader2 : Trash}
-			loading={isLoading}
+			Icon={isPending ? Loader2 : Trash}
+			loading={isPending}
 			onClick={handleDelete}
-			disabled={isLoading}
 		/>
 
 	);

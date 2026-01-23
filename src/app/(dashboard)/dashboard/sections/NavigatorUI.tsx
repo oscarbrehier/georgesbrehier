@@ -78,6 +78,8 @@ export function NavigatorUI<T extends NavigableItem>({
 		const { error } = await updateFn(id, data);
 		if (error) toast.error(error);
 
+		router.refresh();
+
 	};
 
 	return (

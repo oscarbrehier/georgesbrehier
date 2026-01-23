@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase"
 import { UI_LABELS } from "@/utils/constants";
 import { createSlug } from "@/utils/utils";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { refresh, revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 export interface SectionUpdatePayload {
