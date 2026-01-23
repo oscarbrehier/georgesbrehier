@@ -150,8 +150,7 @@ export function CollectionsUI({
 										{sectionTree.is_visible && (
 											<CollectionVisibilityBtn
 												collection={{
-													...collection,
-													section_id: sectionTree.id
+													...collection
 												}}
 											/>
 										)}

@@ -1,37 +1,43 @@
 import { Eye, EyeOff } from "lucide-react";
 import { Button, ButtonText } from "./Button";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { setCollectionVisibility } from "../actions/collections";
-import { UI_LABELS } from "@/utils/constants";
+import { updateCollection } from "../actions/collections";
+import { useRouter } from "next/navigation";
 
 export function CollectionVisibilityBtn({
 	collection
 }: {
-	collection: { id: string; section_id: string; is_visible: boolean };
+	collection: { id: string; is_visible: boolean };
 }) {
 
+	const router = useRouter();
+	const [isPending, startTransition] = useTransition();
+
 	const [isVisible, setIsVisible] = useState(collection.is_visible);
-	const [isPending, setIsPending] = useState(false);
 
 	async function toggleVisibility() {
 
-		if (isPending) return ;
-		setIsPending(true);
+		const newVisibility = !isVisible;
 
-		try {
+		setIsVisible(newVisibility);
 
-			await setCollectionVisibility(collection.id, collection.section_id, !isVisible);
-			setIsVisible(!isVisible);
+		const { error } = await updateCollection(collection.id, { is_visible: newVisibility });
 
-		} catch (err) {
+		if (error) {
 
-			const message = err instanceof Error ? err.message : "Unknown error";
-			toast(`Failed to change ${UI_LABELS.collection.singular} visibility`, { description: message });
+			setIsVisible(!newVisibility);
+			toast.error("Update failed", { description: error });
 
-		} finally {
-			setIsPending(false);
+			return;
+
 		};
+
+		startTransition(() => {
+			router.refresh();
+		});
+
+		toast.success(newVisibility ? "Chapter is now public" : "Chapter is now hidden");
 
 	};
 

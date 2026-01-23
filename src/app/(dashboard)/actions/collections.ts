@@ -55,10 +55,15 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	if (!oldData) return { error: `${UI_LABELS.collection.capitalized} not found` };
 
-	const isHidingDefault = (data.is_visible === false && oldData.is_default === true);
-	const isUnsettingDefault = (data.is_default === false && oldData.is_default === true);
+	const isHiding = data.is_visible === false;
+	const isUnsettingDefault = data.is_default === false && oldData.is_default === true;
+	const isSettingAsDefault = data.is_default === true;
 
-	if (isHidingDefault || isUnsettingDefault) {
+	if (isSettingAsDefault) {
+		data.is_visible = true;
+	};
+
+	if ((isHiding && oldData.is_default) || isUnsettingDefault) {
 
 		const { data: nextBest } = await supabase
 			.from("collections")
@@ -70,14 +75,24 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 			.limit(1)
 			.maybeSingle();
 
-		if (!nextBest) {
-			return { error: `This is the only ${UI_LABELS.collection.singular} in this ${UI_LABELS.section.singular}. It must remain visible and default.` };
-		}
+		if (nextBest) {
 
-		await supabase
-			.from("collections")
-			.update({ is_default: true })
-			.eq("id", nextBest.id);
+			await supabase
+				.from("collections")
+				.update({ is_default: true, is_visible: true })
+				.eq("id", nextBest.id);
+
+		} else {
+
+			if (isUnsettingDefault && !isHiding) {
+				return { error: `This is the only ${UI_LABELS.collection.singular}. It must remain the default so the section has a home page.` };
+			};
+
+			if (isHiding) {
+				data.is_default = true;
+			};
+
+		};
 
 	};
 
@@ -107,28 +122,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	const sectionId = updatedCollection.section_id;
 
-	if (data.is_default === false && oldData.is_default === true) {
-
-		const { data: nextBest } = await supabase
-			.from("collections")
-			.select("id")
-			.eq("section_id", sectionId)
-			.neq("id", collectionId)
-			.order("is_visible", { ascending: false })
-			.order("position", { ascending: true })
-			.limit(1)
-			.single();
-
-		if (nextBest) {
-			await supabase
-				.from("collections")
-				.update({ is_default: true })
-				.eq("id", nextBest.id);
-		};
-
-	};
-
-	if (data.is_default === true || isUnsettingDefault || isHidingDefault) {
+	if (data.is_default === true || isUnsettingDefault || isHiding) {
 		revalidateTag("site-home", "max");
 	};
 

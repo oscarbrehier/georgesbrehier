@@ -92,6 +92,7 @@ export function NavigatorItem<T extends NavigableItem>({
 					)}
 
 					<Tooltip>
+						
 						<TooltipTrigger asChild>
 							<Button
 								variant="base" size="sm" Icon={isVisible ? EyeOff : Eye}
@@ -101,6 +102,7 @@ export function NavigatorItem<T extends NavigableItem>({
 								<ButtonText>{isVisible ? "Hide" : "Show"}</ButtonText>
 							</Button>
 						</TooltipTrigger>
+
 						{item.parent_hidden && (
 							<TooltipContent>
 								<p className="w-full max-w-96 text-center">
