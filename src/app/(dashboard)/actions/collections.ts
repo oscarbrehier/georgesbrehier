@@ -132,6 +132,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 	if (oldData?.slug) revalidateTag(`lookup-collection-${oldData.slug}`, "max");
 	if (updatedCollection.slug) revalidateTag(`lookup-collection-${updatedCollection.slug}`, "max");
 
+	revalidatePath("/", "layout");
 	revalidatePath("/");
 	revalidatePath(`/dashboard/sections/${sectionId}`);
 
@@ -142,7 +143,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 export async function createCollection({
 	sectionId,
 	title: rawTitle,
-	is_default
+	is_default: userWantsDefault
 }: {
 	sectionId: string;
 	title: string;
@@ -151,17 +152,37 @@ export async function createCollection({
 
 	if (!sectionId || !rawTitle) return { error: `${UI_LABELS.collection.capitalized} title and ${UI_LABELS.section.singular} ID are required.` };
 
+	const { data: defaultCollection } = await supabase
+		.from("collections")
+		.select("id, is_visible")
+		.eq("section_id", sectionId)
+		.eq("is_default", true)
+		.single();
+
+	const hasVisibleDefault = defaultCollection && defaultCollection.is_visible;
+	const shouldBeDefault = userWantsDefault || !hasVisibleDefault;
+
 	const title = rawTitle.trim().toLocaleLowerCase();
-	const slug = createSlug(title);
+	const payload = {
+		title,
+		slug: createSlug(title),
+		section_id: sectionId,
+		is_default: shouldBeDefault,
+		is_visible: true
+	};
+
+	if (shouldBeDefault && defaultCollection) {
+
+		await supabase
+			.from("collections")
+			.update({ is_default: false })
+			.eq("id", defaultCollection.id);
+
+	};
 
 	const { data: newCol, error: insertError } = await supabase
 		.from("collections")
-		.insert({
-			title,
-			slug,
-			section_id: sectionId,
-			is_default
-		})
+		.insert(payload)
 		.select("is_default")
 		.single();
 
