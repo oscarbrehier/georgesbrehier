@@ -110,11 +110,10 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 	revalidateTag("sections", "max");
 	revalidateTag(`section-${sectionId}`, "max");
 
-
 	if (oldData?.slug) revalidateTag(`lookup-section-${oldData.slug}`, "max");
 	if (updatedSection.slug) revalidateTag(`lookup-section-${updatedSection.slug}`, "max");
 
-	revalidatePath("/");
+	revalidatePath("/", "layout");
 	revalidatePath("/dashboard/sections");
 
 	return { error: null };
