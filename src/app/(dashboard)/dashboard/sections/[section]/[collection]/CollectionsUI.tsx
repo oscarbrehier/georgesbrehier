@@ -132,18 +132,31 @@ export function CollectionsUI({
 										{collection.title}
 									</h2>
 
-									<Link
-										href={`/dashboard/upload?section=${sectionTree.id}&collection=${collection.id}`}
-									>
-										<Button
-											size="sm"
-											Icon={CloudUpload}
+									<div className="flex items-center space-x-2">
+
+										<Link
+											href={`/dashboard/upload?section=${sectionTree.id}&collection=${collection.id}`}
 										>
-											<ButtonText>
-												Upload
-											</ButtonText>
-										</Button>
-									</Link>
+											<Button
+												size="sm"
+												Icon={CloudUpload}
+											>
+												<ButtonText>
+													Upload
+												</ButtonText>
+											</Button>
+										</Link>
+
+										{sectionTree.is_visible && (
+											<CollectionVisibilityBtn
+												collection={{
+													...collection,
+													section_id: sectionTree.id
+												}}
+											/>
+										)}
+
+									</div>
 
 									<div className="flex items-center space-x-2">
 
@@ -172,15 +185,6 @@ export function CollectionsUI({
 
 
 									</div>
-
-									{sectionTree.is_visible && (
-										<CollectionVisibilityBtn
-											collection={{
-												...collection,
-												section_id: sectionTree.id
-											}}
-										/>
-									)}
 
 								</div>
 

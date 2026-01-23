@@ -17,7 +17,8 @@ export async function uploadToGallery(title: string, description: string, image_
 
 		if (error) return { result: null, error: error.message }
 
-		revalidateTag(`collection-${collectionId}-gallery`, "max")
+		revalidateTag("sections", "max");
+		revalidateTag(`collection-${collectionId}-gallery`, "max");
 
 		return { result: data, error: null };
 
