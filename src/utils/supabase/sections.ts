@@ -4,11 +4,26 @@ import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from 'next/cache';
 import { fetchSupabase } from "./fetchSupabase";
 
+export async function getSectionId(slug: string): Promise<string | null> {
+
+	"use cache"
+	cacheTag(`lookup-section-${slug}`);
+	cacheLife("days");
+
+	const { data, error } = await supabase
+		.from("sections")
+		.select("id")
+		.eq("slug", slug)
+		.single();
+
+	return error ? null : data.id;
+
+};
+
 export async function getSections(): Promise<GallerySection[]> {
 
 	"use cache"
-	cacheTag("sections");
-	cacheLife("hours");
+	cacheLife("seconds");
 
 	const { data, error } = await supabase
 		.from("sections")
@@ -19,60 +34,57 @@ export async function getSections(): Promise<GallerySection[]> {
 
 };
 
-
-export async function getSection(slug: string): Promise<GallerySection | null> {
+export async function getSectionsCached() {
 
 	"use cache"
-	cacheTag(`section-slug-${slug}`);
+	cacheTag("sections");
 	cacheLife("hours");
 
-	let sections = await fetchSupabase<GallerySection>(
-		"sections",
-		{ slug },
-		"*",
-		true
-	);
-
-	return sections;
+	return getSections();
 
 };
 
-// export async function getSectionWithDefaultCollection(slug: string): Promise<SectionWithDefaultCollection | null> {
+export async function getNavSections(): Promise<SectionNavItem[]> {
 
-// 	"use cache"
-// 	cacheTag(`section-${slug}-default-${collection}`);
-// 	cacheLife("hours");
+	"use cache"
+	cacheTag("sections");
+	cacheLife("minutes");
 
-// 	const { data, error } = await supabase
-// 		.from("sections")
-// 		.select(`
-// 				id,
-// 				slug,
-// 				title,
-// 				defaultCollection:collections!inner(is_default, id, slug, title)
-// 			`)
-// 		.eq("slug", slug)
-// 		.filter("collections.is_default", "eq", true)
-// 		.single();
+	const { data, error } = await supabase
+		.from("public_navigation")
+		.select("*")
+		.order("position", { ascending: true });
 
-// 	if (error) {
-// 		console.error("Error fetching default section:", error);
-// 		return null;
-// 	};
+	if (error) {
+		return [];
+	};
 
-// 	const flattened = {
-// 		...data,
-// 		defaultCollection: data.defaultCollection[0] ?? undefined
-// 	};
+	return data;
 
-// 	return flattened;
+};
 
-// };
+export async function getSection(sectionId: string): Promise<GallerySection | null> {
+
+	"use cache"
+	cacheTag(`section-${sectionId}`);
+	cacheLife("hours");
+
+	const { data, error } = await supabase
+		.from("sections")
+		.select("*")
+		.eq("id", sectionId)
+		.single();
+
+	if (error || !data) return null;
+
+	return data;
+
+};
 
 export async function getDefaultSectionWithCollection(): Promise<SectionWithDefaultCollection | null> {
 
 	"use cache"
-	cacheTag(`default-section-with-collection`);
+	cacheTag("site-home");
 	cacheLife("hours");
 
 	const { data, error } = await supabase
@@ -98,5 +110,38 @@ export async function getDefaultSectionWithCollection(): Promise<SectionWithDefa
 	delete flattened.collections;
 
 	return flattened;
+
+};
+
+export async function getSectionTree(value: string, type: "id" | "slug"): Promise<GallerySectionTree | null> {
+
+	const { data, error } = await supabase
+		.from("sections")
+		.select(`
+			id,
+			slug,
+			is_visible,
+			collections (
+        		id,
+				title,
+				slug,
+				is_default,
+				is_visible,
+        		works (
+          			*
+        		)
+      		)
+		`)
+		.eq(type, value)
+		.single();
+
+	if (error) {
+
+		console.error("Error fetching full section tree:", error);
+		return null;
+
+	};
+
+	return data;
 
 };

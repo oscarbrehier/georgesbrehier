@@ -3,34 +3,66 @@ import { supabase } from "@/lib/supabase";
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchSupabase } from "./fetchSupabase";
 
-export async function getCollectionsBySectionId(sectionId: string): Promise<GalleryCollection[]> {
+export async function getCollectionId(slug: string): Promise<string | null> {
 
     "use cache"
-	cacheTag(`section-${sectionId}-collections`);
-	cacheLife("hours");
+    cacheTag(`lookup-collection-${slug}`);
+    cacheLife("days");
 
-	if (!sectionId) return [];
+    const { data, error } = await supabase
+        .from("collections")
+        .select("id")
+        .eq("slug", slug)
+        .single();
 
-	const { data, error } = await supabase
-		.from("collections")
-		.select("*")
-		.eq("section_id", sectionId);
-
-	if (error) return [];
-	return data;
+    return error ? null : data.id;
 
 };
 
-export async function getCollectionMetadata(collection: string): Promise<GalleryCollectionWithSection | null> {
+export async function getCollectionsBySection(sectionId: string): Promise<GalleryCollection[]> {
 
-	"use cache"
-	cacheTag(`collection-metadata-${collection}`);
-	cacheLife("hours");
+    "use cache"
+    cacheTag(`section-${sectionId}-collections`);
+    cacheLife("hours");
 
-	return await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ "slug": collection },
-		`
+    if (!sectionId) return [];
+
+    const { data, error } = await supabase
+        .from("collections")
+        .select("*")
+        .eq("section_id", sectionId);
+
+    if (error) return [];
+    return data;
+
+};
+
+export async function getActiveCollections(sectionId: string): Promise<CollectionNavItem[]> {
+
+    const { data, error } = await supabase
+        .from("active_collections_nav")
+        .select("*")
+        .eq("section_id", sectionId)
+        .order("position", { ascending: true });
+
+    if (error) {
+        return [];
+    };
+
+    return data;
+
+};
+
+export async function getCollectionMetadata(collectionId: string): Promise<GalleryCollectionWithSection | null> {
+
+    "use cache"
+    cacheTag(`collection-${collectionId}-metadata`);
+    cacheLife("hours");
+
+    return await fetchSupabase<GalleryCollectionWithSection>(
+        "collections",
+        { "id": collectionId },
+        `
             id,
             slug,
             title,
@@ -51,21 +83,27 @@ export async function getCollectionMetadata(collection: string): Promise<Gallery
                 title
             )
         `,
-		true
-	);
+        true
+    );
+
+};
+
+export async function getCachedDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
+
+    "use cache"
+    cacheTag(`section-${sectionId}-collections`);
+    cacheLife("hours");
+
+    return await getDefaultCollectionBySectionId(sectionId);
 
 };
 
 export async function getDefaultCollectionBySectionId(sectionId: string): Promise<GalleryCollectionWithSection | null> {
 
-    "use cache"
-	cacheTag(`section-${sectionId}-default-collection`);
-	cacheLife("hours");
-
-	return await fetchSupabase<GalleryCollectionWithSection>(
-		"collections",
-		{ section_id: sectionId, is_default: true },
-		`
+    return await fetchSupabase<GalleryCollectionWithSection>(
+        "collections",
+        { section_id: sectionId, is_default: true },
+        `
             id,
             slug,
             title,
@@ -75,7 +113,29 @@ export async function getDefaultCollectionBySectionId(sectionId: string): Promis
                 slug
             )
         `,
-		true
-	);
+        true
+    );
+
+};
+
+export async function getCollectionsWithSectionState(sectionId: string): Promise<(GalleryCollection & { parent_hidden: boolean })[]> {
+
+    if (!sectionId) return [];
+
+    const { data, error } = await supabase
+        .from("collections")
+        .select(`
+            *,
+            sections:section_id (
+                is_visible
+            )    
+        `)
+        .eq("section_id", sectionId);
+
+    if (error) return [];
+    return data.map((col) => ({
+        ...col,
+        parent_hidden: !col.sections?.is_visible
+    }));
 
 };

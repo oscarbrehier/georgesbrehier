@@ -27,7 +27,7 @@ export function Select({
 			<select
 				id={id}
 				{...props}
-				className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-background text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
+				className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all appearance-none cursor-pointer"
 			>
 
 				{/* {options.map((option, idx) => (

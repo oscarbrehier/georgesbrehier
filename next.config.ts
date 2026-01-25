@@ -1,3 +1,4 @@
+import { MAX_BODY_SIZE_STR } from "@/utils/constants";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -50,7 +51,10 @@ const nextConfig: NextConfig = {
 	},
 
 	experimental: {
-		typedEnv: true
+		typedEnv: true,
+		serverActions: {
+			bodySizeLimit: MAX_BODY_SIZE_STR
+		}
 	},
 
 };

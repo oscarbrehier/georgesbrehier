@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import "../globals.css";
 import { roboto } from "@/utils/fonts";
 import { cn } from "@/lib/utils";
-import { getSections } from "@/utils/supabase/sections";
+import { getNavSections, getSections } from "@/utils/supabase/sections";
 import Link from "next/link";
 
 export default async function Layout({
@@ -13,7 +13,7 @@ export default async function Layout({
 	nav?: React.ReactNode;
 }>) {
 
-	const sections = await getSections();
+	const navItems = await getNavSections();
 
 	return (
 		<>
@@ -40,7 +40,7 @@ export default async function Layout({
 
 				<div className="flex space-x-16">
 
-					{sections.map((section) => (
+					{navItems.map((section) => (
 
 						<Link
 							key={section.id}

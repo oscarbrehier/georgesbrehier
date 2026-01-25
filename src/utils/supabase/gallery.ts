@@ -13,7 +13,7 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 
 	let { section = "all", range, collectionId } = opts || {};
 
-	if (collectionId) cacheTag(`gallery-collection-${collectionId}`);
+	if (collectionId) cacheTag(`collection-${collectionId}-gallery`);
 	cacheLife("hours");
 
 	if (!section) section = "all";

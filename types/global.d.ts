@@ -4,6 +4,7 @@ declare global {
 		url: string;
 		title: string;
 	};
+
 	interface GalleryItem {
 		id: number;
 		title: string;
@@ -13,11 +14,39 @@ declare global {
 		position: number;
 		created_at: string;
 	};
+
 	interface GallerySection {
 		id: string;
 		title: string;
 		is_default: boolean;
 		slug: string;
+		is_visible: boolean;
+		position: number;
+	};
+
+	interface SectionNavItem {
+		id: string;
+		title: string;
+		slug: string;
+		position: number;
+	};
+
+	interface GalleryCollectionWithItems extends GalleryItem {
+		works: GalleryItem;
+	};
+
+	interface GallerySectionTree {
+		id: string;
+		slug: string;
+		is_visible;
+		collections: {
+			id: string;
+			slug: string;
+			title: string;
+			is_default: boolean;
+			is_visible: boolean;
+			works: GalleryItem[];
+		}[];
 	};
 
 	interface SectionWithDefaultCollection extends GallerySection {
@@ -30,7 +59,8 @@ declare global {
 		title: string;
 		is_default: boolean;
 		slug: string;
-		visible: boolean;
+		is_visible: boolean;
+		position: number;
 		seo_title: string,
 		seo_description: string,
 		seo_og_image_url: string,
@@ -42,6 +72,7 @@ declare global {
 		seo_canonical_url: null,
 		seo_robots: string;
 	};
+
 	interface GalleryCollectionSEO {
 		seo_title: string,
 		seo_description: string,
@@ -54,9 +85,20 @@ declare global {
 		seo_canonical_url: null,
 		seo_robots: string
 	};
+
+	interface CollectionNavItem {
+		id: string;
+		section_id: string;
+		title: string;
+		slug: string;
+		position: number;
+		is_default: boolean;
+	};
+
 	interface GalleryCollectionWithSection extends GalleryCollection {
 		section: GallerySection
 	};
+
 	interface GalleryItemWithCollection extends GalleryItem {
 		collection: GalleryCollection;
 	};

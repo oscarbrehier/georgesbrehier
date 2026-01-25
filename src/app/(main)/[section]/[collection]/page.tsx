@@ -8,8 +8,9 @@ import VerticalGallery from "@/components/vertical_gallery/Gallery";
 import GalleryWrapper from "@/components/gallery/GalleryWrapper";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
-import { getCollectionMetadata, getDefaultCollectionBySectionId } from "@/utils/supabase/collections";
-import { getDefaultSectionWithCollection, getSection } from "@/utils/supabase/sections";
+import { getCollectionMetadata, getCachedDefaultCollectionBySectionId, getCollectionId } from "@/utils/supabase/collections";
+import { getDefaultSectionWithCollection, getSection, getSectionId } from "@/utils/supabase/sections";
+import { UI_LABELS } from "@/utils/constants";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -47,18 +48,18 @@ export async function generateMetadata(
 
 	const { section, collection } = await params;
 
+	const defaultMetadata = {
+		title: `${capitalize(section)} - ${capitalize(collection)}`,
+	};
+
 	const url = `/${section}/${collection}`;
 	const fullUrl = getFullUrl(url);
 
-	const metadata = await getCollectionMetadata(collection);
+	const collectionId = await getCollectionId(collection);
+	if (!collectionId) return defaultMetadata;
 
-	if (!metadata) {
-
-		return {
-			title: `${capitalize(section)} - ${capitalize(collection)}`,
-		};
-
-	};
+	const metadata = await getCollectionMetadata(collectionId);
+	if (!metadata) return defaultMetadata;
 
 	const robotsValue = metadata.seo_robots || "index, follow";
 
@@ -128,7 +129,10 @@ export default async function Page({
 
 	const { section: sectionSlug, collection: collectionSlug } = await params;
 
-	let section = await getSection(sectionSlug);
+	const sectionId = await getSectionId(sectionSlug);
+	if (!sectionId) return notFound();
+
+	let section = await getSection(sectionId);
 	const defaultSectionPromise = getDefaultSectionWithCollection();
 
 	if (!section) {
@@ -136,8 +140,11 @@ export default async function Page({
 		if (!section) return notFound();
 	};
 
-	const collectionPromise = getCollectionMetadata(collectionSlug);
-	const defaultCollectionPromise = getDefaultCollectionBySectionId(section.id);
+	const collectionId = await getCollectionId(collectionSlug);
+	if (!collectionId) return notFound();
+
+	const collectionPromise = getCollectionMetadata(collectionId);
+	const defaultCollectionPromise = getCachedDefaultCollectionBySectionId(section.id);
 
 	let collection = await collectionPromise;
 
@@ -167,7 +174,7 @@ export default async function Page({
 		"@context": "https://schema.org",
 		"@type": "ImageGallery",
 		"name": `${collection.title} - ${section.title}`,
-		"description": `Gallery collection: ${collection.title} by Georges Bréhier`,
+		"description": `Gallery ${UI_LABELS.collection.singular}: ${collection.title} by Georges Bréhier`,
 		"url": fullUrl,
 		"author": {
 			"@type": "Person",

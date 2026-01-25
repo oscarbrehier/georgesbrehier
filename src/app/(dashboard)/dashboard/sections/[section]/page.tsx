@@ -1,0 +1,63 @@
+import { Button, ButtonText } from "@/app/(dashboard)/components/Button";
+import { NavigatorUI } from "../NavigatorUI";
+import { updateCollection, updateCollectionPositions } from "@/app/(dashboard)/actions/collections";
+import { getCollectionsBySection, getCollectionsWithSectionState } from "@/utils/supabase/collections";
+import { getSectionId } from "@/utils/supabase/sections";
+import { UI_LABELS } from "@/utils/constants";
+
+export default async function Page({
+	params
+}: {
+	params: Promise<{ section: string }>
+}) {
+
+	const { section: sectionSlug } = await params;
+
+	const sectionId = await getSectionId(sectionSlug);
+
+	if (!sectionId) {
+
+		return (
+
+			<div className="h-32 w-full flex flex-col items-center justify-center">
+
+				<h1 className="text-xl font-medium">{UI_LABELS.section.capitalized} Not Found</h1>
+				<p className="text-neutral-500">The {UI_LABELS.section.singular} "{sectionSlug}" may have been moved or deleted.</p>
+				
+				<a className="mt-4" href="/dashboard/sections">
+					<Button		
+					>
+						<ButtonText>
+							Return to {UI_LABELS.section.capPlural}
+						</ButtonText>
+					</Button>
+				</a>
+
+			</div>
+
+		);
+
+	};
+
+	const collections = await getCollectionsWithSectionState(sectionId);
+
+	return (
+
+
+		<div className="h-full w-full flex flex-col">
+
+			<NavigatorUI
+				sectionId={sectionId}
+				title={sectionSlug}
+				items={collections.sort((a, b) => a.position - b.position)}
+				type="collection"
+				basePath={sectionSlug}
+				onSave={updateCollectionPositions}
+				updateFn={updateCollection}
+			/>
+
+		</div>
+
+	);
+
+};

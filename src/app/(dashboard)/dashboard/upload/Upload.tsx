@@ -1,9 +1,9 @@
 "use client"
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cloud, Loader2, Check, X } from "lucide-react";
-import { getCollectionsBySectionId } from "@/utils/supabase/collections";
+import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
 import { Select } from "@/components/dashboard/Select";
@@ -13,6 +13,8 @@ import { getSections } from "@/utils/supabase/sections";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
+import { UI_LABELS } from "@/utils/constants";
+import { MAX_BODY_SIZE } from "@/utils/constants";
 
 interface UploadProgress {
 	filename: string
@@ -21,44 +23,84 @@ interface UploadProgress {
 };
 
 export function Upload({
-	sections: initialSections
+	sections: initialSections,
+	target,
 }: {
-	sections: GallerySection[]
+	sections: GallerySection[];
+	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
 }) {
 
 	const { formData, setFormData, resetForm } = useUploadFormStore();
 
 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
-	const [collections, setCollections] = useState<GalleryCollection[] | null>(null);
+	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
 	const [error, setError] = useState<string | null>(null);
+	const [fileError, setFileError] = useState<string | null>(null);
+
+	useEffect(() => {
+
+		if (target?.sectionId) {
+
+			setFormData({
+				sectionId: target?.sectionId ?? "",
+				collectionId: target?.collectionId ?? ""
+			});
+
+		} else {
+
+			setFormData({
+				sectionId: "",
+				collectionId: ""
+			});
+
+		};
+
+		if (target?.collections) {
+			setCollections(target.collections);
+		} else if (!target?.sectionId) {
+			setCollections(null);
+		};
+
+	}, [target, setFormData]);
+
+	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
 
 	const processImages = (files: FileList) => {
 
+		setFileError(null);
+
 		const imageFiles: File[] = [];
 		const previews: string[] = [];
+		const rejectedFiles: string[] = [];
 
 		Array.from(files).forEach((file) => {
 
-			if (file.type.startsWith("image/")) {
+			if (!file.type.startsWith("image/")) return;
 
-				imageFiles.push(file);
-				previews.push(URL.createObjectURL(file));
-
+			if (file.size > MAX_BODY_SIZE) {
+				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
+				return;
 			};
+
+			imageFiles.push(file);
+			previews.push(URL.createObjectURL(file));
 
 		});
 
-		if (imageFiles.length === 0) {
+		if (rejectedFiles.length > 0) {
+			setFileError(`Skipped ${rejectedFiles.length} file(s) over ${toMB(MAX_BODY_SIZE)}MB: ${rejectedFiles.join(", ")}`);
+			setTimeout(() => setFileError(null), 5000);
+			if (imageFiles.length === 0) return;
+		};
 
+		if (imageFiles.length === 0 && rejectedFiles.length === 0) {
 			setError("No valid image files selected");
 			setTimeout(() => setError(null), 3000);
-
 			return;
-
-		};
+		}
 
 		setFormData({
 			images: [...formData.images, ...imageFiles],
@@ -66,7 +108,9 @@ export function Upload({
 		});
 
 		drag.resetDrag();
-		setError(null);
+		if (imageFiles.length > 0 && rejectedFiles.length === 0) {
+			setError(null);
+		}
 
 	};
 
@@ -97,12 +141,12 @@ export function Upload({
 
 		if (name === "sectionId") {
 
-			const collectionsRes = await getCollectionsBySectionId(value);
+			const collectionsRes = await getCollectionsBySection(value);
 			setCollections(collectionsRes ?? null);
 
 			setFormData({
-				collectionId: "",
 				sectionId: value,
+				collectionId: "",
 			});
 
 			return;
@@ -142,7 +186,6 @@ export function Upload({
 			setUploadProgress((prev) =>
 				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
 			);
-
 
 			const { url, error: imageError } = await uploadImage(file);
 
@@ -212,7 +255,7 @@ export function Upload({
 				type="collection"
 				onSuccess={async () => {
 					if (formData.sectionId) {
-						const collectionRes = await getCollectionsBySectionId(formData.sectionId);
+						const collectionRes = await getCollectionsBySection(formData.sectionId);
 						setCollections(collectionRes);
 					}
 				}}
@@ -224,90 +267,108 @@ export function Upload({
 
 				<form onSubmit={handleSubmit} className="space-y-8">
 
-					<div
-						onDragEnter={drag.handleDragEnter}
-						onDragLeave={drag.handleDragLeave}
-						onDragOver={drag.handleDragOver}
-						onDrop={drag.handleDrop}
-						className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
-							? "border-neutral-400 bg-background"
-							: "border-neutral-200"
-							}`}
-					>
+					<div className="flex flex-col space-y-2">
 
-						<input
-							id="image_input"
-							type="file"
-							accept="image/*"
-							multiple
-							onChange={handleFileInputChange}
-							className="hidden"
-						/>
+						<div
+							onDragEnter={drag.handleDragEnter}
+							onDragLeave={drag.handleDragLeave}
+							onDragOver={drag.handleDragOver}
+							onDrop={drag.handleDrop}
+							className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
+								? "border-neutral-400 bg-dashboard"
+								: "border-neutral-200"
+								}`}
+						>
 
-						{formData.images.length > 0 ? (
+							<input
+								id="image_input"
+								type="file"
+								accept="image/jpeg,image/png,image/webp"
+								multiple
+								onChange={handleFileInputChange}
+								className="hidden"
+							/>
 
-							<div className="p-6">
+							{formData.images.length > 0 ? (
 
-								<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+								<div className="p-6">
 
-									{formData.imagePreviews.map((preview, index) => (
+									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
 
-										<div key={index} className="relative group">
+										{formData.imagePreviews.map((preview, index) => (
 
-											<img
-												src={preview}
-												alt={`Preview ${index + 1}`}
-												className="w-full h-32 object-cover rounded-lg"
-											/>
+											<div key={index} className="relative group">
 
-											<button
-												type="button"
-												onClick={() => removeImage(index)}
-												className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-											>
-												<X className="w-4 h-4" />
-											</button>
+												<img
+													src={preview}
+													alt={`Preview ${index + 1}`}
+													className="w-full h-32 object-cover rounded-lg"
+												/>
 
-										</div>
+												<button
+													type="button"
+													onClick={() => removeImage(index)}
+													className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+												>
+													<X className="w-4 h-4" />
+												</button>
 
-									))}
+											</div>
+
+										))}
+
+									</div>
+
+									<button
+										type="button"
+										onClick={() => document.getElementById("image_input")?.click()}
+										className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
+									>
+										Add more images
+									</button>
 
 								</div>
 
+							) : (
+
+								<div className="px-12 py-8 text-center">
+
+									<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dashboard mb-4">
+										<Cloud className="w-8 h-8 text-neutral-600" />
+									</div>
+
+									<h3 className="text-lg font-medium text-neutral-900 mb-2">
+										Drag your images here
+									</h3>
+
+									<p className="text-sm text-neutral-600 mb-4">
+										or click to browse (multiple files supported)
+									</p>
+
+									<label htmlFor="image_input" className="inline-block">
+										<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
+											Select images
+										</span>
+									</label>
+
+								</div>
+
+							)}
+
+						</div>
+
+						{fileError && (
+							<div className="p-4 rounded-lg bg-red-50 border border-red-200 flex justify-between">
+								<p className="text-sm text-red-600">{fileError}</p>
+
 								<button
-									type="button"
-									onClick={() => document.getElementById("image_input")?.click()}
-									className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
+									onClick={() => setFileError(null)}
+									className="text-red-700 cursor-pointer"
 								>
-									Add more images
+									<X size={18} />
 								</button>
 
 							</div>
-
-						) : (
-
-							<div className="px-12 py-8 text-center">
-
-								<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background mb-4">
-									<Cloud className="w-8 h-8 text-neutral-600" />
-								</div>
-
-								<h3 className="text-lg font-medium text-neutral-900 mb-2">
-									Drag your images here
-								</h3>
-
-								<p className="text-sm text-neutral-600 mb-4">
-									or click to browse (multiple files supported)
-								</p>
-
-								<label htmlFor="image_input" className="inline-block">
-									<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
-										Select images
-									</span>
-								</label>
-
-							</div>
-
 						)}
 
 					</div>
@@ -335,7 +396,7 @@ export function Upload({
 								value={formData.description}
 								onChange={handleInputChange}
 								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-background text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
+								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
 							/>
 
 						</div>
@@ -343,7 +404,7 @@ export function Upload({
 						<div>
 
 							<Select
-								label="Section"
+								label={UI_LABELS.section.capitalized}
 								id="section"
 								name="sectionId"
 								value={formData.sectionId}
@@ -363,7 +424,7 @@ export function Upload({
 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
 								onClick={() => setOpenSectionDialog(true)}
 							>
-								Create a new section
+								Create a new {UI_LABELS.section.singular}
 							</button>
 
 						</div>
@@ -371,7 +432,7 @@ export function Upload({
 						<div>
 
 							<Select
-								label="Collection"
+								label={UI_LABELS.collection.capitalized}
 								id="collection"
 								name="collectionId"
 								value={formData.collectionId}
@@ -392,7 +453,7 @@ export function Upload({
 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
 								onClick={() => setOpenCollectionDialog(true)}
 							>
-								Create a new collection
+								Create a new {UI_LABELS.collection.singular}
 							</button>
 
 						</div>
@@ -407,22 +468,22 @@ export function Upload({
 
 							{uploadProgress.map((progress, index) => (
 
-								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-background border border-neutral-200">
+								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dashboard border border-neutral-200">
 
 									{progress.status === "pending" && (
 										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
 									)}
 
 									{progress.status === "uploading" && (
-										<Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />
+										<Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
 									)}
 
 									{progress.status === "success" && (
-										<Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+										<Check className="w-5 h-5 text-green-600 shrink-0" />
 									)}
 
 									{progress.status === "error" && (
-										<X className="w-5 h-5 text-red-600 flex-shrink-0" />
+										<X className="w-5 h-5 text-red-600 shrink-0" />
 									)}
 
 									<div className="flex-1 min-w-0">

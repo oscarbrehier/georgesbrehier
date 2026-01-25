@@ -4,28 +4,74 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSections } from "@/utils/supabase/sections";
-import { useActionState, useEffect, useState } from "react";
-import { createCollection, CollectionFormState } from "../actions/createCollection";
+import { FormEvent, useActionState, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { EditData } from "./CreateItemDialog";
+import { createCollection, updateCollection } from "../actions/collections";
+import { UI_LABELS } from "@/utils/constants";
 
+interface FormState {
+	message?: string;
+	error?: string | null;
+	success?: boolean;
+};
 
-const initialState = { message: "", error: "" };
 const initialForm = {
 	sectionId: "",
 	collectionTitle: "",
 	isDefault: false
 };
 
-export function NewCollectionForm({
-	onSuccess
+export function CollectionForm({
+	onSuccess,
+	initialData
 }: {
 	onSuccess?: () => void;
+	initialData?: EditData;
 }) {
 
-	const [sections, setSections] = useState<GallerySection[]>([]);
-	const [formData, setFormData] = useState(initialForm);
+	const isEditMode = !!initialData;
 
-	const [state, formAction, pending] = useActionState<CollectionFormState | undefined, FormData>(createCollection, initialState);
+	const [sections, setSections] = useState<GallerySection[]>([]);
+	const [formData, setFormData] = useState({
+		sectionId: initialData?.section_id ?? "",
+		collectionTitle: initialData?.title ?? "",
+		isDefault: initialData?.is_default ?? false,
+	});
+
+	const [formState, setFormState] = useState<FormState>({});
+	const [pending, setPending] = useState(false);
+
+	async function handleSubmit(e: FormEvent) {
+
+		e.preventDefault();
+		if (pending) setPending(false);
+		setPending(true);
+
+		if (isEditMode) {
+
+			const { error } = await updateCollection(initialData.id, {
+				title: formData.collectionTitle,
+				is_default: formData.isDefault
+			});
+
+			setFormState({ error, success: !error, message: !error ? "Updated!" : "" });
+
+		} else {
+
+			const res = await createCollection({
+				sectionId: formData.sectionId,
+				title: formData.collectionTitle,
+				is_default: formData.isDefault,
+			});
+
+			setFormState(res);
+
+		};
+
+		setPending(false);
+
+	};
 
 	function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
 
@@ -33,7 +79,7 @@ export function NewCollectionForm({
 
 		setFormData(prev => ({
 			...prev,
-			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value.toLocaleLowerCase()
+			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value
 		}));
 
 	};
@@ -55,23 +101,21 @@ export function NewCollectionForm({
 
 	useEffect(() => {
 
-		if (pending) {
-			setFormData(initialForm);
+		if (formState.success) {
+			
+			if (onSuccess) onSuccess();
+
+			if (!isEditMode) setFormData(initialForm);
+
 		};
 
-	}, [pending]);
-
-	useEffect(() => {
-		if (state?.success && onSuccess) {
-			onSuccess?.();
-		};
-	}, [state?.success, onSuccess]);
+	}, [formState.success, onSuccess, isEditMode]);
 
 	return (
 
 		<form
-			className="grid gap-4 w"
-			action={formAction}
+			className="grid gap-4"
+			onSubmit={handleSubmit}
 		>
 
 			<Select
@@ -79,7 +123,7 @@ export function NewCollectionForm({
 				onValueChange={(value) => {
 					setFormData(prev => ({ ...prev, sectionId: value }));
 				}}
-				value={formData.sectionId}
+				value={initialData?.section_id ?? formData.sectionId}
 			>
 				<SelectTrigger className="w-full">
 					<SelectValue placeholder="Select a section" />
@@ -88,7 +132,7 @@ export function NewCollectionForm({
 					id="section"
 				>
 					<SelectGroup>
-						<SelectLabel>Sections</SelectLabel>
+						<SelectLabel>{UI_LABELS.section.capPlural}</SelectLabel>
 						{sections.map((section) => (
 							<SelectItem
 								key={section.id}
@@ -102,7 +146,7 @@ export function NewCollectionForm({
 			</Select>
 
 			<div className="grid w-full max-w-sm items-center gap-3">
-				<Label htmlFor="collectionTitle">Collection Title</Label>
+				<Label htmlFor="collectionTitle">{UI_LABELS.collection.capitalized} Title</Label>
 				<Input
 					type="text"
 					id="collectionTitle"
@@ -127,15 +171,7 @@ export function NewCollectionForm({
 				</div>
 			</div>
 
-			<div className="w-full space-y-2">
-
-				{state?.error && (
-					<p className="text-xs text-red-600 text-center">{state.error}</p>
-				)}
-
-				{state?.success && (
-					<p className="text-xs text-green-600 text-center">{state.message}</p>
-				)}
+			<div className="w-full space-y-4">
 
 				<Button
 					type="submit"
@@ -144,14 +180,25 @@ export function NewCollectionForm({
 				>
 
 					{pending ? (
-						<Loader2 className="w-5 h-5 text-green-600 animate-spin flex-shrink-0" />
+						<Loader2 className="w-5 h-5 text-green-600 animate-spin shrink-0" />
 					) : (
 						<span className="truncate">
-							Create collection{formData.collectionTitle && `: ${formData.collectionTitle}`}
+							{isEditMode
+								? `Update ${UI_LABELS.collection.singular}`
+								: `Create ${UI_LABELS.collection.singular}${formData.collectionTitle && `: ${formData.collectionTitle}`}`
+							}
 						</span>
 					)}
 
 				</Button>
+
+				{formState?.error && (
+					<p className="text-xs text-red-600 text-center">{formState.error}</p>
+				)}
+
+				{formState?.success && (
+					<p className="text-xs text-green-600 text-center">{formState.message}</p>
+				)}
 
 			</div>
 

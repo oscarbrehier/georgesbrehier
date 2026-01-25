@@ -6,11 +6,9 @@ import { cn } from "@/utils/utils";
 export function CollectionNav({
 	collections,
 	currentCollection,
-	section
 }: {
-	collections: GalleryCollection[],
+	collections: CollectionNavItem[],
 	currentCollection: string,
-	section: string
 }) {
 
 	return (
@@ -22,7 +20,7 @@ export function CollectionNav({
 				<li key={collection.id}>
 
 					<Link
-						href={`/${section}/${collection.slug}`}
+						href={collection.slug}
 						className={cn(
 							"capitalize text-[15px]",
 							collection.slug === currentCollection ? "text-black underline" : "text-neutral-600 hover:text-black"

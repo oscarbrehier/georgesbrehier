@@ -18,7 +18,7 @@ export function GalleryItem({
 	dragAttributes,
 	dragListeners,
 }: {
-	item: GalleryItemWithCollection;
+	item: GalleryItem & { collection: { id: string; title: string; is_visible: boolean; }, parent_hidden: boolean };
 	isSelected: boolean;
 	isEditMode: boolean;
 	currentPath: string;
@@ -30,6 +30,9 @@ export function GalleryItem({
 }) {
 
 	const [isDeleting, setIsDeleting] = useState(false);
+
+	const isVisible = !item.parent_hidden && item.collection.is_visible;
+	const isHidden = !isVisible;
 
 	function handleSelect() {
 
@@ -74,7 +77,13 @@ export function GalleryItem({
 
 	return (
 
-		<div className="relative h-full w-full flex bg-neutral-200 group">
+		<div
+			id={item.collection.title}
+			className={cn(
+				"relative h-full w-full flex bg-neutral-200 group",
+				isHidden && "opacity-30"
+			)}
+		>
 
 			{isEditMode && (
 				<button

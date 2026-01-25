@@ -1,3 +1,5 @@
+"use client"
+
 import { getBaseUrl } from "@/utils/seo";
 import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
@@ -16,7 +18,7 @@ function ResetPasswordForm() {
 		await supabase
 			.auth
 			.resetPasswordForEmail(email, {
-				redirectTo: `${getBaseUrl()}/dashboard/auth/reset-password`
+				redirectTo: `${getBaseUrl()}/auth/reset-password`
 			});
 
 		setIsOpen(false);
@@ -30,7 +32,7 @@ function ResetPasswordForm() {
 			{
 				isOpen && (
 
-					<div className="fixed top-14 right-4 z-[70] bg-neutral-200 border-[1px] border-neutral-300 py-2 px-4 rounded-md">
+					<div className="fixed top-14 right-4 z-70 bg-neutral-200 border-[1px] border-neutral-300 py-2 px-4 rounded-md">
 
 						<input
 							type="text"

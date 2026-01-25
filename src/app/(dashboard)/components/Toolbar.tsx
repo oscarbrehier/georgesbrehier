@@ -6,9 +6,12 @@ import { Ban, CheckCheck, Eye, Pencil, PencilOff, Plus, Trash } from "lucide-rea
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button, ButtonText } from "../../components/Button";
-import { CreateItemDialog } from "../../components/CreateItemDialog";
-import { deleteSection } from "../../actions/deleteSection";
+import { Button, ButtonText } from "./Button";
+import { CreateItemDialog } from "./CreateItemDialog";
+import { deleteSection } from "../actions/sections";
+import { QuickActions } from "./QuickActions";
+import { getSectionId } from "@/utils/supabase/sections";
+import { UI_LABELS } from "@/utils/constants";
 
 export function Toolbar({
 	isEditing,
@@ -66,51 +69,15 @@ export function Toolbar({
 
 	return (
 
-		<div className="h-20 w-full flex items-start justify-between gap-4">
+		<div className={cn(
+			"h-auto pb-8 w-full flex justify-between",
+			"2lg:flex-row flex-col 2lg:items-center items-end",
+			"2lg:gap-0 w gap-2"
+		)}>
 
-			<div className="flex gap-4">
+			<QuickActions />
 
-				<a href="/">
-					<Button
-						variant="base"
-						size="sm"
-						Icon={Eye}
-					>
-						<ButtonText>View Website</ButtonText>
-					</Button>
-				</a>
-
-				<CreateItemDialog
-					type="section"
-				>
-					<Button
-						className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
-						Icon={Plus}
-						size="sm"
-					>
-						<ButtonText>
-							Create new Section
-						</ButtonText>
-					</Button>
-				</CreateItemDialog>
-
-				<CreateItemDialog
-					type="collection"
-				>
-					<Button
-						className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
-						Icon={Plus}
-						size="sm"
-					>
-						<ButtonText>
-							Create new Collection
-						</ButtonText>
-					</Button>
-				</CreateItemDialog>
-
-			</div>
-
-			<div className="flex gap-4">
+			<div className="flex sm:flex-row flex-col sm:items-start items-end gap-2">
 
 				{
 					isEditing && selectedItems.length > 0 && (
@@ -121,6 +88,7 @@ export function Toolbar({
 								className={"bg-red-600 hover:bg-red-700 text-neutral-50"}
 								onClick={handleDelete}
 								disabled={selectedItems.length === 0 || isDeleting}
+								size="sm"
 								Icon={Ban}
 							>
 								<ButtonText>Delete {selectedItems.length} {selectedItems.length === 1 ? "Item" : "Items"}</ButtonText>
@@ -136,6 +104,7 @@ export function Toolbar({
 
 						<Button
 							className="bg-amber-600 hover:bg-amber-700 text-neutral-50"
+							size="sm"
 							onClick={onSave}
 							disabled={isDeleting}
 							Icon={CheckCheck}
@@ -151,6 +120,7 @@ export function Toolbar({
 					className={cn(
 						isEditing ? "bg-blue-600 hover:bg-blue-700 text-neutral-50" : "bg-neutral-200 hover:bg-neutral-300 text-neutral-800"
 					)}
+					size="sm"
 					onClick={() => onEditToggle()}
 					Icon={isEditing ? PencilOff : Pencil}
 				>
@@ -181,13 +151,20 @@ function DeleteSectionButton({
 
 		if (isDeleting) return;
 		if (!section) return;
-		if (!confirm(`You are about to permanently delete the "${section}" section. This action cannot be undone. Are you sure you want to proceed?`)) return;
+		if (!confirm(`You are about to permanently delete the "${section}" ${UI_LABELS.section.singular}. This action cannot be undone. Are you sure you want to proceed?`)) return;
 
 		setIsDeleting(true);
 
-		const { error } = await deleteSection(section);
+		const sectionId = await getSectionId(section);
+		if (!sectionId) {
+			toast(`Failed to delete ${UI_LABELS.section.singular}`);
+			setIsDeleting(false);
+			return null;
+		};
 
-		if (error) toast("Failed to delete section:", { description: error });
+		const { error } = await deleteSection(sectionId);
+
+		if (error) toast(`Failed to delete ${UI_LABELS.section.singular}:`, { description: error });
 
 		setIsDeleting(false);
 
@@ -199,16 +176,18 @@ function DeleteSectionButton({
 			className={cn(
 				"bg-red-600 hover:bg-red-700 text-neutral-50 disabled:bg-red-200"
 			)}
+			size="sm"
 			onClick={handleDeleteSection}
 			disabled={isDeleting}
 			Icon={Trash}
 		>
 			<ButtonText>
 				Delete
+				"
+				<span className="">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
+				"
 				{" "}
-				<span className="underline">{section.length > 20 ? `${section.slice(0, 20)}…` : section}</span>
-				{" "}
-				collection
+				{UI_LABELS.collection.singular}
 			</ButtonText>
 		</Button>
 
