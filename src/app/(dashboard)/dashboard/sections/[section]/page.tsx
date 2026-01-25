@@ -49,7 +49,7 @@ export default async function Page({
 			<NavigatorUI
 				sectionId={sectionId}
 				title={sectionSlug}
-				items={collections}
+				items={collections.sort((a, b) => a.position - b.position)}
 				type="collection"
 				basePath={sectionSlug}
 				onSave={updateCollectionPositions}

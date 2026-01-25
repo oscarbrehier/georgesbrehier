@@ -14,6 +14,7 @@ import { UI_LABELS } from "@/utils/constants";
 export interface NavigableItem {
 	id: string;
 	section_id?: string;
+	status?: "visible" | "hidden" | "empty";
 	slug: string;
 	title: string;
 	is_visible: boolean;
@@ -44,13 +45,17 @@ export function NavigatorUI<T extends NavigableItem>({
 
 	const router = useRouter();
 
+	const sortByPosition = (a: T, b: T) => a.position - b.position;
+
 	const [orderedItems, setOrderedItems] = useState(items);
 	const [isMounted, setIsMounted] = useState(false);
 
 	const hasChanges = JSON.stringify(items.map(i => i.id)) !== JSON.stringify(orderedItems.map(i => i.id));
 
 	useEffect(() => { setIsMounted(true); }, []);
-	useEffect(() => { setOrderedItems(items); }, [items]);
+	useEffect(() => {
+		setOrderedItems(() => [...items].sort(sortByPosition));
+	}, [items]);
 
 	if (!isMounted) return null;
 

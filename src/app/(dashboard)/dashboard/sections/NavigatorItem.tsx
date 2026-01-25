@@ -29,16 +29,38 @@ export function NavigatorItem<T extends NavigableItem>({
 	onUpdate: (id: string, data: any) => void;
 }) {
 
-	const isVisible = !item.parent_hidden && item.is_visible;
+	const status = item.status || (item.is_visible ? "visible" : "hidden");
 
-	const borderColor = item.is_default ? "border-amber-400" : "border-blue-400";
+	const getStatusUI = (status: string) => {
+		switch (status) {
+			case "visible":
+				return {
+					label: "Publicly Visible",
+					classes: "border-blue-400"
+				};
+			case "empty":
+				return {
+					label: "Hidden: Needs Content",
+					classes: "border-amber-400"
+				};
+			case "hidden":
+			default:
+				return {
+					label: "Hidden: Off",
+					classes: "border-neutral-300"
+				};
+		}
+	};
+
+	const statusUI = getStatusUI(status);
+	const isVisible = status === "visible";
 
 	return (
 
 		<div className={cn(
 			"relative bg-neutral-100 rounded-xl w-full flex items-center space-x-6 p-6 group border-l-6",
 			"outline-1 outline-neutral-200",
-			isVisible ? borderColor : "opacity-70 hover:opacity-100"
+			status === "hidden" ? "opacity-70 hover:opacity-100 border-neutral-300" : statusUI.classes
 		)}>
 
 			<Link href={`${basePath}/${item.slug}`} className="absolute inset-0 z-0" />
@@ -56,10 +78,12 @@ export function NavigatorItem<T extends NavigableItem>({
 						<p className="text-neutral-500 text-sm">/{item.slug}</p>
 					</div>
 
-					<div className="flex space-x-2 ">
+					<div className="flex space-x-2">
 
 						<Badge>
-							{isVisible ? "Visible" : "Hidden"}
+							<span className="capitalize">
+								{statusUI.label}
+							</span>
 						</Badge>
 
 						{item.parent_hidden && (
@@ -92,7 +116,7 @@ export function NavigatorItem<T extends NavigableItem>({
 					)}
 
 					<Tooltip>
-						
+
 						<TooltipTrigger asChild>
 							<Button
 								variant="base" size="sm" Icon={isVisible ? EyeOff : Eye}

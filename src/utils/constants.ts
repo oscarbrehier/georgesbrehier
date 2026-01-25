@@ -14,3 +14,6 @@ export const UI_LABELS = {
 } as const;
 
 export type ItemType = keyof typeof UI_LABELS;
+
+export const MAX_BODY_SIZE_STR = "14mb";
+export const MAX_BODY_SIZE = 10 * 1024 * 1024;
