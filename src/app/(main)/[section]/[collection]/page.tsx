@@ -210,7 +210,11 @@ export default async function Page({
 
 				<ScrollHint />
 
-				<GalleryWrapper items={galleryItems} />
+				<GalleryWrapper
+					sectionId={sectionId}
+					currentCollection={collectionId}
+					items={galleryItems}
+				/>
 				<VerticalGallery images={galleryItems} />
 
 			</main>

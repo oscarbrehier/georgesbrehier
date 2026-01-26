@@ -16,29 +16,21 @@ export default async function Layout({
 	const navItems = await getNavSections();
 
 	return (
-		<>
 
-			<header className={cn(
-				"fixed top-0 left-0 z-60",
-				"lg:h-screen lg:w-36 w-full p-8",
-				"bg-background",
-				"flex lg:flex-col items-center lg:justify-start justify-between"
-			)}>
+		<main>
 
-				<h1 className={`${roboto.className} font-semibold text-xl capitalize text-neutral-800 flex flex-col -space-y-1.5`}>
-					<span>georges</span>
-					<span>bréhier</span>
-				</h1>
+			<header
+				className="w-full fixed px-8 h-18 grid grid-cols-5 z-20"
+			>
 
-				<nav className='lg:w-full w-auto lg:mt-20' aria-label="Main navigation">
-					{nav}
-				</nav>
+				<div className="col-span-1 flex items-center">
+					<h1 className={`${roboto.className} font-semibold text-xl text-neutral-800 tracking-widest space-x-4`}>
+						<span>Georges</span>
+						<span>Bréhier</span>
+					</h1>
+				</div>
 
-			</header>
-
-			<div className="pl-44 pr-8 pt-11.5 w-full fixed top-0 left-0 flex justify-between z-60">
-
-				<div className="flex space-x-16">
+				<div className="col-span-3 h-full flex items-center justify-center space-x-12">
 
 					{navItems.map((section) => (
 
@@ -54,20 +46,19 @@ export default async function Layout({
 
 				</div>
 
-				<div className="flex space-x-16">
-
+				<div className="col-span-1 flex items-center justify-between">
 					<p className="text-[15px]">History</p>
 					<p className="text-[15px]">About</p>
-
 				</div>
 
-			</div>
+			</header>
 
 			<Suspense>
 				{children}
 			</Suspense>
 
-		</>
+		</main>
+
 	);
 
 };
