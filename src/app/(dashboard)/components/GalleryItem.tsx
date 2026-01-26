@@ -1,11 +1,15 @@
 "use client"
 
 import { deleteGalleryItem } from "@/app/(dashboard)/actions/deleteGalleryItems";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/utils/utils";
-import { Grip, X } from "lucide-react";
+import { Grip, Pen, X } from "lucide-react";
 import Image from "next/image";
 import { MouseEvent, useState } from "react";
 import { toast } from "sonner";
+import { CreateItemDialog } from "./dialog/CreateItemDialog";
+import { GalleryItemForm } from "./dialog/GalleryItemForm";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export function GalleryItem({
 	item,
@@ -79,62 +83,106 @@ export function GalleryItem({
 
 		<div
 			id={item.collection.title}
-			className={cn(
-				"relative h-full w-full flex bg-neutral-200 group",
-				isHidden && "opacity-30"
-			)}
+			className={cn(isHidden && "opacity-30")}
 		>
 
-			{isEditMode && (
-				<button
-					{...dragAttributes}
-					{...dragListeners}
-					className={cn(
-						"group-hover:flex hidden size-6",
-						"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 right-6 w z-40 rounded-full items-center justify-center"
-					)}
-					onClick={(e) => e.stopPropagation()}
-				>
-					<Grip size={16} className="text-red-600" />
-				</button>
-			)}
-
-			{isEditMode && (
-				<button
-					className={cn(
-						"group-hover:flex hidden size-6",
-						"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 -right-2 z-40 rounded-full items-center justify-center"
-					)}
-					onClick={handleDeleteItem}
-					disabled={isDeleting}
-				>
-					<X size={16} className="text-red-600" />
-				</button>
-			)}
-
-			<button
+			<div
 				className={cn(
-					"flex items-center w-full h-80",
-					isSelected && "ring-2 ring-offset-2 ring-blue-600"
+					"relative h-full w-full flex bg-neutral-200 group",
 				)}
-				onClick={() => {
-					if (!isEditMode || isDeleting) return;
-					handleSelect();
-				}}
-				aria-disabled={!isEditMode || isDeleting}
 			>
 
-				<div className="relative w-full h-full">
-					<Image
-						src={item.image_url}
-						alt="image"
-						fill
-						className="object-contain"
-						quality={50}
-					/>
-				</div>
+				{isEditMode && (
+					<button
+						{...dragAttributes}
+						{...dragListeners}
+						className={cn(
+							"group-hover:flex hidden size-6",
+							"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 right-6 w z-40 rounded-full items-center justify-center"
+						)}
+						onClick={(e) => e.stopPropagation()}
+					>
+						<Grip size={16} className="text-red-600" />
+					</button>
+				)}
 
-			</button>
+				{isEditMode && (
+
+					<Dialog>
+
+						<DialogTrigger asChild>
+							<button
+								className={cn(
+									"group-hover:flex hidden size-6",
+									"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 right-14 z-40 rounded-full items-center justify-center"
+								)}
+							>
+								<Pen size={16} className="text-red-600" />
+							</button>
+						</DialogTrigger>
+
+						<DialogContent className="w-fit bg-dashboard">
+
+							<DialogHeader>
+								<DialogTitle>Edit item</DialogTitle>
+							</DialogHeader>
+
+							<GalleryItemForm
+								data={{
+									...item,
+									collectionId: item.collection.id
+								}}
+							/>
+
+						</DialogContent>
+
+					</Dialog>
+
+				)}
+
+				{isEditMode && (
+					<button
+						className={cn(
+							"group-hover:flex hidden size-6",
+							"bg-neutral-50 outline-1 outline-red-600/20 absolute -top-2 -right-2 z-40 rounded-full items-center justify-center"
+						)}
+						onClick={handleDeleteItem}
+						disabled={isDeleting}
+					>
+						<X size={16} className="text-red-600" />
+					</button>
+				)}
+
+				<button
+					className={cn(
+						"flex flex-col justify-center w-full h-80",
+						isSelected && "ring-2 ring-offset-2 ring-blue-600"
+					)}
+					onClick={() => {
+						if (!isEditMode || isDeleting) return;
+						handleSelect();
+					}}
+					aria-disabled={!isEditMode || isDeleting}
+				>
+
+					<div className="relative w-full h-full">
+						<Image
+							src={item.image_url}
+							alt="image"
+							fill
+							className="object-contain"
+							quality={50}
+						/>
+					</div>
+
+				</button>
+
+			</div>
+
+			<div className="mt-1">
+				<p className="text-sm">{item.title}</p>
+			</div>
+
 		</div>
 
 	);

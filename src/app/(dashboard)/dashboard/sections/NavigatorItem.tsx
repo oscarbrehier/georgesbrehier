@@ -4,7 +4,7 @@ import { Eye, EyeOff, Grip, Loader2, Pen, SquareArrowUp, Trash } from "lucide-re
 import Link from "next/link";
 import { NavigableItem } from "./NavigatorUI";
 import { Badge } from "../../components/Badge";
-import { CreateItemDialog } from "../../components/CreateItemDialog";
+import { CreateItemDialog } from "../../components/dialog/CreateItemDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { UI_LABELS } from "@/utils/constants";
 import { MouseEvent, useState, useTransition } from "react";
@@ -46,7 +46,7 @@ export function NavigatorItem<T extends NavigableItem>({
 			case "hidden":
 			default:
 				return {
-					label: "Hidden: Off",
+					label: "Hidden",
 					classes: "border-neutral-300"
 				};
 		}
