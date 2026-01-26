@@ -8,7 +8,7 @@ import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
 import { Select } from "@/components/dashboard/Select";
 import { Input } from "@/components/dashboard/Input";
-import { CreateItemDialog } from "@/app/(dashboard)/components/CreateItemDialog";
+import { CreateItemDialog } from "../../components/dialog/CreateItemDialog";
 import { getSections } from "@/utils/supabase/sections";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";

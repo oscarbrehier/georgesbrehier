@@ -44,7 +44,7 @@ export function ImageGallery({
 			};
 
 			const newItem: GalleryItemSubset = {
-				id: Math.random(),
+				id: crypto.randomUUID(),
 				image_url: url,
 				title: file.name,
 			};

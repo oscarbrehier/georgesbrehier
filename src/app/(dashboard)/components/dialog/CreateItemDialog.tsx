@@ -7,7 +7,6 @@ import { useState } from "react";
 
 const SectionForm = dynamic(() => import("./SectionForm").then(mod => mod.SectionForm));
 const CollectionForm = dynamic(() => import("./CollectionForm").then(mod => mod.CollectionForm));
-const GalleryItemForm = dynamic(() => import("./GalleryItemForm").then(mod => mod.GalleryItemForm));
 
 export interface EditData {
 	id: string;

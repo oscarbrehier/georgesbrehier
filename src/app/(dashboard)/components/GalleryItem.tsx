@@ -7,7 +7,6 @@ import { Grip, Pen, X } from "lucide-react";
 import Image from "next/image";
 import { MouseEvent, useState } from "react";
 import { toast } from "sonner";
-import { CreateItemDialog } from "./dialog/CreateItemDialog";
 import { GalleryItemForm } from "./dialog/GalleryItemForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
