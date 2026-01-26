@@ -21,7 +21,7 @@ export function GalleryAnimator({
 
 			const track = document.getElementById("gallery-track");
 			const wrapper = document.getElementById("gallery-wrapper");
-			
+
 			if (!track || !wrapper) return;
 
 			const getDistance = () => wrapper.scrollWidth - (window.innerWidth - 144);
@@ -59,7 +59,7 @@ export function GalleryAnimator({
 
 	useEffect(() => {
 
-		const container = document.getElementById("gallery-container");
+		const container = document.getElementById("gallery-track");
 		if (!container) return;
 
 		let selectedId: string | null = null;
