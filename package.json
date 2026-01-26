@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "migrate": "tsx --env-file=.env.local src/scripts/migrate-images.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -42,6 +43,7 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5"
   },
