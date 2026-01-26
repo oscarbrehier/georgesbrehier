@@ -2,7 +2,7 @@
 
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 const leftMargin = 144;
 gsap.registerPlugin(ScrollTrigger);
@@ -15,41 +15,45 @@ export function GalleryAnimator({
 
 	useEffect(() => {
 
-		const mm = gsap.matchMedia();
+		if (!items.length) return;
 
-		mm.add("(min-width: 1024px)", () => {
+		const ctx = gsap.context(() => {
 
-			const container = document.getElementById("gallery-container");
-			if (!container) return;
+			const track = document.getElementById("gallery-track");
+			const wrapper = document.getElementById("gallery-wrapper");
+			
+			if (!track || !wrapper) return;
 
-			const sections = gsap.utils.toArray<HTMLElement>(".panel");
+			const getDistance = () => wrapper.scrollWidth - (window.innerWidth - 144);
 
-			const totalWidth = sections.reduce((acc, section) => acc + section.offsetWidth, 0);
-
-			const panelWidth = sections[0].offsetWidth;
-			const imageWidth = panelWidth * 0.75;
-			const imageInsetLeft = (panelWidth - imageWidth) / 2;
-			const imageRight = imageInsetLeft + imageWidth;
-			const endPadding = (window.innerWidth / 2) - imageRight + imageWidth;
-
-			const scrollDistance = totalWidth - window.innerWidth + leftMargin + endPadding;
-
-			const animation = gsap.to(sections, {
-				x: () => -scrollDistance,
+			const scrollTween = gsap.to(wrapper, {
+				x: () => -getDistance(),
 				ease: "none",
 				scrollTrigger: {
-					trigger: container,
-					pin: true,
-					scrub: 1,
-					end: () => "+=" + scrollDistance
+					trigger: track,
+					start: "top top",
+					end: () => `+=${getDistance()}`,
+					scrub: 1.2,
+					invalidateOnRefresh: true,
+					onRefresh: () => {
+						if (track) {
+							track.style.height = `${getDistance() + window.innerHeight}px`;
+						}
+					}
 				}
 			});
 
+			const ro = new ResizeObserver(() => {
+				ScrollTrigger.refresh();
+			});
+
+			ro.observe(wrapper);
+
+			return () => ro.disconnect();
+
 		});
 
-		return () => {
-			mm.revert();
-		};
+		return () => ctx.revert();
 
 	}, [items]);
 
@@ -59,38 +63,54 @@ export function GalleryAnimator({
 		if (!container) return;
 
 		let selectedId: string | null = null;
+		let isAnySelected = false;
+
+		function clearSelected() {
+
+			if (!isAnySelected) return;
+
+			container!.querySelectorAll("[data-itemid]").forEach((div) => {
+				(div as HTMLElement).classList.remove("w-full", "h-full");
+			});
+
+			selectedId = null;
+			isAnySelected = false;
+
+		};
 
 		function handleClick(event: Event) {
 
-			const target = (event.target as HTMLElement).closest("[data-itemid]") as HTMLElement | null;;
+			const target = (event.target as HTMLElement).closest("[data-itemid]") as HTMLElement | null;
 			if (!target) return;
 
-			const id = target.dataset.itemid;
+			const id = target.dataset.itemid || null;
 
 			if (id === selectedId) {
-				clearSelected(container!);
-				selectedId = null;
-				return;
+				clearSelected();
+			} else {
+
+				clearSelected();
+
+				target.classList.add("w-full", "h-full");
+				selectedId = id;
+				isAnySelected = true;
 			};
 
-			clearSelected(container!);
-			target.classList.add("w-full", "h-full");
-			selectedId = id ?? null;
-
-		};
-
-		function clearSelected(el: HTMLElement) {
-			el.querySelectorAll("[data-itemid]").forEach((div) => {
-				(div as HTMLElement).classList.remove("w-full", "h-full");
-			});
 		};
 
 		container.addEventListener("click", handleClick);
-		window.addEventListener("scroll", () => clearSelected(container));
+
+		const trigger = ScrollTrigger.create({
+			onUpdate: (self) => {
+				if (Math.abs(self.getVelocity()) > 10) {
+					clearSelected();
+				};
+			}
+		});
 
 		return () => {
 			container.removeEventListener("click", handleClick);
-			window.removeEventListener("scroll", () => clearSelected(container));
+			trigger.kill();
 		};
 
 	}, [items]);
