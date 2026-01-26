@@ -5,6 +5,7 @@ import { cn } from "@/utils/utils";
 import { AuthNav } from "../components/AuthNav";
 import Breadcrumbs from "./Breadcrumbs";
 import { getSections } from "@/utils/supabase/sections";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
 	title: "Dashboard",

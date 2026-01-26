@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useEffect, useState } from "react";
-import { Cloud, Loader2, Check, X } from "lucide-react";
+import { Cloud, Loader2, Check, X, ArrowLeft } from "lucide-react";
 import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { useUploadFormStore } from "@/stores/useUploadForm";
 import { cn } from "@/utils/utils";
@@ -15,6 +15,8 @@ import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
 import { UI_LABELS } from "@/utils/constants";
 import { MAX_BODY_SIZE } from "@/utils/constants";
+import { Button, ButtonText } from "../../components/Button";
+import { useRouter } from "next/navigation";
 
 interface UploadProgress {
 	filename: string
@@ -30,7 +32,12 @@ export function Upload({
 	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
 }) {
 
+	const router = useRouter();
+
 	const { formData, setFormData, resetForm } = useUploadFormStore();
+
+	const [openSectionDialog, setOpenSectionDialog] = useState(false);
+	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
 
 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
 	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
@@ -226,11 +233,24 @@ export function Upload({
 
 	};
 
-	const [openSectionDialog, setOpenSectionDialog] = useState(false);
-	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
-
 	return (
-		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10 pb-8">
+		<div className="flex-1 flex-col w-full flex items-center justify-center pb-8">
+
+			<div
+				className="w-full mb-14"
+			>
+
+				<Button
+					Icon={ArrowLeft}
+					size="sm"
+					onClick={() => router.back()}
+				>
+					<ButtonText>
+						Exit Upload
+					</ButtonText>
+				</Button>
+
+			</div>
 
 			<div className={cn(
 				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
