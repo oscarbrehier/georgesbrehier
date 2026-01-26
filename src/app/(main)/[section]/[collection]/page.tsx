@@ -136,8 +136,10 @@ export default async function Page({
 	const defaultSectionPromise = getDefaultSectionWithCollection();
 
 	if (!section) {
+
 		section = await defaultSectionPromise;
 		if (!section) return notFound();
+
 	};
 
 	const collectionId = await getCollectionId(collectionSlug);
@@ -149,9 +151,16 @@ export default async function Page({
 	let collection = await collectionPromise;
 
 	if (!collection) {
+
 		collection = await defaultCollectionPromise;
 		if (!collection) return notFound();
+
 		redirect(`/${section.slug}/${collection.slug}`);
+
+	}
+
+	if (!section.is_visible || !collection.is_visible) {
+		return notFound();
 	};
 
 	if (collection.section.slug !== sectionSlug) {
@@ -161,11 +170,7 @@ export default async function Page({
 	const { data: galleryItems, error } = await getGalleryItems({ collectionId: collection.id });
 
 	if (error || !galleryItems || galleryItems.length == 0) {
-
-		<div className="">
-
-		</div>
-
+		return notFound();
 	};
 
 	const fullUrl = getFullUrl(`/${section.slug}/${collection.slug}`);

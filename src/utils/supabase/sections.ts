@@ -81,6 +81,30 @@ export async function getSection(sectionId: string): Promise<GallerySection | nu
 
 };
 
+export async function getPublishedSection(sectionId: string): Promise<GallerySection | null> {
+
+	"use cache"
+	cacheTag(`section-${sectionId}`);
+	cacheLife("hours");
+
+	const { data, error } = await supabase
+		.from("public_navigation")
+		.select(`
+			*,
+			navigation:public_navigation!inner(id)	
+		`)
+		.eq("id", sectionId)
+		.single();
+
+	if (error || !data) return null;
+
+	return {
+		...data,
+		is_visible: !!data.navigation
+	};
+
+};
+
 export async function getDefaultSectionWithCollection(): Promise<SectionWithDefaultCollection | null> {
 
 	"use cache"
