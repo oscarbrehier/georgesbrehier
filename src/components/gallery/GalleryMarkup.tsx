@@ -8,28 +8,29 @@ export function GalleryMarkup({
 
 	return (
 
-		<div className={`lg:flex hidden hide-scrollbar ml-36 pr-24`} id="gallery-container">
+		<div className={`h-screen lg:flex items-center hidden hide-scrollbar ml-36 pr-24 gap-10 `} id="gallery-container">
 
 			{items.map((item, idx) => (
 
 				<figure
 					key={`gallery-${item.title}-${idx}`}
-					className="panel h-screen 2xl:w-[30vw] xl:w-[40vw] w-[50vw] relative flex items-center justify-center shrink-0"
+					className="panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative flex items-center justify-center shrink-0 w-auto"
 				>
 
 					<div
 						data-itemid={item.id}
-						className="relative transition-all duration-75 ease-in-out w-3/4 h-[80%]"
+						className="relative h-[80%] w-auto transition-all ease-in-out duration-300"
 					>
+
 						<Image
 							src={item.image_url}
 							alt={item.description || item.title}
-							fill
-							className="gallery-image cursor-pointer object-contain"
-							priority={idx < 3}
+							width={800}
+							height={600}
+							className="gallery-image cursor-pointer object-contain h-full w-auto"
 							loading={idx < 3 ? "eager" : "lazy"}
-							quality={85}
 						/>
+
 					</div>
 
 					{item.title && (
