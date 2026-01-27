@@ -7,8 +7,7 @@ import { ArtworkMetadata, useUploadFormStore } from "@/stores/useUploadForm";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
 import { uploadToGalleryBatch } from "@/app/(dashboard)/actions/uploadToGallery";
-import { MAX_BODY_SIZE, UI_LABELS } from "@/utils/constants";
-import { useRouter } from "next/navigation";
+import { MAX_BODY_SIZE } from "@/utils/constants";
 import { FileSelector } from "./FileSelector";
 import { Button } from "@/components/ui/button";
 import { ImageCard } from "./ImageCard";
@@ -34,8 +33,6 @@ export function UploadV2({
 	sections: GallerySection[];
 	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
 }) {
-
-	const router = useRouter();
 
 	const { formData, setGlobalData, addItems, updateItem, removeItem, resetForm } = useUploadFormStore();
 
@@ -85,6 +82,12 @@ export function UploadV2({
 		})();
 
 	}, [formData.sectionId]);
+
+	useEffect(() => {
+		return () => {
+			if (!isLoading) resetForm();
+		};
+	}, []);
 
 	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
 
@@ -239,7 +242,7 @@ export function UploadV2({
 				});
 
 				toast.error("Images saved to storage, but database entry failed.");
-				 
+
 			} else {
 
 				setUploadProgress(prev => {
@@ -271,13 +274,29 @@ export function UploadV2({
 
 	};
 
+	function clearSuccessfulItems() {
+
+		const successfulIds = Object.entries(uploadProgress)
+			.filter(([_, progress]) => progress.status === "success")
+			.map(([id]) => id);
+
+		successfulIds.forEach(id => removeItem(id));
+
+		setUploadProgress(prev => {
+			const next = { ...prev };
+			successfulIds.forEach(id => delete next[id]);
+			return next;
+		});
+
+	};
+
 	const uploadCount = Object.values(uploadProgress).filter(p => p.status === "success").length;
 
 	return (
 
 		<div className="h-auto w-full pb-8">
 
-			<div className="w-full h-10 flex items-center justify-between fixed pr-16 bg-dashboard z-30">
+			<div className="w-full h-14 flex items-center justify-between fixed pr-16 bg-dashboard z-30">
 
 				<div>
 					<p className="text-xl text-black">Upload to gallery</p>
@@ -292,16 +311,32 @@ export function UploadV2({
 						)}
 
 						{!isLoading && (
-							<Button
-								variant="ghost"
-								size="sm"
-								className="text-muted-foreground hover:text-destructive"
-								onClick={resetForm}
-								disabled={isLoading}
-							>
-								<Trash2 className="mr-2 h-4 w-4" />
-								Clear All
-							</Button>
+
+							<div className="flex gap-4">
+
+								<Button
+									variant="ghost"
+									size="sm"
+									className="text-muted-foreground hover:text-destructive"
+									onClick={resetForm}
+									disabled={isLoading}
+								>
+									<Trash2 className="mr-2 h-4 w-4" />
+									Clear All
+								</Button>
+
+								{uploadCount > 0 && (
+									<Button
+										size="sm"
+										className="bg-green-400 hover:bg-green-300"
+										onClick={clearSuccessfulItems}
+									>
+										Clear {uploadCount} Finished
+									</Button>
+								)}
+
+							</div>
+
 						)}
 
 						<Button
@@ -325,7 +360,7 @@ export function UploadV2({
 
 			</div>
 
-			<div className="pt-14 mb-8 space-y-4">
+			<div className="pt-18 mb-8 space-y-4">
 
 				<UploadDestionation
 					formData={formData}

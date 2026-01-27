@@ -1,4 +1,4 @@
-import { ImageFile } from "@/app/(dashboard)/dashboard/upload/UploadV2";
+import { toast } from "sonner";
 import { create } from "zustand";
 
 export interface ArtworkMetadata {
@@ -38,9 +38,27 @@ export const useUploadFormStore = create<UploadFormState>((set) => ({
 	setGlobalData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
 
 	addItems: (newItems) =>
-		set((state) => ({
-			formData: { ...state.formData, items: [...state.formData.items, ...newItems] }
-		})),
+		set((state) => {
+
+			const uniqueNewItems = newItems.filter(newItem =>
+				!state.formData.items.some(existingItem =>
+					existingItem.title === newItem.title &&
+					existingItem.file.size === newItem.file.size
+				)
+			);
+
+			if (uniqueNewItems.length === 0) {
+				return state;
+			};
+
+			return {
+				formData: {
+					...state.formData,
+					items: [...state.formData.items, ...uniqueNewItems]
+				}
+			};
+
+		}),
 
 	updateItem: (id, data) =>
 		set((state) => ({
@@ -53,12 +71,30 @@ export const useUploadFormStore = create<UploadFormState>((set) => ({
 		})),
 
 	removeItem: (id) =>
-		set((state) => ({
-			formData: {
-				...state.formData,
-				items: state.formData.items.filter((item) => item.id !== id)
-			}
-		})),
+		set((state) => {
 
-	resetForm: () => set({ formData: initialState }),
+			const item = state.formData.items.find(i => i.id === id);
+
+			if (item?.preview) {
+				URL.revokeObjectURL(item.preview);
+			};
+
+			return {
+				formData: {
+					...state.formData,
+					items: state.formData.items.filter((item) => item.id !== id)
+				}
+			};
+
+		}),
+
+	resetForm: () => set((state) => {
+
+		state.formData.items.forEach(i => {
+			URL.revokeObjectURL(i.preview);
+		});
+
+		return { formData: initialState };
+
+	}),
 }));

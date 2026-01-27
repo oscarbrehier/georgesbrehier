@@ -49,7 +49,7 @@ export default async function Layout({
 		<div className="min-h-screen w-full px-8 pb-8 pt-24 bg-dashboard">
 
 			<div className={cn(
-				"w-full fixed top-0 left-0 z-50 px-8 space-y-2",
+				"w-full fixed top-0 left-0 z-50 px-8 pb-7 space-y-2 bg-dashboard",
 			)}>
 
 				<div className={cn(
