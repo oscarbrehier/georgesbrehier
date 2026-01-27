@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ArtworkMetadata } from "@/stores/useUploadForm"
-import { UploadProgress } from "./UploadV2"
+import { UploadProgress } from "./Upload"
 import { cn } from "@/utils/utils"
 
 export interface ImageData {

@@ -1,561 +1,416 @@
-// "use client"
+"use client"
 
-// import type React from "react";
-// import { useEffect, useState } from "react";
-// import { Cloud, Loader2, Check, X, ArrowLeft } from "lucide-react";
-// import { getCollectionsBySection } from "@/utils/supabase/collections";
-// import { useUploadFormStore } from "@/stores/useUploadForm";
-// import { cn } from "@/utils/utils";
-// import { Select } from "@/components/dashboard/Select";
-// import { Input } from "@/components/dashboard/Input";
-// import { CreateItemDialog } from "../../components/dialog/CreateItemDialog";
-// import { getSections } from "@/utils/supabase/sections";
-// import { useDragAndDrop } from "@/hooks/useDragAndDrop";
-// import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
-// import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
-// import { UI_LABELS } from "@/utils/constants";
-// import { MAX_BODY_SIZE } from "@/utils/constants";
-// import { Button, ButtonText } from "../../components/Button";
-// import { useRouter } from "next/navigation";
-
-// interface UploadProgress {
-// 	filename: string
-// 	status: "pending" | "uploading" | "success" | "error"
-// 	error?: string
-// };
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Upload as UploadIcon, Trash2, Loader2, X } from "lucide-react";
+import { ArtworkMetadata, useUploadFormStore } from "@/stores/useUploadForm";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
+import { uploadToGalleryBatch } from "@/app/(dashboard)/actions/uploadToGallery";
+import { MAX_BODY_SIZE } from "@/utils/constants";
+import { FileSelector } from "./FileSelector";
+import { Button } from "@/components/ui/button";
+import { ImageCard } from "./ImageCard";
+import { getCollectionsBySection } from "@/utils/supabase/collections";
+import { UploadDestionation } from "./UploadDestination";
+import { toast } from "sonner";
 
-// export function Upload({
-// 	sections: initialSections,
-// 	target,
-// }: {
-// 	sections: GallerySection[];
-// 	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
-// }) {
+export interface UploadProgress {
+	filename: string
+	status: "pending" | "uploading" | "success" | "error"
+	error?: string
+};
 
-// 	const router = useRouter();
+export interface ImageFile extends File {
+	id: string;
+	preview: string;
+};
 
-// 	const { formData, setFormData, resetForm } = useUploadFormStore();
+export function Upload({
+	sections: initialSections,
+	target,
+}: {
+	sections: GallerySection[];
+	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
+}) {
 
-// 	const [openSectionDialog, setOpenSectionDialog] = useState(false);
-// 	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
+	const { formData, setGlobalData, addItems, updateItem, removeItem, resetForm } = useUploadFormStore();
 
-// 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
-// 	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
+	const [sections, setSections] = useState<GallerySection[]>(initialSections);
+	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
 
-// 	const [isLoading, setIsLoading] = useState(false);
-// 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
-// 	const [error, setError] = useState<string | null>(null);
-// 	const [fileError, setFileError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [uploadProgress, setUploadProgress] = useState<Record<string, UploadProgress>>({});
+	const [error, setError] = useState<string | null>(null);
+	const [fileError, setFileError] = useState<string | null>(null);
 
-// 	useEffect(() => {
+	useEffect(() => {
 
-// 		if (target?.sectionId) {
+		if (target?.sectionId) {
 
-// 			setFormData({
-// 				sectionId: target?.sectionId ?? "",
-// 				collectionId: target?.collectionId ?? ""
-// 			});
+			setGlobalData({
+				sectionId: target?.sectionId ?? "",
+				collectionId: target?.collectionId ?? ""
+			});
 
-// 		} else {
+		} else {
 
-// 			setFormData({
-// 				sectionId: "",
-// 				collectionId: ""
-// 			});
+			setGlobalData({
+				sectionId: "",
+				collectionId: ""
+			});
 
-// 		};
+		};
 
-// 		if (target?.collections) {
-// 			setCollections(target.collections);
-// 		} else if (!target?.sectionId) {
-// 			setCollections(null);
-// 		};
+		if (target?.collections) {
+			setCollections(target.collections);
+		} else if (!target?.sectionId) {
+			setCollections(null);
+		};
 
-// 	}, [target, setFormData]);
+	}, [target, setGlobalData]);
 
-// 	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
+	useEffect(() => {
 
-// 	const processImages = (files: FileList) => {
+		if (!formData.sectionId) return;
 
-// 		setFileError(null);
+		(async () => {
 
-// 		const imageFiles: File[] = [];
-// 		const previews: string[] = [];
-// 		const rejectedFiles: string[] = [];
+			const res = await getCollectionsBySection(formData.sectionId);
+			setCollections(res);
 
-// 		Array.from(files).forEach((file) => {
+		})();
 
-// 			if (!file.type.startsWith("image/")) return;
+	}, [formData.sectionId]);
 
-// 			if (file.size > MAX_BODY_SIZE) {
-// 				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
-// 				return;
-// 			};
+	useEffect(() => {
+		return () => {
+			if (!isLoading) resetForm();
+		};
+	}, []);
 
-// 			imageFiles.push(file);
-// 			previews.push(URL.createObjectURL(file));
+	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
 
-// 		});
+	const processImages = (files: FileList) => {
 
-// 		if (rejectedFiles.length > 0) {
-// 			setFileError(`Skipped ${rejectedFiles.length} file(s) over ${toMB(MAX_BODY_SIZE)}MB: ${rejectedFiles.join(", ")}`);
-// 			setTimeout(() => setFileError(null), 5000);
-// 			if (imageFiles.length === 0) return;
-// 		};
+		setFileError(null);
 
-// 		if (imageFiles.length === 0 && rejectedFiles.length === 0) {
-// 			setError("No valid image files selected");
-// 			setTimeout(() => setError(null), 3000);
-// 			return;
-// 		}
+		const items: ArtworkMetadata[] = [];
+		const rejectedFiles: string[] = [];
 
-// 		setFormData({
-// 			images: [...formData.images, ...imageFiles],
-// 			imagePreviews: [...formData.imagePreviews, ...previews],
-// 		});
+		Array.from(files).forEach((file) => {
 
-// 		drag.resetDrag();
-// 		if (imageFiles.length > 0 && rejectedFiles.length === 0) {
-// 			setError(null);
-// 		}
+			if (!file.type.startsWith("image/")) return;
 
-// 	};
+			if (file.size > MAX_BODY_SIZE) {
+				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
+				return;
+			};
 
-// 	const drag = useDragAndDrop(processImages);
+			const id = crypto.randomUUID();
 
-// 	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+			items.push({
+				id,
+				file,
+				preview: URL.createObjectURL(file),
+				title: file.name,
+				description: ""
+			});
 
-// 		const files = e.currentTarget.files;
+		});
 
-// 		if (files && files.length > 0) {
-// 			processImages(files);
-// 		};
+		if (rejectedFiles.length > 0) {
+			setFileError(`Skipped ${rejectedFiles.length} file(s) over ${toMB(MAX_BODY_SIZE)}MB: ${rejectedFiles.join(", ")}`);
+			setTimeout(() => setFileError(null), 5000);
+			if (items.length === 0) return;
+		};
 
-// 	};
+		if (items.length === 0 && rejectedFiles.length === 0) {
+			toast("No valid image files selected");
+			return;
+		}
 
-// 	const removeImage = (index: number) => {
+		addItems(items);
 
-// 		setFormData({
-// 			images: formData.images.filter((_, i) => i !== index),
-// 			imagePreviews: formData.imagePreviews.filter((_, i) => i !== index),
-// 		});
+		drag.resetDrag();
+		if (items.length > 0 && rejectedFiles.length === 0) {
+			setError(null);
+		}
 
-// 	};
+	};
 
-// 	const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+	const drag = useDragAndDrop(processImages);
 
-// 		const { name, value } = e.currentTarget;
+	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-// 		if (name === "sectionId") {
+		const files = e.currentTarget.files;
 
-// 			const collectionsRes = await getCollectionsBySection(value);
-// 			setCollections(collectionsRes ?? null);
+		if (files && files.length > 0) {
+			processImages(files);
+		};
 
-// 			setFormData({
-// 				sectionId: value,
-// 				collectionId: "",
-// 			});
+	};
 
-// 			return;
+	const handleSubmit = async (e: React.FormEvent) => {
 
-// 		};
+		e.preventDefault();
+		setError(null);
 
-// 		setFormData({
-// 			[name]: value,
-// 		});
+		if (formData.items.length === 0 || !formData.sectionId || !formData.collectionId) {
 
+			toast.error("Missing required fields. Please select a destination and add images.");
+			return;
 
-// 	};
+		};
 
-// 	const handleSubmit = async (e: React.FormEvent) => {
+		const hasEmptyTitles = formData.items.some(i => !i.title.trim());
 
-// 		e.preventDefault();
-// 		setError(null);
+		if (hasEmptyTitles) {
 
-// 		if (formData.images.length === 0 || !formData.title || !formData.collectionId) {
-// 			setError("Please fill in required fields and select at least one image");
-// 			return;
-// 		};
+			setError("All items must have a title.");
+			toast.error("One or more images are missing a title");
+			return;
 
-// 		setIsLoading(true);
+		};
 
-// 		const progress: UploadProgress[] = formData.images.map((img) => ({
-// 			filename: img.name,
-// 			status: "pending"
-// 		}));
+		setIsLoading(true);
 
-// 		setUploadProgress(progress);
+		const initalProgress: Record<string, UploadProgress> = {};
+		formData.items.forEach(item => initalProgress[item.id] = { filename: item.title, status: "pending" });
 
-// 		for (let i = 0; i < formData.images.length; i++) {
+		setUploadProgress(initalProgress);
 
-// 			const file = formData.images[i];
+		const uploadItems: any[] = [];
+		let hasError = false;
 
-// 			setUploadProgress((prev) =>
-// 				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
-// 			);
+		for (const galleryItem of formData.items) {
 
-// 			const { url, error: imageError } = await uploadImage(file);
+			const itemId = galleryItem.id;
 
-// 			if (imageError || !url) {
-// 				setError(imageError || "Upload failed");
-// 				setIsLoading(false);
-// 				return;
-// 			};
+			setUploadProgress(prev => ({
+				...prev,
+				[itemId]: { ...prev[itemId], status: "uploading" }
+			}));
 
-// 			const itemTitle = formData.images.length > 1
-// 				? `${formData.title} - ${i + 1}`
-// 				: formData.title;
+			const { data: cloudData, error: imageError } = await uploadImage(galleryItem.file);
 
-// 			const { error: galleryError } = await uploadToGallery(itemTitle, formData.description, url, formData.collectionId);
+			if (imageError || !cloudData?.url) {
 
-// 			setUploadProgress((prev) =>
-// 				prev.map((p, idx) => idx === i ? {
-// 					...p,
-// 					status: galleryError ? "error" : "success",
-// 					...(galleryError && { error: galleryError })
-// 				} : p)
-// 			);
+				setUploadProgress(prev => ({
+					...prev,
+					[itemId]: { ...prev[itemId], status: "error", error: imageError || "Storage failed" }
+				}));
 
-// 		};
+				hasError = true;
+				continue;
 
-// 		setIsLoading(false);
+			};
 
-// 		const allSuccess = uploadProgress.every(p => p.status === "success");
+			uploadItems.push({
+				title: galleryItem.title.trim(),
+				description: galleryItem.description,
+				collection_id: formData.collectionId,
+				width: galleryItem.width ? Number(galleryItem.width) : null,
+				height: galleryItem.height ? Number(galleryItem.height) : null,
+				image_url: cloudData.url,
+				image_width: cloudData.image_width,
+				image_height: cloudData.image_height,
+				cloudinary_public_id: cloudData.cloudinary_public_id,
+			});
 
-// 		if (allSuccess) {
+			setUploadProgress(prev => ({ ...prev, [galleryItem.id]: { ...prev[galleryItem.id], status: "uploading" } }));
 
-// 			setTimeout(() => {
-// 				resetForm();
-// 				setUploadProgress([]);
-// 			}, 2000);
+		};
 
-// 		};
+		if (uploadItems.length > 0) {
 
-// 	};
+			const { error: batchError } = await uploadToGalleryBatch(uploadItems);
 
-// 	return (
-// 		<div className="flex-1 flex-col w-full flex items-center justify-center pb-8">
+			if (batchError) {
 
-// 			<div
-// 				className="w-full mb-14"
-// 			>
+				hasError = true;
 
-// 				<Button
-// 					Icon={ArrowLeft}
-// 					size="sm"
-// 					onClick={() => router.back()}
-// 				>
-// 					<ButtonText>
-// 						Exit Upload
-// 					</ButtonText>
-// 				</Button>
+				setUploadProgress(prev => {
+					const next = { ...prev };
+					formData.items.forEach(item => {
+						if (next[item.id].status === "uploading") {
+							next[item.id].status = "error";
+							next[item.id].error = "Database save failed";
+						}
+					});
+					return next;
+				});
 
-// 			</div>
+				toast.error("Images saved to storage, but database entry failed.");
 
-// 			<div className={cn(
-// 				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
-// 			)}>
+			} else {
 
-// 				<p className="text-5xl text-black">Upload to gallery</p>
-// 				<p className="text-neutral-500">Upload single or multiple items to the gallery</p>
+				setUploadProgress(prev => {
 
-// 			</div>
+					const next = { ...prev };
 
-// 			<CreateItemDialog
-// 				type="section"
-// 				onSuccess={async () => {
-// 					const sectionsRes = await getSections();
-// 					setSections(sectionsRes);
-// 				}}
-// 				open={openSectionDialog}
-// 				onOpenChange={setOpenSectionDialog}
-// 			></CreateItemDialog>
+					formData.items.forEach(item => {
+						if (next[item.id].status !== "error") next[item.id].status = "success";
+					});
 
-// 			<CreateItemDialog
-// 				type="collection"
-// 				onSuccess={async () => {
-// 					if (formData.sectionId) {
-// 						const collectionRes = await getCollectionsBySection(formData.sectionId);
-// 						setCollections(collectionRes);
-// 					}
-// 				}}
-// 				open={openCollectionDialog}
-// 				onOpenChange={setOpenCollectionDialog}
-// 			></CreateItemDialog>
+					return next;
 
-// 			<div className="w-full max-w-4xl">
+				})
 
-// 				<form onSubmit={handleSubmit} className="space-y-8">
+			};
 
-// 					<div className="flex flex-col space-y-2">
+		};
 
-// 						<div
-// 							onDragEnter={drag.handleDragEnter}
-// 							onDragLeave={drag.handleDragLeave}
-// 							onDragOver={drag.handleDragOver}
-// 							onDrop={drag.handleDrop}
-// 							className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
-// 								? "border-neutral-400 bg-dashboard"
-// 								: "border-neutral-200"
-// 								}`}
-// 						>
+		setIsLoading(false);
 
-// 							<input
-// 								id="image_input"
-// 								type="file"
-// 								accept="image/jpeg,image/png,image/webp"
-// 								multiple
-// 								onChange={handleFileInputChange}
-// 								className="hidden"
-// 							/>
+		if (!hasError && uploadItems.length === formData.items.length) {
 
-// 							{formData.images.length > 0 ? (
+			toast.success("All items uploaded successfully");
+			setTimeout(() => { resetForm(); setUploadProgress({}); }, 2000);
 
-// 								<div className="p-6">
+		} else if (hasError) {
+			toast.error("Some items failed to upload. Please check errors.");
+		};
 
-// 									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+	};
 
-// 										{formData.imagePreviews.map((preview, index) => (
+	function clearSuccessfulItems() {
 
-// 											<div key={index} className="relative group">
+		const successfulIds = Object.entries(uploadProgress)
+			.filter(([_, progress]) => progress.status === "success")
+			.map(([id]) => id);
 
-// 												<img
-// 													src={preview}
-// 													alt={`Preview ${index + 1}`}
-// 													className="w-full h-32 object-cover rounded-lg"
-// 												/>
+		successfulIds.forEach(id => removeItem(id));
 
-// 												<button
-// 													type="button"
-// 													onClick={() => removeImage(index)}
-// 													className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-// 												>
-// 													<X className="w-4 h-4" />
-// 												</button>
+		setUploadProgress(prev => {
+			const next = { ...prev };
+			successfulIds.forEach(id => delete next[id]);
+			return next;
+		});
 
-// 											</div>
+	};
 
-// 										))}
+	const uploadCount = Object.values(uploadProgress).filter(p => p.status === "success").length;
 
-// 									</div>
+	return (
 
-// 									<button
-// 										type="button"
-// 										onClick={() => document.getElementById("image_input")?.click()}
-// 										className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
-// 									>
-// 										Add more images
-// 									</button>
+		<div className="h-auto w-full pb-8">
 
-// 								</div>
+			<div className="w-full h-14 flex items-center justify-between fixed pr-16 bg-dashboard z-30">
 
-// 							) : (
+				<div>
+					<p className="text-xl text-black">Upload to gallery</p>
+				</div>
 
-// 								<div className="px-12 py-8 text-center">
+				{formData.items.length > 0 && (
 
-// 									<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dashboard mb-4">
-// 										<Cloud className="w-8 h-8 text-neutral-600" />
-// 									</div>
+					<div className="flex items-center space-x-4">
 
-// 									<h3 className="text-lg font-medium text-neutral-900 mb-2">
-// 										Drag your images here
-// 									</h3>
+						{isLoading && (
+							<p className="text-sm text-muted-foreground">Images uploaded: {uploadCount}/{formData.items.length}</p>
+						)}
 
-// 									<p className="text-sm text-neutral-600 mb-4">
-// 										or click to browse (multiple files supported)
-// 									</p>
+						{!isLoading && (
 
-// 									<label htmlFor="image_input" className="inline-block">
-// 										<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
-// 											Select images
-// 										</span>
-// 									</label>
+							<div className="flex gap-4">
 
-// 								</div>
+								<Button
+									variant="ghost"
+									size="sm"
+									className="text-muted-foreground hover:text-destructive"
+									onClick={resetForm}
+									disabled={isLoading}
+								>
+									<Trash2 className="mr-2 h-4 w-4" />
+									Clear All
+								</Button>
 
-// 							)}
+								{uploadCount > 0 && (
+									<Button
+										size="sm"
+										className="bg-green-400 hover:bg-green-300"
+										onClick={clearSuccessfulItems}
+									>
+										Clear {uploadCount} Finished
+									</Button>
+								)}
 
-// 						</div>
+							</div>
 
-// 						{fileError && (
-// 							<div className="p-4 rounded-lg bg-red-50 border border-red-200 flex justify-between">
-// 								<p className="text-sm text-red-600">{fileError}</p>
+						)}
 
-// 								<button
-// 									onClick={() => setFileError(null)}
-// 									className="text-red-700 cursor-pointer"
-// 								>
-// 									<X size={18} />
-// 								</button>
+						<Button
+							size="sm"
+							onClick={handleSubmit}
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<Loader2 className="animate-spin h-4 w-4" />
+							) : (
+								<>
+									<UploadIcon className="mr-2 h-4 w-4" />
+									Upload {formData.items.length} images
+								</>
+							)}
+						</Button>
 
-// 							</div>
-// 						)}
+					</div>
 
-// 					</div>
+				)}
 
-// 					<div className="space-y-4">
+			</div>
 
-// 						<Input
-// 							label={<>Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}</>}
-// 							id="title"
-// 							type="text"
-// 							name="title"
-// 							value={formData.title}
-// 							onChange={handleInputChange}
-// 						/>
+			<div className="pt-18 mb-8 space-y-4">
 
-// 						<div>
+				<UploadDestionation
+					formData={formData}
+					onChange={(sectionId, collectionId) => setGlobalData({ sectionId, collectionId })}
+					sections={sections}
+					onSectionsChange={setSections}
+					collections={collections}
+					onCollectionsChange={setCollections}
+				/>
 
-// 							<label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
-// 								Description
-// 							</label>
+				<FileSelector
+					drag={drag}
+					onInputChange={handleFileInputChange}
+				/>
 
-// 							<textarea
-// 								id="description"
-// 								name="description"
-// 								value={formData.description}
-// 								onChange={handleInputChange}
-// 								rows={2}
-// 								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
-// 							/>
+				{(fileError || error) && (
+					<div className="p-4 rounded-lg bg-red-50 border border-red-200 flex justify-between">
+						<p className="text-sm text-red-600">{fileError || error}</p>
 
-// 						</div>
+						<button
+							onClick={() => setFileError(null)}
+							className="text-red-700 cursor-pointer"
+						>
+							<X size={18} />
+						</button>
 
-// 						<div>
+					</div>
+				)}
 
-// 							<Select
-// 								label={UI_LABELS.section.capitalized}
-// 								id="section"
-// 								name="sectionId"
-// 								value={formData.sectionId}
-// 								onChange={handleInputChange}
-// 							>
-// 								<option value="">Choose a section</option>
-// 								{sections.map((section) => (
-// 									<option
-// 										key={section.id}
-// 										className="capitalize"
-// 										value={section.id}>{section.title}</option>
-// 								))}
-// 							</Select>
+			</div>
 
-// 							<button
-// 								type="button"
-// 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
-// 								onClick={() => setOpenSectionDialog(true)}
-// 							>
-// 								Create a new {UI_LABELS.section.singular}
-// 							</button>
+			<div className="grid grid-cols-5 gap-2">
 
-// 						</div>
+				{formData.items.map((item, index) => (
 
-// 						<div>
+					<ImageCard
+						key={index}
+						data={item}
+						onRemove={removeItem}
+						onUpdate={updateItem}
+						progress={uploadProgress[item.id]}
+						disabled={isLoading}
+					/>
 
-// 							<Select
-// 								label={UI_LABELS.collection.capitalized}
-// 								id="collection"
-// 								name="collectionId"
-// 								value={formData.collectionId}
-// 								onChange={handleInputChange}
-// 								disabled={!collections}
-// 							>
-// 								<option value="">Choose a collection</option>
-// 								{collections?.map((collection) => (
-// 									<option
-// 										key={collection.id}
-// 										className="capitalize"
-// 										value={collection.id}>{collection.title}</option>
-// 								))}
-// 							</Select>
+				))}
 
-// 							<button
-// 								type="button"
-// 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
-// 								onClick={() => setOpenCollectionDialog(true)}
-// 							>
-// 								Create a new {UI_LABELS.collection.singular}
-// 							</button>
+			</div>
 
-// 						</div>
+		</div>
 
-// 					</div>
+	);
 
-// 					{uploadProgress.length > 0 && (
-
-// 						<div className="space-y-2">
-
-// 							<h4 className="text-sm font-medium text-neutral-700">Upload Progress</h4>
-
-// 							{uploadProgress.map((progress, index) => (
-
-// 								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dashboard border border-neutral-200">
-
-// 									{progress.status === "pending" && (
-// 										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
-// 									)}
-
-// 									{progress.status === "uploading" && (
-// 										<Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
-// 									)}
-
-// 									{progress.status === "success" && (
-// 										<Check className="w-5 h-5 text-green-600 shrink-0" />
-// 									)}
-
-// 									{progress.status === "error" && (
-// 										<X className="w-5 h-5 text-red-600 shrink-0" />
-// 									)}
-
-// 									<div className="flex-1 min-w-0">
-// 										<p className="text-sm text-neutral-900 truncate">{progress.filename}</p>
-// 										{progress.error && (
-// 											<p className="text-xs text-red-600">{progress.error}</p>
-// 										)}
-// 									</div>
-
-// 								</div>
-
-// 							))}
-
-// 						</div>
-
-// 					)}
-
-// 					{error && (
-// 						<div className="p-4 rounded-lg bg-red-50 border border-red-200">
-// 							<p className="text-sm text-red-600">{error}</p>
-// 						</div>
-// 					)}
-
-// 					<button
-// 						type="submit"
-// 						disabled={isLoading}
-// 						className="w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-// 					>
-
-// 						{isLoading ? (
-
-// 							<>
-// 								<Loader2 className="w-5 h-5 animate-spin" />
-// 								Uploading {uploadProgress.filter(p => p.status === "success").length} / {formData.images.length}
-// 							</>
-
-// 						) : (
-
-// 							<>
-// 								Upload {formData.images.length > 0 && `(${formData.images.length} image${formData.images.length > 1 ? 's' : ''})`}
-// 							</>
-
-// 						)}
-
-// 					</button>
-
-// 				</form>
-
-// 			</div>
-
-// 		</div>
-
-// 	);
-
-// };
+};

@@ -36,16 +36,16 @@ export function ImageGallery({
 
 		try {
 
-			const { url, error } = await uploadImage(file);
+			const { data, error } = await uploadImage(file);
 
-			if (!error || !url) {
+			if (!error || !data?.url) {
 				toast("Image upload failed", { description: error });
 				return;
 			};
 
 			const newItem: GalleryItemSubset = {
 				id: crypto.randomUUID(),
-				image_url: url,
+				image_url: data.url,
 				title: file.name,
 			};
 
