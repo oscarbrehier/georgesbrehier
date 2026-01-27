@@ -6,7 +6,7 @@ import { Upload, Trash2, Loader2, X } from "lucide-react";
 import { ArtworkMetadata, useUploadFormStore } from "@/stores/useUploadForm";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
-import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
+import { uploadToGalleryBatch } from "@/app/(dashboard)/actions/uploadToGallery";
 import { MAX_BODY_SIZE, UI_LABELS } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { FileSelector } from "./FileSelector";
@@ -177,6 +177,9 @@ export function UploadV2({
 
 		setUploadProgress(initalProgress);
 
+		const uploadItems: any[] = [];
+		let hasError = false;
+
 		for (const galleryItem of formData.items) {
 
 			const itemId = galleryItem.id;
@@ -186,43 +189,84 @@ export function UploadV2({
 				[itemId]: { ...prev[itemId], status: "uploading" }
 			}));
 
-			const { url, error: imageError } = await uploadImage(galleryItem.file);
+			const { data: cloudData, error: imageError } = await uploadImage(galleryItem.file);
 
-			if (imageError || !url) {
+			if (imageError || !cloudData?.url) {
 
 				setUploadProgress(prev => ({
 					...prev,
 					[itemId]: { ...prev[itemId], status: "error", error: imageError || "Storage failed" }
 				}));
 
+				hasError = true;
 				continue;
 
 			};
 
-			const { error: galleryError } = await uploadToGallery(galleryItem.title, galleryItem.description, url, formData.collectionId);
+			uploadItems.push({
+				title: galleryItem.title.trim(),
+				description: galleryItem.description,
+				collection_id: formData.collectionId,
+				width: galleryItem.width ? Number(galleryItem.width) : null,
+				height: galleryItem.height ? Number(galleryItem.height) : null,
+				image_url: cloudData.url,
+				image_width: cloudData.image_width,
+				image_height: cloudData.image_height,
+				cloudinary_public_id: cloudData.cloudinary_public_id,
+			});
 
-			setUploadProgress(prev => ({
-				...prev,
-				[itemId]: { ...prev[itemId], status: galleryError ? "error" : "success", error: galleryError || undefined }
-			}));
+			setUploadProgress(prev => ({ ...prev, [galleryItem.id]: { ...prev[galleryItem.id], status: "uploading" } }));
+
+		};
+
+		if (uploadItems.length > 0) {
+
+			const { error: batchError } = await uploadToGalleryBatch(uploadItems);
+
+			if (batchError) {
+
+				hasError = true;
+
+				setUploadProgress(prev => {
+					const next = { ...prev };
+					formData.items.forEach(item => {
+						if (next[item.id].status === "uploading") {
+							next[item.id].status = "error";
+							next[item.id].error = "Database save failed";
+						}
+					});
+					return next;
+				});
+
+				toast.error("Images saved to storage, but database entry failed.");
+				 
+			} else {
+
+				setUploadProgress(prev => {
+
+					const next = { ...prev };
+
+					formData.items.forEach(item => {
+						if (next[item.id].status !== "error") next[item.id].status = "success";
+					});
+
+					return next;
+
+				})
+
+			};
 
 		};
 
 		setIsLoading(false);
 
-		const allSuccess = Object.values(uploadProgress).every(p => p.status === "success");
-
-		if (allSuccess) {
+		if (!hasError && uploadItems.length === formData.items.length) {
 
 			toast.success("All items uploaded successfully");
+			setTimeout(() => { resetForm(); setUploadProgress({}); }, 2000);
 
-			setTimeout(() => {
-				resetForm();
-				setUploadProgress({});
-			}, 2000);
-
-		} else {
-			toast.error("Some uploads failed. Please check the red indicators");
+		} else if (hasError) {
+			toast.error("Some items failed to upload. Please check errors.");
 		};
 
 	};

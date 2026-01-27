@@ -3,32 +3,42 @@
 import { supabase } from "@/lib/supabase";
 import { revalidateTag } from "next/cache";
 
-export async function uploadToGallery(title: string, description: string, image_url: string, collectionId: string): Promise<{
-	result: any[] | null;
+interface UploadData {
+	title: string;
+	description: string;
+	image_url: string;
+	collection_id: string;
+	width?: number;
+	height?: number;
+	image_width: number;
+	image_height: number;
+	cloudinary_public_id: string;
+};
+
+export async function uploadToGalleryBatch(items: UploadData[]): Promise<{
 	error: string | null;
 }> {
 
+	if (items.length === 0) return { error: null };
+
 	try {
 
-		const { data, error } = await supabase
+		const { error } = await supabase
 			.from("works")
-			.insert([{ title, description, image_url, collection_id: collectionId }])
-			.select();
+			.insert(items);
 
-		if (error) return { result: null, error: error.message }
+		if (error) return { error: error.message }
 
 		revalidateTag("sections", "max");
+
+		const collectionId = items[0].collection_id;
 		revalidateTag(`collection-${collectionId}-gallery`, "max");
 
-		return { result: data, error: null };
+		return { error: null };
 
 	} catch (err) {
-
-		console.error("Gallery upload failed:", err);
-
-		const message = err instanceof Error ? err.message : "Upload failed";
-		return { result: null, error: message };
-
+		console.log(err)
+		return { error: err instanceof Error ? err.message : "Upload failed" };
 	};
 
 };

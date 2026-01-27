@@ -7,8 +7,8 @@ export interface ArtworkMetadata {
 	preview: string;
 	title: string;
 	description: string;
-	width?: string;
-	height?: string;
+	width?: number;
+	height?: number;
 };
 
 export interface UploadFormData {
