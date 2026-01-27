@@ -1,7 +1,6 @@
-import { use } from "react";
-import { Upload } from "./Upload";
 import { getSections } from "@/utils/supabase/sections";
 import { getCollectionsBySection } from "@/utils/supabase/collections";
+import { UploadV2 } from "./UploadV2";
 
 export default async function Page({
 	searchParams
@@ -29,7 +28,7 @@ export default async function Page({
 
 	return (
 
-		<Upload
+		<UploadV2
 			sections={sections}
 			target={{ sectionId, collectionId, collections: targetCollections }}
 		/>
