@@ -4,6 +4,7 @@ import { roboto } from "@/utils/fonts";
 import { cn } from "@/lib/utils";
 import { getNavSections, getSections } from "@/utils/supabase/sections";
 import Link from "next/link";
+import { SectionsNav } from "./SectionsNav";
 
 export default async function Layout({
 	children,
@@ -30,21 +31,9 @@ export default async function Layout({
 					</h1>
 				</div>
 
-				<div className="col-span-3 h-full flex items-center justify-center space-x-12">
-
-					{navItems.map((section) => (
-
-						<Link
-							key={section.id}
-							href={`/${section.slug}`}
-							className="capitalize text-[15px]"
-						>
-							{section.title}
-						</Link>
-
-					))}
-
-				</div>
+				<SectionsNav
+					sections={navItems}
+				/>
 
 				<div className="col-span-1 flex items-center justify-between">
 					<p className="text-[15px]">History</p>

@@ -113,7 +113,7 @@ export function ImageGallery({
 						{
 							isImageUploading ? (
 
-								<Loader2 className="size-8 text-blue-600 animate-spin flex-shrink-0" />
+								<Loader2 className="size-8 text-blue-600 animate-spin shrink-0" />
 
 							) : (
 
