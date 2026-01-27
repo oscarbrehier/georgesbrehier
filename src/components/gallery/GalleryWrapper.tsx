@@ -1,16 +1,24 @@
 import { GalleryAnimator } from "./GalleryAnimator";
 import { GalleryMarkup } from "./GalleryMarkup";
 
-export default function GalleryWrapper({ 
-	items
+export default async function GalleryWrapper({
+	items,
+	sectionId,
+	currentCollection
 }: {
-	items: GalleryItem[]
+	items: GalleryItem[];
+	sectionId: string;
+	currentCollection: string;
 }) {
 
 	return (
 
 		<>
-			<GalleryMarkup items={items} />
+			<GalleryMarkup
+				sectionId={sectionId}
+				currentCollection={currentCollection}
+				items={items}
+			/>
 			<GalleryAnimator items={items} />
 		</>
 

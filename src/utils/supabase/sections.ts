@@ -89,10 +89,7 @@ export async function getPublishedSection(sectionId: string): Promise<GallerySec
 
 	const { data, error } = await supabase
 		.from("public_navigation")
-		.select(`
-			*,
-			navigation:public_navigation!inner(id)	
-		`)
+		.select(`*`)
 		.eq("id", sectionId)
 		.single();
 
@@ -100,7 +97,7 @@ export async function getPublishedSection(sectionId: string): Promise<GallerySec
 
 	return {
 		...data,
-		is_visible: !!data.navigation
+		is_visible: true
 	};
 
 };

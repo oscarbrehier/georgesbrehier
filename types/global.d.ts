@@ -10,6 +10,8 @@ declare global {
 		title: string;
 		description: string;
 		image_url: string;
+		image_width: number;
+		image_height: number;
 		section: string;
 		position: number;
 		created_at: string;

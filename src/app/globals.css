@@ -85,7 +85,7 @@
 	body {
 		background-color: #fffaf0;
 		color: var(--foreground);
-		scroll-behavior: smooth;
+		/* scroll-behavior: smooth; */
 	}
 }
 
@@ -96,7 +96,7 @@ html {
 	font-family: Arial, Helvetica, sans-serif;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
-	scroll-behavior: smooth;
+	/* scroll-behavior: smooth; */
 }
 
 html::-webkit-scrollbar,

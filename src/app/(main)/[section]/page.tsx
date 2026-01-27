@@ -24,7 +24,7 @@ export default async function SectionPage({
 		redirect(`${defaultSection.slug}/${defaultSection.defaultCollection.slug}`);
 
 	};
-	
+
 	if (!section.is_visible) {
 		return notFound();
 	};
