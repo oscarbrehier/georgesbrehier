@@ -9,33 +9,46 @@ cloudinary.config({
 });
 
 export interface UploadImageState {
-	url: string | null;
+	data: null | {
+		url: string | null;
+		image_width?: number;
+		image_height?: number;
+		cloudinary_public_id?: string;
+	};
 	error: string | null;
 };
 
 export async function uploadImage(file: File): Promise<UploadImageState> {
 
-	if (!file) return { url: null, error: "No was file uploaded" };
-	
+	if (!file) return { data: null, error: "No was file uploaded" };
+
 	try {
-		
-			const arrayBuffer = await file.arrayBuffer();
-			const buffer = Buffer.from(arrayBuffer);
-			const base64File = `data:${file.type};base64,${buffer.toString("base64")}`;
-		
+
+		const arrayBuffer = await file.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
+		const base64File = `data:${file.type};base64,${buffer.toString("base64")}`;
+
 		const res = await cloudinary.uploader.upload(base64File, {
 			folder: "portfolio",
 			tags: ['artwork']
 		});
 
-		return { url: res.secure_url, error: null };
+		return {
+			data: {
+				url: res.secure_url,
+				image_width: res.width,
+				image_height: res.height,
+				cloudinary_public_id: res.public_id,
+			},
+			error: null
+		};
 
 	} catch (err) {
 
 		console.error("Cloudinary image upload failed:", err);
 
 		const message = err instanceof Error ? err.message : "Upload failed";
-		return { url: null, error: message };
+		return { data: null, error: message };
 
 	};
 

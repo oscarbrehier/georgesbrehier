@@ -1,541 +1,561 @@
-"use client"
-
-import type React from "react";
-import { useEffect, useState } from "react";
-import { Cloud, Loader2, Check, X } from "lucide-react";
-import { getCollectionsBySection } from "@/utils/supabase/collections";
-import { useUploadFormStore } from "@/stores/useUploadForm";
-import { cn } from "@/utils/utils";
-import { Select } from "@/components/dashboard/Select";
-import { Input } from "@/components/dashboard/Input";
-import { CreateItemDialog } from "@/app/(dashboard)/components/CreateItemDialog";
-import { getSections } from "@/utils/supabase/sections";
-import { useDragAndDrop } from "@/hooks/useDragAndDrop";
-import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
-import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
-import { UI_LABELS } from "@/utils/constants";
-import { MAX_BODY_SIZE } from "@/utils/constants";
-
-interface UploadProgress {
-	filename: string
-	status: "pending" | "uploading" | "success" | "error"
-	error?: string
-};
+// "use client"
 
-export function Upload({
-	sections: initialSections,
-	target,
-}: {
-	sections: GallerySection[];
-	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
-}) {
+// import type React from "react";
+// import { useEffect, useState } from "react";
+// import { Cloud, Loader2, Check, X, ArrowLeft } from "lucide-react";
+// import { getCollectionsBySection } from "@/utils/supabase/collections";
+// import { useUploadFormStore } from "@/stores/useUploadForm";
+// import { cn } from "@/utils/utils";
+// import { Select } from "@/components/dashboard/Select";
+// import { Input } from "@/components/dashboard/Input";
+// import { CreateItemDialog } from "../../components/dialog/CreateItemDialog";
+// import { getSections } from "@/utils/supabase/sections";
+// import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+// import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
+// import { uploadToGallery } from "@/app/(dashboard)/actions/uploadToGallery";
+// import { UI_LABELS } from "@/utils/constants";
+// import { MAX_BODY_SIZE } from "@/utils/constants";
+// import { Button, ButtonText } from "../../components/Button";
+// import { useRouter } from "next/navigation";
+
+// interface UploadProgress {
+// 	filename: string
+// 	status: "pending" | "uploading" | "success" | "error"
+// 	error?: string
+// };
 
-	const { formData, setFormData, resetForm } = useUploadFormStore();
+// export function Upload({
+// 	sections: initialSections,
+// 	target,
+// }: {
+// 	sections: GallerySection[];
+// 	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
+// }) {
 
-	const [sections, setSections] = useState<GallerySection[]>(initialSections);
-	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
+// 	const router = useRouter();
 
-	const [isLoading, setIsLoading] = useState(false);
-	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [fileError, setFileError] = useState<string | null>(null);
+// 	const { formData, setFormData, resetForm } = useUploadFormStore();
 
-	useEffect(() => {
+// 	const [openSectionDialog, setOpenSectionDialog] = useState(false);
+// 	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
 
-		if (target?.sectionId) {
+// 	const [sections, setSections] = useState<GallerySection[]>(initialSections);
+// 	const [collections, setCollections] = useState<GalleryCollection[] | null>(target?.collections ?? null);
 
-			setFormData({
-				sectionId: target?.sectionId ?? "",
-				collectionId: target?.collectionId ?? ""
-			});
+// 	const [isLoading, setIsLoading] = useState(false);
+// 	const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+// 	const [error, setError] = useState<string | null>(null);
+// 	const [fileError, setFileError] = useState<string | null>(null);
 
-		} else {
+// 	useEffect(() => {
 
-			setFormData({
-				sectionId: "",
-				collectionId: ""
-			});
+// 		if (target?.sectionId) {
 
-		};
+// 			setFormData({
+// 				sectionId: target?.sectionId ?? "",
+// 				collectionId: target?.collectionId ?? ""
+// 			});
 
-		if (target?.collections) {
-			setCollections(target.collections);
-		} else if (!target?.sectionId) {
-			setCollections(null);
-		};
+// 		} else {
 
-	}, [target, setFormData]);
+// 			setFormData({
+// 				sectionId: "",
+// 				collectionId: ""
+// 			});
 
-	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
+// 		};
 
-	const processImages = (files: FileList) => {
+// 		if (target?.collections) {
+// 			setCollections(target.collections);
+// 		} else if (!target?.sectionId) {
+// 			setCollections(null);
+// 		};
 
-		setFileError(null);
+// 	}, [target, setFormData]);
 
-		const imageFiles: File[] = [];
-		const previews: string[] = [];
-		const rejectedFiles: string[] = [];
+// 	const toMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
 
-		Array.from(files).forEach((file) => {
+// 	const processImages = (files: FileList) => {
 
-			if (!file.type.startsWith("image/")) return;
+// 		setFileError(null);
 
-			if (file.size > MAX_BODY_SIZE) {
-				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
-				return;
-			};
+// 		const imageFiles: File[] = [];
+// 		const previews: string[] = [];
+// 		const rejectedFiles: string[] = [];
 
-			imageFiles.push(file);
-			previews.push(URL.createObjectURL(file));
+// 		Array.from(files).forEach((file) => {
 
-		});
+// 			if (!file.type.startsWith("image/")) return;
 
-		if (rejectedFiles.length > 0) {
-			setFileError(`Skipped ${rejectedFiles.length} file(s) over ${toMB(MAX_BODY_SIZE)}MB: ${rejectedFiles.join(", ")}`);
-			setTimeout(() => setFileError(null), 5000);
-			if (imageFiles.length === 0) return;
-		};
+// 			if (file.size > MAX_BODY_SIZE) {
+// 				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
+// 				return;
+// 			};
 
-		if (imageFiles.length === 0 && rejectedFiles.length === 0) {
-			setError("No valid image files selected");
-			setTimeout(() => setError(null), 3000);
-			return;
-		}
+// 			imageFiles.push(file);
+// 			previews.push(URL.createObjectURL(file));
 
-		setFormData({
-			images: [...formData.images, ...imageFiles],
-			imagePreviews: [...formData.imagePreviews, ...previews],
-		});
+// 		});
 
-		drag.resetDrag();
-		if (imageFiles.length > 0 && rejectedFiles.length === 0) {
-			setError(null);
-		}
+// 		if (rejectedFiles.length > 0) {
+// 			setFileError(`Skipped ${rejectedFiles.length} file(s) over ${toMB(MAX_BODY_SIZE)}MB: ${rejectedFiles.join(", ")}`);
+// 			setTimeout(() => setFileError(null), 5000);
+// 			if (imageFiles.length === 0) return;
+// 		};
 
-	};
+// 		if (imageFiles.length === 0 && rejectedFiles.length === 0) {
+// 			setError("No valid image files selected");
+// 			setTimeout(() => setError(null), 3000);
+// 			return;
+// 		}
 
-	const drag = useDragAndDrop(processImages);
+// 		setFormData({
+// 			images: [...formData.images, ...imageFiles],
+// 			imagePreviews: [...formData.imagePreviews, ...previews],
+// 		});
 
-	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// 		drag.resetDrag();
+// 		if (imageFiles.length > 0 && rejectedFiles.length === 0) {
+// 			setError(null);
+// 		}
 
-		const files = e.currentTarget.files;
+// 	};
 
-		if (files && files.length > 0) {
-			processImages(files);
-		};
+// 	const drag = useDragAndDrop(processImages);
 
-	};
+// 	const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-	const removeImage = (index: number) => {
+// 		const files = e.currentTarget.files;
 
-		setFormData({
-			images: formData.images.filter((_, i) => i !== index),
-			imagePreviews: formData.imagePreviews.filter((_, i) => i !== index),
-		});
+// 		if (files && files.length > 0) {
+// 			processImages(files);
+// 		};
 
-	};
+// 	};
 
-	const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+// 	const removeImage = (index: number) => {
 
-		const { name, value } = e.currentTarget;
+// 		setFormData({
+// 			images: formData.images.filter((_, i) => i !== index),
+// 			imagePreviews: formData.imagePreviews.filter((_, i) => i !== index),
+// 		});
 
-		if (name === "sectionId") {
+// 	};
 
-			const collectionsRes = await getCollectionsBySection(value);
-			setCollections(collectionsRes ?? null);
+// 	const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 
-			setFormData({
-				sectionId: value,
-				collectionId: "",
-			});
+// 		const { name, value } = e.currentTarget;
 
-			return;
+// 		if (name === "sectionId") {
 
-		};
+// 			const collectionsRes = await getCollectionsBySection(value);
+// 			setCollections(collectionsRes ?? null);
 
-		setFormData({
-			[name]: value,
-		});
+// 			setFormData({
+// 				sectionId: value,
+// 				collectionId: "",
+// 			});
 
+// 			return;
 
-	};
+// 		};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+// 		setFormData({
+// 			[name]: value,
+// 		});
 
-		e.preventDefault();
-		setError(null);
 
-		if (formData.images.length === 0 || !formData.title || !formData.collectionId) {
-			setError("Please fill in required fields and select at least one image");
-			return;
-		};
+// 	};
 
-		setIsLoading(true);
+// 	const handleSubmit = async (e: React.FormEvent) => {
 
-		const progress: UploadProgress[] = formData.images.map((img) => ({
-			filename: img.name,
-			status: "pending"
-		}));
+// 		e.preventDefault();
+// 		setError(null);
 
-		setUploadProgress(progress);
+// 		if (formData.images.length === 0 || !formData.title || !formData.collectionId) {
+// 			setError("Please fill in required fields and select at least one image");
+// 			return;
+// 		};
 
-		for (let i = 0; i < formData.images.length; i++) {
+// 		setIsLoading(true);
 
-			const file = formData.images[i];
+// 		const progress: UploadProgress[] = formData.images.map((img) => ({
+// 			filename: img.name,
+// 			status: "pending"
+// 		}));
 
-			setUploadProgress((prev) =>
-				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
-			);
+// 		setUploadProgress(progress);
 
-			const { url, error: imageError } = await uploadImage(file);
+// 		for (let i = 0; i < formData.images.length; i++) {
 
-			if (imageError || !url) {
-				setError(imageError || "Upload failed");
-				setIsLoading(false);
-				return;
-			};
+// 			const file = formData.images[i];
 
-			const itemTitle = formData.images.length > 1
-				? `${formData.title} - ${i + 1}`
-				: formData.title;
+// 			setUploadProgress((prev) =>
+// 				prev.map((p, idx) => idx === i ? { ...p, status: "uploading" } : p)
+// 			);
 
-			const { error: galleryError } = await uploadToGallery(itemTitle, formData.description, url, formData.collectionId);
+// 			const { url, error: imageError } = await uploadImage(file);
 
-			setUploadProgress((prev) =>
-				prev.map((p, idx) => idx === i ? {
-					...p,
-					status: galleryError ? "error" : "success",
-					...(galleryError && { error: galleryError })
-				} : p)
-			);
+// 			if (imageError || !url) {
+// 				setError(imageError || "Upload failed");
+// 				setIsLoading(false);
+// 				return;
+// 			};
 
-		};
+// 			const itemTitle = formData.images.length > 1
+// 				? `${formData.title} - ${i + 1}`
+// 				: formData.title;
 
-		setIsLoading(false);
+// 			const { error: galleryError } = await uploadToGallery(itemTitle, formData.description, url, formData.collectionId);
 
-		const allSuccess = uploadProgress.every(p => p.status === "success");
+// 			setUploadProgress((prev) =>
+// 				prev.map((p, idx) => idx === i ? {
+// 					...p,
+// 					status: galleryError ? "error" : "success",
+// 					...(galleryError && { error: galleryError })
+// 				} : p)
+// 			);
 
-		if (allSuccess) {
+// 		};
 
-			setTimeout(() => {
-				resetForm();
-				setUploadProgress([]);
-			}, 2000);
+// 		setIsLoading(false);
 
-		};
+// 		const allSuccess = uploadProgress.every(p => p.status === "success");
 
-	};
+// 		if (allSuccess) {
 
-	const [openSectionDialog, setOpenSectionDialog] = useState(false);
-	const [openCollectionDialog, setOpenCollectionDialog] = useState(false);
+// 			setTimeout(() => {
+// 				resetForm();
+// 				setUploadProgress([]);
+// 			}, 2000);
 
-	return (
-		<div className="flex-1 flex-col w-full flex items-center justify-center pt-10 pb-8">
+// 		};
 
-			<div className={cn(
-				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
-			)}>
+// 	};
 
-				<p className="text-5xl text-black">Upload to gallery</p>
-				<p className="text-neutral-500">Upload single or multiple items to the gallery</p>
+// 	return (
+// 		<div className="flex-1 flex-col w-full flex items-center justify-center pb-8">
 
-			</div>
+// 			<div
+// 				className="w-full mb-14"
+// 			>
 
-			<CreateItemDialog
-				type="section"
-				onSuccess={async () => {
-					const sectionsRes = await getSections();
-					setSections(sectionsRes);
-				}}
-				open={openSectionDialog}
-				onOpenChange={setOpenSectionDialog}
-			></CreateItemDialog>
+// 				<Button
+// 					Icon={ArrowLeft}
+// 					size="sm"
+// 					onClick={() => router.back()}
+// 				>
+// 					<ButtonText>
+// 						Exit Upload
+// 					</ButtonText>
+// 				</Button>
 
-			<CreateItemDialog
-				type="collection"
-				onSuccess={async () => {
-					if (formData.sectionId) {
-						const collectionRes = await getCollectionsBySection(formData.sectionId);
-						setCollections(collectionRes);
-					}
-				}}
-				open={openCollectionDialog}
-				onOpenChange={setOpenCollectionDialog}
-			></CreateItemDialog>
+// 			</div>
 
-			<div className="w-full max-w-4xl">
+// 			<div className={cn(
+// 				"w-full space-y-3 transition-all duration-300 ease-in-out text-center mb-14"
+// 			)}>
 
-				<form onSubmit={handleSubmit} className="space-y-8">
+// 				<p className="text-5xl text-black">Upload to gallery</p>
+// 				<p className="text-neutral-500">Upload single or multiple items to the gallery</p>
 
-					<div className="flex flex-col space-y-2">
+// 			</div>
 
-						<div
-							onDragEnter={drag.handleDragEnter}
-							onDragLeave={drag.handleDragLeave}
-							onDragOver={drag.handleDragOver}
-							onDrop={drag.handleDrop}
-							className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
-								? "border-neutral-400 bg-dashboard"
-								: "border-neutral-200"
-								}`}
-						>
+// 			<CreateItemDialog
+// 				type="section"
+// 				onSuccess={async () => {
+// 					const sectionsRes = await getSections();
+// 					setSections(sectionsRes);
+// 				}}
+// 				open={openSectionDialog}
+// 				onOpenChange={setOpenSectionDialog}
+// 			></CreateItemDialog>
 
-							<input
-								id="image_input"
-								type="file"
-								accept="image/jpeg,image/png,image/webp"
-								multiple
-								onChange={handleFileInputChange}
-								className="hidden"
-							/>
+// 			<CreateItemDialog
+// 				type="collection"
+// 				onSuccess={async () => {
+// 					if (formData.sectionId) {
+// 						const collectionRes = await getCollectionsBySection(formData.sectionId);
+// 						setCollections(collectionRes);
+// 					}
+// 				}}
+// 				open={openCollectionDialog}
+// 				onOpenChange={setOpenCollectionDialog}
+// 			></CreateItemDialog>
 
-							{formData.images.length > 0 ? (
+// 			<div className="w-full max-w-4xl">
 
-								<div className="p-6">
+// 				<form onSubmit={handleSubmit} className="space-y-8">
 
-									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+// 					<div className="flex flex-col space-y-2">
 
-										{formData.imagePreviews.map((preview, index) => (
+// 						<div
+// 							onDragEnter={drag.handleDragEnter}
+// 							onDragLeave={drag.handleDragLeave}
+// 							onDragOver={drag.handleDragOver}
+// 							onDrop={drag.handleDrop}
+// 							className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ease-out ${drag.isDragging
+// 								? "border-neutral-400 bg-dashboard"
+// 								: "border-neutral-200"
+// 								}`}
+// 						>
 
-											<div key={index} className="relative group">
+// 							<input
+// 								id="image_input"
+// 								type="file"
+// 								accept="image/jpeg,image/png,image/webp"
+// 								multiple
+// 								onChange={handleFileInputChange}
+// 								className="hidden"
+// 							/>
 
-												<img
-													src={preview}
-													alt={`Preview ${index + 1}`}
-													className="w-full h-32 object-cover rounded-lg"
-												/>
+// 							{formData.images.length > 0 ? (
 
-												<button
-													type="button"
-													onClick={() => removeImage(index)}
-													className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-												>
-													<X className="w-4 h-4" />
-												</button>
+// 								<div className="p-6">
 
-											</div>
+// 									<div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
 
-										))}
+// 										{formData.imagePreviews.map((preview, index) => (
 
-									</div>
+// 											<div key={index} className="relative group">
 
-									<button
-										type="button"
-										onClick={() => document.getElementById("image_input")?.click()}
-										className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
-									>
-										Add more images
-									</button>
+// 												<img
+// 													src={preview}
+// 													alt={`Preview ${index + 1}`}
+// 													className="w-full h-32 object-cover rounded-lg"
+// 												/>
 
-								</div>
+// 												<button
+// 													type="button"
+// 													onClick={() => removeImage(index)}
+// 													className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+// 												>
+// 													<X className="w-4 h-4" />
+// 												</button>
 
-							) : (
+// 											</div>
 
-								<div className="px-12 py-8 text-center">
+// 										))}
 
-									<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dashboard mb-4">
-										<Cloud className="w-8 h-8 text-neutral-600" />
-									</div>
+// 									</div>
 
-									<h3 className="text-lg font-medium text-neutral-900 mb-2">
-										Drag your images here
-									</h3>
+// 									<button
+// 										type="button"
+// 										onClick={() => document.getElementById("image_input")?.click()}
+// 										className="w-full py-2 px-4 rounded-lg border-2 border-dashed border-neutral-300 text-neutral-600 hover:border-neutral-400 hover:text-neutral-700 transition-colors text-sm font-medium"
+// 									>
+// 										Add more images
+// 									</button>
 
-									<p className="text-sm text-neutral-600 mb-4">
-										or click to browse (multiple files supported)
-									</p>
+// 								</div>
 
-									<label htmlFor="image_input" className="inline-block">
-										<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
-											Select images
-										</span>
-									</label>
+// 							) : (
 
-								</div>
+// 								<div className="px-12 py-8 text-center">
 
-							)}
+// 									<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dashboard mb-4">
+// 										<Cloud className="w-8 h-8 text-neutral-600" />
+// 									</div>
 
-						</div>
+// 									<h3 className="text-lg font-medium text-neutral-900 mb-2">
+// 										Drag your images here
+// 									</h3>
 
-						{fileError && (
-							<div className="p-4 rounded-lg bg-red-50 border border-red-200 flex justify-between">
-								<p className="text-sm text-red-600">{fileError}</p>
+// 									<p className="text-sm text-neutral-600 mb-4">
+// 										or click to browse (multiple files supported)
+// 									</p>
 
-								<button
-									onClick={() => setFileError(null)}
-									className="text-red-700 cursor-pointer"
-								>
-									<X size={18} />
-								</button>
+// 									<label htmlFor="image_input" className="inline-block">
+// 										<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
+// 											Select images
+// 										</span>
+// 									</label>
 
-							</div>
-						)}
+// 								</div>
 
-					</div>
+// 							)}
 
-					<div className="space-y-4">
+// 						</div>
 
-						<Input
-							label={<>Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}</>}
-							id="title"
-							type="text"
-							name="title"
-							value={formData.title}
-							onChange={handleInputChange}
-						/>
+// 						{fileError && (
+// 							<div className="p-4 rounded-lg bg-red-50 border border-red-200 flex justify-between">
+// 								<p className="text-sm text-red-600">{fileError}</p>
 
-						<div>
+// 								<button
+// 									onClick={() => setFileError(null)}
+// 									className="text-red-700 cursor-pointer"
+// 								>
+// 									<X size={18} />
+// 								</button>
 
-							<label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
-								Description
-							</label>
+// 							</div>
+// 						)}
 
-							<textarea
-								id="description"
-								name="description"
-								value={formData.description}
-								onChange={handleInputChange}
-								rows={2}
-								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
-							/>
+// 					</div>
 
-						</div>
+// 					<div className="space-y-4">
 
-						<div>
+// 						<Input
+// 							label={<>Title {formData.images.length > 1 && <span className="text-neutral-500">(numbers will be appended)</span>}</>}
+// 							id="title"
+// 							type="text"
+// 							name="title"
+// 							value={formData.title}
+// 							onChange={handleInputChange}
+// 						/>
 
-							<Select
-								label={UI_LABELS.section.capitalized}
-								id="section"
-								name="sectionId"
-								value={formData.sectionId}
-								onChange={handleInputChange}
-							>
-								<option value="">Choose a section</option>
-								{sections.map((section) => (
-									<option
-										key={section.id}
-										className="capitalize"
-										value={section.id}>{section.title}</option>
-								))}
-							</Select>
+// 						<div>
 
-							<button
-								type="button"
-								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
-								onClick={() => setOpenSectionDialog(true)}
-							>
-								Create a new {UI_LABELS.section.singular}
-							</button>
+// 							<label htmlFor="description" className="block text-sm font-medium text-neutral-700 mb-2">
+// 								Description
+// 							</label>
 
-						</div>
+// 							<textarea
+// 								id="description"
+// 								name="description"
+// 								value={formData.description}
+// 								onChange={handleInputChange}
+// 								rows={2}
+// 								className="w-full px-4 py-3 rounded-lg border border-neutral-200 bg-dashboard text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all resize-none"
+// 							/>
 
-						<div>
+// 						</div>
 
-							<Select
-								label={UI_LABELS.collection.capitalized}
-								id="collection"
-								name="collectionId"
-								value={formData.collectionId}
-								onChange={handleInputChange}
-								disabled={!collections}
-							>
-								<option value="">Choose a collection</option>
-								{collections?.map((collection) => (
-									<option
-										key={collection.id}
-										className="capitalize"
-										value={collection.id}>{collection.title}</option>
-								))}
-							</Select>
+// 						<div>
 
-							<button
-								type="button"
-								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
-								onClick={() => setOpenCollectionDialog(true)}
-							>
-								Create a new {UI_LABELS.collection.singular}
-							</button>
+// 							<Select
+// 								label={UI_LABELS.section.capitalized}
+// 								id="section"
+// 								name="sectionId"
+// 								value={formData.sectionId}
+// 								onChange={handleInputChange}
+// 							>
+// 								<option value="">Choose a section</option>
+// 								{sections.map((section) => (
+// 									<option
+// 										key={section.id}
+// 										className="capitalize"
+// 										value={section.id}>{section.title}</option>
+// 								))}
+// 							</Select>
 
-						</div>
+// 							<button
+// 								type="button"
+// 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
+// 								onClick={() => setOpenSectionDialog(true)}
+// 							>
+// 								Create a new {UI_LABELS.section.singular}
+// 							</button>
 
-					</div>
+// 						</div>
 
-					{uploadProgress.length > 0 && (
+// 						<div>
 
-						<div className="space-y-2">
+// 							<Select
+// 								label={UI_LABELS.collection.capitalized}
+// 								id="collection"
+// 								name="collectionId"
+// 								value={formData.collectionId}
+// 								onChange={handleInputChange}
+// 								disabled={!collections}
+// 							>
+// 								<option value="">Choose a collection</option>
+// 								{collections?.map((collection) => (
+// 									<option
+// 										key={collection.id}
+// 										className="capitalize"
+// 										value={collection.id}>{collection.title}</option>
+// 								))}
+// 							</Select>
 
-							<h4 className="text-sm font-medium text-neutral-700">Upload Progress</h4>
+// 							<button
+// 								type="button"
+// 								className="text-neutral-600 text-xs mt-1.5 underline cursor-pointer"
+// 								onClick={() => setOpenCollectionDialog(true)}
+// 							>
+// 								Create a new {UI_LABELS.collection.singular}
+// 							</button>
 
-							{uploadProgress.map((progress, index) => (
+// 						</div>
 
-								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dashboard border border-neutral-200">
+// 					</div>
 
-									{progress.status === "pending" && (
-										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
-									)}
+// 					{uploadProgress.length > 0 && (
 
-									{progress.status === "uploading" && (
-										<Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
-									)}
+// 						<div className="space-y-2">
 
-									{progress.status === "success" && (
-										<Check className="w-5 h-5 text-green-600 shrink-0" />
-									)}
+// 							<h4 className="text-sm font-medium text-neutral-700">Upload Progress</h4>
 
-									{progress.status === "error" && (
-										<X className="w-5 h-5 text-red-600 shrink-0" />
-									)}
+// 							{uploadProgress.map((progress, index) => (
 
-									<div className="flex-1 min-w-0">
-										<p className="text-sm text-neutral-900 truncate">{progress.filename}</p>
-										{progress.error && (
-											<p className="text-xs text-red-600">{progress.error}</p>
-										)}
-									</div>
+// 								<div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-dashboard border border-neutral-200">
 
-								</div>
+// 									{progress.status === "pending" && (
+// 										<div className="w-5 h-5 rounded-full border-2 border-neutral-300" />
+// 									)}
 
-							))}
+// 									{progress.status === "uploading" && (
+// 										<Loader2 className="w-5 h-5 text-blue-600 animate-spin shrink-0" />
+// 									)}
 
-						</div>
+// 									{progress.status === "success" && (
+// 										<Check className="w-5 h-5 text-green-600 shrink-0" />
+// 									)}
 
-					)}
+// 									{progress.status === "error" && (
+// 										<X className="w-5 h-5 text-red-600 shrink-0" />
+// 									)}
 
-					{error && (
-						<div className="p-4 rounded-lg bg-red-50 border border-red-200">
-							<p className="text-sm text-red-600">{error}</p>
-						</div>
-					)}
+// 									<div className="flex-1 min-w-0">
+// 										<p className="text-sm text-neutral-900 truncate">{progress.filename}</p>
+// 										{progress.error && (
+// 											<p className="text-xs text-red-600">{progress.error}</p>
+// 										)}
+// 									</div>
 
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-					>
+// 								</div>
 
-						{isLoading ? (
+// 							))}
 
-							<>
-								<Loader2 className="w-5 h-5 animate-spin" />
-								Uploading {uploadProgress.filter(p => p.status === "success").length} / {formData.images.length}
-							</>
+// 						</div>
 
-						) : (
+// 					)}
 
-							<>
-								Upload {formData.images.length > 0 && `(${formData.images.length} image${formData.images.length > 1 ? 's' : ''})`}
-							</>
+// 					{error && (
+// 						<div className="p-4 rounded-lg bg-red-50 border border-red-200">
+// 							<p className="text-sm text-red-600">{error}</p>
+// 						</div>
+// 					)}
 
-						)}
+// 					<button
+// 						type="submit"
+// 						disabled={isLoading}
+// 						className="w-full py-3 px-6 rounded-lg bg-neutral-900 text-white font-medium transition-all duration-200 hover:bg-neutral-800 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+// 					>
 
-					</button>
+// 						{isLoading ? (
 
-				</form>
+// 							<>
+// 								<Loader2 className="w-5 h-5 animate-spin" />
+// 								Uploading {uploadProgress.filter(p => p.status === "success").length} / {formData.images.length}
+// 							</>
 
-			</div>
+// 						) : (
 
-		</div>
+// 							<>
+// 								Upload {formData.images.length > 0 && `(${formData.images.length} image${formData.images.length > 1 ? 's' : ''})`}
+// 							</>
 
-	);
+// 						)}
 
-};
+// 					</button>
+
+// 				</form>
+
+// 			</div>
+
+// 		</div>
+
+// 	);
+
+// };

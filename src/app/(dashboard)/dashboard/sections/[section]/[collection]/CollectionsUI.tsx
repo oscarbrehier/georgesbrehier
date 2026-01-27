@@ -215,7 +215,7 @@ export function CollectionsUI({
 										{collection.works.length >= 1 ?
 
 											<div className={cn(
-												"grid gap-4",
+												"grid gap-x-4 gap-y-6",
 												"2xl:grid-cols-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2"
 											)}>
 

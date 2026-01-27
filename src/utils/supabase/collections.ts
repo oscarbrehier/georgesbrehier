@@ -67,6 +67,7 @@ export async function getCollectionMetadata(collectionId: string): Promise<Galle
             slug,
             title,
             is_default,
+            is_visible,
             seo_title,
             seo_description,
             seo_og_image_url,

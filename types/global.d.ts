@@ -6,7 +6,7 @@ declare global {
 	};
 
 	interface GalleryItem {
-		id: number;
+		id: string;
 		title: string;
 		description: string;
 		image_url: string;
@@ -105,7 +105,7 @@ declare global {
 		collection: GalleryCollection;
 	};
 
-	type GalleryItemToDelete = { id: number; collectionId: string };
+	type GalleryItemToDelete = { id: string; collectionId: string };
 };
 
 export { };

@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button, ButtonText } from "./Button";
-import { CreateItemDialog } from "./CreateItemDialog";
 import { deleteSection } from "../actions/sections";
 import { QuickActions } from "./QuickActions";
 import { getSectionId } from "@/utils/supabase/sections";

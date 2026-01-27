@@ -1,6 +1,6 @@
 import { CloudUpload, Eye, Plus } from "lucide-react";
 import { Button, ButtonText } from "./Button";
-import { CreateItemDialog, EditData } from "./CreateItemDialog";
+import { CreateItemDialog, EditData } from "./dialog/CreateItemDialog";
 import { cn } from "@/utils/utils";
 import { UI_LABELS } from "@/utils/constants";
 import Link from "next/link";

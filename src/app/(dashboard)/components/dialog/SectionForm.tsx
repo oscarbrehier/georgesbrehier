@@ -2,12 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getSections } from "@/utils/supabase/sections";
-import { FormEvent, useActionState, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { createSection, updateSection } from "../../actions/sections";
 import { EditData } from "./CreateItemDialog";
-import { createCollection, updateCollection } from "../actions/collections";
 import { UI_LABELS } from "@/utils/constants";
 
 interface FormState {
@@ -17,14 +15,13 @@ interface FormState {
 };
 
 const initialForm = {
-	sectionId: "",
-	collectionTitle: "",
+	sectionTitle: "",
 	isDefault: false
 };
 
-export function CollectionForm({
+export function SectionForm({
 	onSuccess,
-	initialData
+	initialData,
 }: {
 	onSuccess?: () => void;
 	initialData?: EditData;
@@ -32,26 +29,26 @@ export function CollectionForm({
 
 	const isEditMode = !!initialData;
 
-	const [sections, setSections] = useState<GallerySection[]>([]);
 	const [formData, setFormData] = useState({
-		sectionId: initialData?.section_id ?? "",
-		collectionTitle: initialData?.title ?? "",
-		isDefault: initialData?.is_default ?? false,
+		sectionTitle: initialData?.title ?? "",
+		isDefault: initialData?.is_default || false
 	});
 
 	const [formState, setFormState] = useState<FormState>({});
 	const [pending, setPending] = useState(false);
 
+	const isFormComplete = formData.sectionTitle.trim().length > 0;
+
 	async function handleSubmit(e: FormEvent) {
 
 		e.preventDefault();
-		if (pending) setPending(false);
+		if (pending) return;
 		setPending(true);
 
 		if (isEditMode) {
 
-			const { error } = await updateCollection(initialData.id, {
-				title: formData.collectionTitle,
+			const { error } = await updateSection(initialData.id, {
+				title: formData.sectionTitle,
 				is_default: formData.isDefault
 			});
 
@@ -59,10 +56,9 @@ export function CollectionForm({
 
 		} else {
 
-			const res = await createCollection({
-				sectionId: formData.sectionId,
-				title: formData.collectionTitle,
-				is_default: formData.isDefault,
+			const res = await createSection({
+				title: formData.sectionTitle,
+				is_default: formData.isDefault
 			});
 
 			setFormState(res);
@@ -79,30 +75,15 @@ export function CollectionForm({
 
 		setFormData(prev => ({
 			...prev,
-			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value
+			[name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value.toLocaleLowerCase()
 		}));
 
 	};
 
 	useEffect(() => {
 
-		(async () => {
-
-			const res = await getSections();
-			if (res) setSections(res);
-
-		})();
-
-	}, []);
-
-	const isFormComplete =
-		formData.sectionId.trim().length > 0 &&
-		formData.collectionTitle.trim().length > 0;
-
-	useEffect(() => {
-
 		if (formState.success) {
-			
+
 			if (onSuccess) onSuccess();
 
 			if (!isEditMode) setFormData(initialForm);
@@ -118,41 +99,14 @@ export function CollectionForm({
 			onSubmit={handleSubmit}
 		>
 
-			<Select
-				name="sectionId"
-				onValueChange={(value) => {
-					setFormData(prev => ({ ...prev, sectionId: value }));
-				}}
-				value={initialData?.section_id ?? formData.sectionId}
-			>
-				<SelectTrigger className="w-full">
-					<SelectValue placeholder="Select a section" />
-				</SelectTrigger>
-				<SelectContent
-					id="section"
-				>
-					<SelectGroup>
-						<SelectLabel>{UI_LABELS.section.capPlural}</SelectLabel>
-						{sections.map((section) => (
-							<SelectItem
-								key={section.id}
-								value={section.id}
-							>
-								{section.title}
-							</SelectItem>
-						))}
-					</SelectGroup>
-				</SelectContent>
-			</Select>
-
 			<div className="grid w-full max-w-sm items-center gap-3">
-				<Label htmlFor="collectionTitle">{UI_LABELS.collection.capitalized} Title</Label>
+				<Label htmlFor="sectionTitle">Title</Label>
 				<Input
 					type="text"
-					id="collectionTitle"
-					name="collectionTitle"
-					placeholder="Title"
-					value={formData.collectionTitle}
+					id="sectionTitle"
+					name="sectionTitle"
+					placeholder={isEditMode ? initialData.title : "Title"}
+					value={formData.sectionTitle}
 					onChange={handleInputChange}
 				/>
 			</div>
@@ -167,7 +121,7 @@ export function CollectionForm({
 					}}
 				/>
 				<div className="grid gap-2">
-					<Label htmlFor="isDefault">Make default</Label>
+					<Label htmlFor="isDefault">Default</Label>
 				</div>
 			</div>
 
@@ -184,19 +138,19 @@ export function CollectionForm({
 					) : (
 						<span className="truncate">
 							{isEditMode
-								? `Update ${UI_LABELS.collection.singular}`
-								: `Create ${UI_LABELS.collection.singular}${formData.collectionTitle && `: ${formData.collectionTitle}`}`
+								? `Update ${UI_LABELS.section.singular}`
+								: `Create ${UI_LABELS.section.singular}${formData.sectionTitle && `: ${formData.sectionTitle}`}`
 							}
 						</span>
 					)}
 
 				</Button>
 
-				{formState?.error && (
+				{formState.error && (
 					<p className="text-xs text-red-600 text-center">{formState.error}</p>
 				)}
 
-				{formState?.success && (
+				{formState.success && (
 					<p className="text-xs text-green-600 text-center">{formState.message}</p>
 				)}
 
