@@ -31,9 +31,11 @@ export default async function Layout({
 					</h1>
 				</div>
 
-				<SectionsNav
-					sections={navItems}
-				/>
+				<Suspense>
+					<SectionsNav
+						sections={navItems}
+					/>
+				</Suspense>
 
 				<div className="col-span-1 flex items-center justify-between">
 					<p className="text-[15px]">History</p>
