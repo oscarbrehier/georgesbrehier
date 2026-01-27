@@ -80,16 +80,18 @@ export function NavigatorItem<T extends NavigableItem>({
 
 					<div className="flex space-x-2">
 
-						<Badge>
-							<span className="capitalize">
-								{statusUI.label}
-							</span>
-						</Badge>
-
-						{item.parent_hidden && (
+						{item.parent_hidden ? (
 							<Badge variant="destructive">
 								{UI_LABELS.section.capitalized} Hidden
 							</Badge>
+						) : (
+
+							<Badge>
+								<span className="capitalize">
+									{statusUI.label}
+								</span>
+							</Badge>
+
 						)}
 
 						{item?.is_default && (
