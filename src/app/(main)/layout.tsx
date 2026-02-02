@@ -18,10 +18,10 @@ export default async function Layout({
 
 	return (
 
-		<main>
+		<main className="h-svh flex flex-col overflow-hidden sm:h-auto sm:block sm:overflow-visible">
 
 			<header
-				className="w-full fixed px-8 h-18 grid grid-cols-5 z-20"
+				className="w-full fixed px-8 h-18 sm:grid hidden grid-cols-5 z-20"
 			>
 
 				<div className="col-span-1 flex items-center">
@@ -43,6 +43,36 @@ export default async function Layout({
 				</div>
 
 			</header>
+
+			<header
+				className={cn(
+					"sm:hidden flex-none flex flex-col p-4",
+					"px-8",
+				)}
+			>
+
+				<div className="col-span-1 flex items-center">
+					<h1 className={`${roboto.className} font-semibold text-xl text-neutral-800 tracking-widest space-x-4`}>
+						<span>Georges</span>
+						<span>Bréhier</span>
+					</h1>
+				</div>
+
+				<Suspense>
+					<div
+						className={cn(
+							"",
+							"sm:hidden flex flex-col mt-6",
+						)}
+					>
+						<SectionsNav
+						sections={navItems}
+					/>
+					</div>
+				</Suspense>
+
+			</header>
+
 
 			<Suspense>
 				{children}

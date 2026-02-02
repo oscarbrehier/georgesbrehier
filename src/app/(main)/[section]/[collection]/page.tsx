@@ -211,18 +211,18 @@ export default async function Page({
 				strategy="afterInteractive"
 			/>
 
-			<main>
+			<ScrollHint />
 
-				<ScrollHint />
+			<GalleryWrapper
+				sectionId={sectionId}
+				currentCollection={collectionId}
+				items={galleryItems}
+			/>
 
-				<GalleryWrapper
-					sectionId={sectionId}
-					currentCollection={collectionId}
-					items={galleryItems}
-				/>
-				<VerticalGallery images={galleryItems} />
-
-			</main>
+			<VerticalGallery
+				sectionId={sectionId}
+				images={galleryItems}
+			/>
 
 		</>
 

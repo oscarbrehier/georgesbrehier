@@ -1,34 +1,62 @@
+import { getActiveCollections } from "@/utils/supabase/collections";
 import Image from "next/image";
+import Link from "next/link";
 
-export default async function VerticalGallery({ images }: { images: GalleryItem[] }) {
+export default async function VerticalGallery({
+	images,
+	sectionId
+}: {
+	images: GalleryItem[];
+	sectionId: string;
+}) {
+
+	const collections = await getActiveCollections(sectionId);
 
 	return (
 
-		<div className="lg:hidden flex min-h-screen h-auto w-full flex-col items-center pt-32 p-8 space-y-8 bg-neutral-100">
+		<div className="sm:hidden flex flex-col min-h-0 pt-10 px-8">
 
-			{images.map((image, idx) => (
+			<div className="w-full mb-2 space-x-4 flex overflow-y-scroll">
 
-				<figure
-					key={`${image.id}-${idx}`}
-					className="max-w-xl"
-				>
+				{collections.map((item) => (
+					<Link
+						key={item.id}
+						href={item.slug}
+						className="shrink-0 text-sm"
+					>
+						{item.title}
+					</Link>
+				))}
 
-					<Image
-						src={image.image_url}
-						alt={image.title}
-						width={600}
-						height={800}
-						className="w-full h-auto"
-						loading={idx < 3 ? "eager" : "lazy"}
-					/>
+			</div>
 
-					{image.title && (
-						<figcaption className="text-black mt-1 sr-only">{image.title}</figcaption>
-					)}
+			<div className="flex-1 w-full overflow-y-auto flex flex-col items-center space-y-8 bg-background hide-scrollbar">
 
-				</figure>
+				{images.map((image, idx) => (
 
-			))}
+					<figure
+						key={`${image.id}-${idx}`}
+						className="max-w-xl w-full"
+					>
+
+						<Image
+							src={image.image_url}
+							alt={image.title}
+							width={600}
+							height={800}
+							className="w-full h-auto"
+							loading={idx < 3 ? "eager" : "lazy"}
+						/>
+
+						{image.title && (
+							<figcaption className="text-black mt-1 sr-only">{image.title}</figcaption>
+						)}
+
+					</figure>
+
+				))}
+
+			</div>
 
 		</div>
 

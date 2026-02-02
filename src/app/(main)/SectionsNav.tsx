@@ -19,14 +19,14 @@ export function SectionsNav({
 
 	return (
 
-		<div className="col-span-3 h-full flex items-center justify-center space-x-12">
+		<div className="col-span-3 h-full flex sm:flex-row flex-col sm:items-center justify-center sm:space-x-12 space-x-0 sm:space-y-0 space-y-2">
 
 			{sections.map((section) => (
 
 				<Link
 					key={section.id}
 					href={`/${section.slug}`}
-					className={cn("capitalize text-[15px]", isActive(section.slug) && "underline")}
+					className={cn("capitalize sm:text-[15px] text-sm", isActive(section.slug) && "underline")}
 				>
 					{section.title}
 				</Link>

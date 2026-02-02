@@ -17,7 +17,7 @@ export async function GalleryMarkup({
 
 	return (
 
-		<div id="gallery-track" className="relative w-full">
+		<div id="gallery-track" className="relative w-full sm:block hidden">
 
 			<div className="sticky top-0 h-screen flex flex-col justify-center pl-36 overflow-hidden">
 
