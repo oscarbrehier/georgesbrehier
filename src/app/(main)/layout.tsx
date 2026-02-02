@@ -66,17 +66,18 @@ export default async function Layout({
 						)}
 					>
 						<SectionsNav
-						sections={navItems}
-					/>
+							sections={navItems}
+						/>
 					</div>
 				</Suspense>
 
 			</header>
 
-
-			<Suspense>
-				{children}
-			</Suspense>
+			<div className="flex-1 flex flex-col min-h-0 relative sm:contents">
+				<Suspense>
+					{children}
+				</Suspense>
+			</div>
 
 		</main>
 
