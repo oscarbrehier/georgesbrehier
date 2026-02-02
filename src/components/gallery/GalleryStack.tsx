@@ -1,16 +1,15 @@
-import { getActiveCollections } from "@/utils/supabase/collections";
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function VerticalGallery({
-	images,
-	sectionId
+export default function GalleryStack({
+	items,
+	collections,
+	currentCollection,
 }: {
-	images: GalleryItem[];
-	sectionId: string;
+	items: GalleryItem[];
+	collections: CollectionNavItem[];
+	currentCollection: string;
 }) {
-
-	const collections = await getActiveCollections(sectionId);
 
 	return (
 
@@ -22,7 +21,7 @@ export default async function VerticalGallery({
 					<Link
 						key={item.id}
 						href={item.slug}
-						className="shrink-0 text-sm"
+						className={`shrink-0 text-sm ${currentCollection === item.id && "underline"}`}
 					>
 						{item.title}
 					</Link>
@@ -32,7 +31,7 @@ export default async function VerticalGallery({
 
 			<div className="flex-1 w-full overflow-y-auto flex flex-col items-center space-y-8 bg-background hide-scrollbar">
 
-				{images.map((image, idx) => (
+				{items.map((image, idx) => (
 
 					<figure
 						key={`${image.id}-${idx}`}

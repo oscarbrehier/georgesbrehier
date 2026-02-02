@@ -3,17 +3,15 @@ import { cn } from "@/utils/utils";
 import Image from "next/image";
 import Link from "next/link";
 
-export async function GalleryMarkup({
+export function GalleryMarkup({
 	items,
-	sectionId,
+	collections,
 	currentCollection,
 }: {
 	items: GalleryItem[];
-	sectionId: string;
+	collections: CollectionNavItem[];
 	currentCollection: string;
 }) {
-
-	const collections = await getActiveCollections(sectionId);
 
 	return (
 
@@ -42,7 +40,7 @@ export async function GalleryMarkup({
 							key={idx}
 							className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative flex flex-col items-center justify-center w-auto"
 						>
-							
+
 							<div
 								data-itemid={item.id}
 								className="relative h-[80%] w-auto transition-[width,height] ease-in-out duration-300"

@@ -4,13 +4,14 @@ import { fetchSupabase } from "@/utils/supabase/fetchSupabase";
 import { ResolvingMetadata } from "next";
 import { capitalize } from "@/utils/capitalize";
 import { ScrollHint } from "@/components/ScrollHint";
-import VerticalGallery from "@/components/vertical_gallery/Gallery";
-import GalleryWrapper from "@/components/gallery/GalleryWrapper";
+import VerticalGallery from "@/components/gallery/GalleryStack";
+import GalleryWrapper from "@/components/gallery/GallerySpread";
 import Script from "next/script";
 import { baseSeo, getFullUrl } from "@/utils/seo";
-import { getCollectionMetadata, getCachedDefaultCollectionBySectionId, getCollectionId } from "@/utils/supabase/collections";
+import { getCollectionMetadata, getCachedDefaultCollectionBySectionId, getCollectionId, getActiveCollections } from "@/utils/supabase/collections";
 import { getDefaultSectionWithCollection, getSection, getSectionId } from "@/utils/supabase/sections";
 import { UI_LABELS } from "@/utils/constants";
+import { GallerySwitcher } from "@/components/gallery/GallerySwitcher";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>
@@ -200,6 +201,8 @@ export default async function Page({
 		}))
 	};
 
+	const collections = await getActiveCollections(sectionId);
+
 	return (
 
 		<>
@@ -213,15 +216,10 @@ export default async function Page({
 
 			<ScrollHint />
 
-			<GalleryWrapper
-				sectionId={sectionId}
+			<GallerySwitcher
 				currentCollection={collectionId}
+				collections={collections}
 				items={galleryItems}
-			/>
-
-			<VerticalGallery
-				sectionId={sectionId}
-				images={galleryItems}
 			/>
 
 		</>

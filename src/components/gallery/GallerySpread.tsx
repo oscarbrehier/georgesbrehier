@@ -1,13 +1,13 @@
 import { GalleryAnimator } from "./GalleryAnimator";
 import { GalleryMarkup } from "./GalleryMarkup";
 
-export default async function GalleryWrapper({
+export default function GallerySpread({
 	items,
-	sectionId,
+	collections,
 	currentCollection
 }: {
 	items: GalleryItem[];
-	sectionId: string;
+	collections: CollectionNavItem[];
 	currentCollection: string;
 }) {
 
@@ -15,7 +15,7 @@ export default async function GalleryWrapper({
 
 		<>
 			<GalleryMarkup
-				sectionId={sectionId}
+				collections={collections}
 				currentCollection={currentCollection}
 				items={items}
 			/>
