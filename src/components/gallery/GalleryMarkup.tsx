@@ -17,7 +17,7 @@ export function GalleryMarkup({
 
 		<div id="gallery-track" className="relative w-full sm:block hidden">
 
-			<div className="sticky top-0 h-screen flex flex-col justify-center pl-36 overflow-hidden">
+			<div className="sticky top-0 h-screen flex flex-col justify-center md:pl-36 pl-8 overflow-hidden">
 
 				<div className="w-full h-8 flex space-x-8 mb-4">
 
@@ -57,7 +57,7 @@ export function GalleryMarkup({
 							</div>
 
 							<div className="w-full mt-1">
-								<p className="text-neutral-500 font-extralight">{item.title}</p>
+								<p className="text-neutral-600">{item.title}</p>
 							</div>
 
 						</figure>

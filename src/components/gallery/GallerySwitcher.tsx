@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic';
 const GalleryStack = dynamic(() => import("@/components/gallery/GalleryStack"));
 const GallerySpread = dynamic(() => import("@/components/gallery/GallerySpread"));
 
+export const BREAKPOINT_GALLERY_STACK = 1024;
+
 export function GallerySwitcher({
 	items,
 	collections,
@@ -20,7 +22,7 @@ export function GallerySwitcher({
 
 	useEffect(() => {
 
-		const checkMobile = () => setIsMobile(window.innerWidth < 640);
+		const checkMobile = () => setIsMobile(window.innerWidth < BREAKPOINT_GALLERY_STACK);
 		checkMobile();
 
 		window.addEventListener("resize", checkMobile);

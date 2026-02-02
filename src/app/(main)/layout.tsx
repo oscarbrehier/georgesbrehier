@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { getNavSections, getSections } from "@/utils/supabase/sections";
 import Link from "next/link";
 import { SectionsNav } from "./SectionsNav";
+import { Navigation } from "@/components/Navigation";
 
 export default async function Layout({
 	children,
@@ -14,66 +15,15 @@ export default async function Layout({
 	nav?: React.ReactNode;
 }>) {
 
-	const navItems = await getNavSections();
+	const sectionNav = await getNavSections();
 
 	return (
 
-		<main className="h-svh flex flex-col overflow-hidden sm:h-auto sm:block sm:overflow-visible">
+		<main className="h-svh flex flex-col overflow-hidden gallery-stack:h-auto gallery-stack:block gallery-stack:overflow-visible">
 
-			<header
-				className="w-full fixed px-8 h-18 sm:grid hidden grid-cols-5 z-20"
-			>
+			<Navigation sectionNav={sectionNav} />
 
-				<div className="col-span-1 flex items-center">
-					<h1 className={`${roboto.className} font-semibold text-xl text-neutral-800 tracking-widest space-x-4`}>
-						<span>Georges</span>
-						<span>Bréhier</span>
-					</h1>
-				</div>
-
-				<Suspense>
-					<SectionsNav
-						sections={navItems}
-					/>
-				</Suspense>
-
-				<div className="col-span-1 flex items-center justify-between">
-					<p className="text-[15px]">History</p>
-					<p className="text-[15px]">About</p>
-				</div>
-
-			</header>
-
-			<header
-				className={cn(
-					"sm:hidden flex-none flex flex-col p-4",
-					"px-8",
-				)}
-			>
-
-				<div className="col-span-1 flex items-center">
-					<h1 className={`${roboto.className} font-semibold text-xl text-neutral-800 tracking-widest space-x-4`}>
-						<span>Georges</span>
-						<span>Bréhier</span>
-					</h1>
-				</div>
-
-				<Suspense>
-					<div
-						className={cn(
-							"",
-							"sm:hidden flex flex-col mt-6",
-						)}
-					>
-						<SectionsNav
-							sections={navItems}
-						/>
-					</div>
-				</Suspense>
-
-			</header>
-
-			<div className="flex-1 flex flex-col min-h-0 relative sm:contents">
+			<div className="flex-1 flex flex-col min-h-0 relative gallery-stack:contents">
 				<Suspense>
 					{children}
 				</Suspense>

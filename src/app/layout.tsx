@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 
 import { baseSeo, getBaseUrl } from "@/utils/seo";
@@ -14,6 +14,16 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+const inter = Inter({
+	subsets: ['latin'],
+	variable: '--font-inter',
+});
+
+const montserrat = Montserrat({
+	subsets: ["latin"],
+	variable: "--font-tenor",
 });
 
 const name = baseSeo.name;
@@ -70,7 +80,7 @@ export default function RootLayout({
 		<html lang="en">
 
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen w-full bg-background`}
+				className={`${inter.variable} ${montserrat.variable} font-sans antialiased min-h-screen w-full bg-background`}
 			>
 				{children}
 				<Toaster />

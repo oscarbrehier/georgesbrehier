@@ -33,13 +33,13 @@ export default function GalleryStack({
 
 			</div>
 
-			<div className="flex-1 w-full overflow-y-auto min-h-0 pb-8 space-y-8 overscroll-y-contain hide-scrollbar">
+			<div className="flex-1 w-full grid sm:grid-cols-2 grid-cols-1 sm:gap-4 gap-8 overflow-y-auto min-h-0 pb-8 overscroll-y-contain hide-scrollbar">
 
 				{items.map((image, idx) => (
 
 					<figure
 						key={`${image.id}-${idx}`}
-						className="max-w-xl w-full"
+						className="max-w-xl w-full h-full flex items-center"
 					>
 
 						<Image
