@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useEffect, useState } from "react";
-import { Upload as UploadIcon, Trash2, Loader2, X } from "lucide-react";
+import { Upload as UploadIcon, Trash2, Loader2, X, ArrowLeft } from "lucide-react";
 import { ArtworkMetadata, useUploadFormStore } from "@/stores/useUploadForm";
 import { useDragAndDrop } from "@/hooks/useDragAndDrop";
 import { uploadImage } from "@/app/(dashboard)/actions/uploadImage";
@@ -298,7 +298,15 @@ export function Upload({
 
 			<div className="w-full h-14 flex items-center justify-between fixed pr-16 bg-dashboard z-30">
 
-				<div>
+
+				<div className="flex items-center space-x-4">
+					<Button
+						variant="outline"
+						className="bg-dashboard"
+						size="icon"
+					>
+						<ArrowLeft />
+					</Button>
 					<p className="text-xl text-black">Upload to gallery</p>
 				</div>
 

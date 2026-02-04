@@ -179,7 +179,7 @@ export function GalleryItem({
 			</div>
 
 			<div className="mt-1">
-				<p className="text-sm">{item.title}</p>
+				<p className="text-sm truncate">{item.title}</p>
 			</div>
 
 		</div>
