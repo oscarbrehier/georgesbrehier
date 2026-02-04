@@ -14,6 +14,7 @@ import { ImageCard } from "./ImageCard";
 import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { UploadDestionation } from "./UploadDestination";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export interface UploadProgress {
 	filename: string
@@ -33,6 +34,8 @@ export function Upload({
 	sections: GallerySection[];
 	target?: { sectionId: string | null, collectionId: string | null, collections: GalleryCollection[] | null };
 }) {
+
+	const router = useRouter();
 
 	const { formData, setGlobalData, addItems, updateItem, removeItem, resetForm } = useUploadFormStore();
 
@@ -304,6 +307,7 @@ export function Upload({
 						variant="outline"
 						className="bg-dashboard"
 						size="icon"
+						onClick={() => router.back()}
 					>
 						<ArrowLeft />
 					</Button>
