@@ -244,6 +244,7 @@ export function Upload({
 					return next;
 				});
 
+        console.log(batchError);
 				toast.error("Images saved to storage, but database entry failed.");
 
 			} else {
