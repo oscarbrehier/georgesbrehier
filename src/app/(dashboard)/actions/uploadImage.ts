@@ -1,5 +1,6 @@
 "use server"
 
+import { captureException } from "@sentry/nextjs";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -45,7 +46,8 @@ export async function uploadImage(file: File): Promise<UploadImageState> {
 
 	} catch (err) {
 
-		console.error("Cloudinary image upload failed:", err);
+    console.error("Cloudinary image upload failed:", err);
+    captureException(err);
 
 		const message = err instanceof Error ? err.message : "Upload failed";
 		return { data: null, error: message };

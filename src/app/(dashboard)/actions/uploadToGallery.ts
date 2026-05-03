@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { captureException } from "@sentry/nextjs";
 import { revalidateTag } from "next/cache";
 
 interface UploadData {
@@ -35,6 +36,7 @@ export async function uploadToGalleryBatch(items: UploadData[]): Promise<{
     return { error: null };
   } catch (err) {
     console.log(err);
+    captureException(err);
     return { error: err instanceof Error ? err.message : "Upload failed" };
   }
 }
