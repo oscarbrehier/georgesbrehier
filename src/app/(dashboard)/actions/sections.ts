@@ -5,6 +5,7 @@ import { UI_LABELS } from "@/utils/constants";
 import { createSlug } from "@/utils/utils";
 import { refresh, revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { captureException } from "@sentry/nextjs";
 
 export interface SectionUpdatePayload {
 	title?: string;
@@ -97,7 +98,11 @@ export async function updateSection(sectionId: string, data: Omit<SectionUpdateP
 			return {
 				error: `The title "${payload.title}" is already being used for another ${UI_LABELS.section.singular}. Please choose a unique name for this ${UI_LABELS.section.singular}.`
 			};
-		};
+    };
+
+    captureException(new Error(`updateSection Failed: ${error.message}`), {
+      extra: { sectionId, payload, errorCode: error.code }
+    });
 	
 		return { error: error.message };
 	

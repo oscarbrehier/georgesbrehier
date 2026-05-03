@@ -3,6 +3,7 @@
 import { supabase } from "@/lib/supabase";
 import { UI_LABELS } from "@/utils/constants";
 import { createSlug } from "@/utils/utils";
+import { captureException } from "@sentry/nextjs";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export interface CollectionUpdatePayload {
@@ -114,7 +115,11 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 			return {
 				error: `A ${UI_LABELS.collection.singular} named "${payload.title}" already exists in this ${UI_LABELS.section.singular}. Please give this ${UI_LABELS.collection.singular} a different name.`
 			};
-		};
+    };
+
+    captureException(new Error(`updateCollection Failed: ${error.message}`), {
+      extra: { sectionId, payload, errorCode: error.code }
+    });
 
 		return { error: error.message };
 

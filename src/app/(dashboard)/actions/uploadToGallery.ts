@@ -26,7 +26,16 @@ export async function uploadToGalleryBatch(items: UploadData[]): Promise<{
 
     const { error } = await supabase.from("works").insert(items);
 
-    if (error) return { error: error.message };
+    if (error) {
+      captureException(new Error(`Supabase batch insert failed: ${error.message}`), {
+        extra: {
+          errorCode: error.code,
+          itemCount: items.length
+        }
+      });
+      
+      return { error: error.message };
+    }
 
     revalidateTag("sections", "max");
 
@@ -37,6 +46,7 @@ export async function uploadToGalleryBatch(items: UploadData[]): Promise<{
   } catch (err) {
     console.log(err);
     captureException(err);
+    
     return { error: err instanceof Error ? err.message : "Upload failed" };
   }
 }
