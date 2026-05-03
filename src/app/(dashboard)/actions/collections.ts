@@ -118,7 +118,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
     };
 
     captureException(new Error(`updateCollection Failed: ${error.message}`), {
-      extra: { sectionId, payload, errorCode: error.code }
+      extra: { collectionId, payload, errorCode: error.code }
     });
 
 		return { error: error.message };
