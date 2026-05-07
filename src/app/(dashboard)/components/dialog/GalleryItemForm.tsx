@@ -152,7 +152,6 @@ export function GalleryItemForm({
 							name="width"
 							value={formData.width}
 							onChange={handleInputChange}
-							disabled
 						/>
 					</div>
 
@@ -164,7 +163,6 @@ export function GalleryItemForm({
 							name="height"
 							value={formData.height}
 							onChange={handleInputChange}
-							disabled
 						/>
 					</div>
 

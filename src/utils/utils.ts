@@ -5,4 +5,12 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
 };
 
-export const createSlug = (text: string) => text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+export const createSlug = (text: string) =>
+	text
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, '-')
+		.replace(/[^\w-]+/g, '')
+		.replace(/--+/g, '-');

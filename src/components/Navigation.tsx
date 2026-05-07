@@ -96,11 +96,11 @@ export function Navigation({
 				</nav>
 			</Suspense>
 
-			<div aria-label="Utility Links" className="lg:col-span-1 col-span-2 hidden gallery-stack:flex items-center lg:justify-between justify-end space-x-12">
+			{/* <div aria-label="Utility Links" className="lg:col-span-1 col-span-2 hidden gallery-stack:flex items-center lg:justify-between justify-end space-x-12">
 				{UTILITY_LINKS.map((link, idx) => (
 					<Link key={idx} href={link.href} className="text-[15px]">{link.title}</Link>
 				))}
-			</div>
+			</div> */}
 
 			<Suspense>
 				<nav

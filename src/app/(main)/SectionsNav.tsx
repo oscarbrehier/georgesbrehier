@@ -27,8 +27,8 @@ export function SectionsNav({
 					key={section.id}
 					href={`/${section.slug}`}
 					className={cn(
-						"capitalize gallery-stack:text-[15px] text-sm transition-colors hover:text-neutral-500",
-						isActive(section.slug) ? "underline underline-offset-4 text-black" : "text-neutral-600"
+						"capitalize gallery-stack:text-[15px] text-sm",
+						isActive(section.slug) ? "text-black" : "text-neutral-500 hover:text-black transition-all"
 					)}
 				>
 					{section.title}

@@ -22,7 +22,7 @@ export function GalleryMarkup({
 				<div className="w-full h-8 flex space-x-8 mb-4">
 
 					{collections.map((c) => (
-						<Link key={c.id} href={`${c.slug}`} className={cn("cursor-pointer", c.id == currentCollection && "underline")}>
+						<Link key={c.id} href={`${c.slug}`} className={cn("cursor-pointer", c.id != currentCollection && "text-neutral-500 hover:text-black transition-all")}>
 							{c.title}
 						</Link>
 					))}
@@ -56,8 +56,9 @@ export function GalleryMarkup({
 								/>
 							</div>
 
-							<div className="w-full mt-1">
+							<div className="w-full mt-2">
 								<p className="text-neutral-600">{item.title}</p>
+								<p className="text-neutral-600 text-xs">{item.image_height}cm x {item.image_width}cm</p>
 							</div>
 
 						</figure>

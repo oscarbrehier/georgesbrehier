@@ -175,7 +175,7 @@ export function CollectionsUI({
 
 										{!sectionTree.is_visible && (
 											<Badge variant="destructive">
-												Section Hidden
+												{UI_LABELS.section.capitalized} Hidden
 											</Badge>
 										)}
 

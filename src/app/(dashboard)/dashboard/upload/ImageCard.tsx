@@ -123,22 +123,6 @@ export function ImageCard({
 
 					<div className="space-y-2">
 
-						<Label htmlFor={`width-${data.id}`} className="text-xs text-muted-foreground">
-							Width (cm)
-						</Label>
-
-						<Input
-							id={`width-${data.id}`}
-							name="width"
-							type="number"
-							onChange={onInputChange}
-							className="h-9 bg-input border-border"
-							disabled={disabled}
-						/>
-
-					</div>
-					<div className="space-y-2">
-
 						<Label htmlFor={`height-${data.id}`} className="text-xs text-muted-foreground">
 							Height (cm)
 						</Label>
@@ -146,6 +130,23 @@ export function ImageCard({
 						<Input
 							id={`height-${data.id}`}
 							name="height"
+							type="number"
+							onChange={onInputChange}
+							className="h-9 bg-input border-border"
+							disabled={disabled}
+						/>
+
+					</div>
+
+					<div className="space-y-2">
+
+						<Label htmlFor={`width-${data.id}`} className="text-xs text-muted-foreground">
+							Width (cm)
+						</Label>
+
+						<Input
+							id={`width-${data.id}`}
+							name="width"
 							type="number"
 							onChange={onInputChange}
 							className="h-9 bg-input border-border"
