@@ -9,7 +9,6 @@ export default async function Page() {
 	const activeSections = await getNavSections();
 
 	const sectionsWithStatus = sections
-		.sort((a, b) => a.position - b.position)
 		.map((section) => {
 
 			const isManuallyHidden = !section.is_visible;

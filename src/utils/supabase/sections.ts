@@ -27,7 +27,8 @@ export async function getSections(): Promise<GallerySection[]> {
 
 	const { data, error } = await supabase
 		.from("sections")
-		.select("*");
+		.select("*")
+		.order("position", { ascending: true });
 
 	if (error) return [];
 	return data;
@@ -154,6 +155,8 @@ export async function getSectionTree(value: string, type: "id" | "slug"): Promis
       		)
 		`)
 		.eq(type, value)
+		.order('is_default', { referencedTable: 'collections', ascending: false })
+		.order('position', { referencedTable: 'collections.works', ascending: true })
 		.single();
 
 	if (error) {
