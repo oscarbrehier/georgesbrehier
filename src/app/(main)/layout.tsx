@@ -1,10 +1,6 @@
 import React, { Suspense } from "react";
 import "../globals.css";
-import { roboto } from "@/utils/fonts";
-import { cn } from "@/lib/utils";
-import { getNavSections, getSections } from "@/utils/supabase/sections";
-import Link from "next/link";
-import { SectionsNav } from "./SectionsNav";
+import { getNavSections } from "@/utils/supabase/sections";
 import { Navigation } from "@/components/Navigation";
 
 export default async function Layout({

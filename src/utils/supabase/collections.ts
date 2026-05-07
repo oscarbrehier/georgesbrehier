@@ -131,7 +131,8 @@ export async function getCollectionsWithSectionState(sectionId: string): Promise
                 is_visible
             )    
         `)
-        .eq("section_id", sectionId);
+        .eq("section_id", sectionId)
+        .order("position", { ascending: true });
 
     if (error) return [];
     return data.map((col) => ({

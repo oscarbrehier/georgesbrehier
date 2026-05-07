@@ -76,7 +76,10 @@ export function CollectionsUI({
 			});
 		});
 
-		await updateGalleryItems(changes);
+		if (changes.length > 0) {
+			await updateGalleryItems(changes);
+		};
+		
 		setIsEditing(false);
 
 	};
@@ -114,7 +117,7 @@ export function CollectionsUI({
 
 					<div className="ml-36 flex-1 w-full">
 
-						{collections.sort((a, b) => Number(b.is_default) - Number(a.is_default)).map((collection, idx) => (
+						{collections.map((collection, idx) => (
 
 							<section
 								key={collection.id}

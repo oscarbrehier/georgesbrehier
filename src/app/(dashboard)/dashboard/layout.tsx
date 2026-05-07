@@ -6,6 +6,7 @@ import { AuthNav } from "../components/AuthNav";
 import Breadcrumbs from "./Breadcrumbs";
 import { getSections } from "@/utils/supabase/sections";
 import { ArrowLeft } from "lucide-react";
+import { PageTracker } from "./PageTracker";
 
 export const metadata: Metadata = {
 	title: "Dashboard",
@@ -89,6 +90,7 @@ export default async function Layout({
 				</div>
 
 				<Suspense>
+					<PageTracker />
 					<BreadcrumbsWrapper />
 				</Suspense>
 

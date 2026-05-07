@@ -12,6 +12,7 @@ import { getCollectionMetadata, getCachedDefaultCollectionBySectionId, getCollec
 import { getDefaultSectionWithCollection, getSection, getSectionId } from "@/utils/supabase/sections";
 import { UI_LABELS } from "@/utils/constants";
 import { GallerySwitcher } from "@/components/gallery/GallerySwitcher";
+import { createClient } from "@/utils/supabase/server";
 
 type Props = {
 	params: Promise<{ section: string, collection: string }>

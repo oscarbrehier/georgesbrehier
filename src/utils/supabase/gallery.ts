@@ -21,7 +21,6 @@ export async function getGalleryItems(opts?: { section?: string, range?: number[
 	let query = supabase
 		.from("works")
 		.select("*")
-		.order("created_at", { ascending: false })
 		.order("position", { ascending: true });
 
 	if (collectionId) query = query.eq("collection_id", collectionId)
