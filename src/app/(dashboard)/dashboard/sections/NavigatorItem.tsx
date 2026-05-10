@@ -54,7 +54,7 @@ export function NavigatorItem<T extends NavigableItem>({
 
 	const statusUI = getStatusUI(status);
 	const isVisible = status === "visible";
-
+	
 	return (
 
 		<div className={cn(

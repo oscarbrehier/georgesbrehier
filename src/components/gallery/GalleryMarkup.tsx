@@ -13,6 +13,8 @@ export function GalleryMarkup({
 	currentCollection: string;
 }) {
 
+	const collectionData = collections.find((item) => item.id === currentCollection);
+
 	return (
 
 		<div id="gallery-track" className="relative w-full sm:block hidden">
@@ -33,6 +35,12 @@ export function GalleryMarkup({
 					id="gallery-wrapper"
 					className="flex items-center pr-24 gap-10 will-change-transform"
 				>
+
+					{collectionData?.description && (
+						<div className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative w-auto aspect-1/2">
+							<p className="text-lg">{collectionData.description}</p>
+						</div>
+					)}
 
 					{items.map((item, idx) => (
 
@@ -57,8 +65,18 @@ export function GalleryMarkup({
 							</div>
 
 							<div className="w-full mt-2">
+
 								<p className="text-neutral-600">{item.title}</p>
-								<p className="text-neutral-600 text-xs">{item.image_height}cm x {item.image_width}cm</p>
+
+								<div className="space-y-0.5 mt-0.5">
+									<p className="text-neutral-600 text-xs">{item.description}</p>
+
+									{collectionData?.show_dimensions && (
+										<p className="text-neutral-600 text-xs">{item.image_height}cm x {item.image_width}cm</p>
+									)}
+								</div>
+
+
 							</div>
 
 						</figure>

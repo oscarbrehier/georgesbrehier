@@ -135,6 +135,7 @@ export async function getCollectionsWithSectionState(sectionId: string): Promise
         .order("position", { ascending: true });
 
     if (error) return [];
+    
     return data.map((col) => ({
         ...col,
         parent_hidden: !col.sections?.is_visible

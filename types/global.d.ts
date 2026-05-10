@@ -59,10 +59,12 @@ declare global {
 		id: string;
 		section_id: string;
 		title: string;
+		description?: string;
 		is_default: boolean;
 		slug: string;
 		is_visible: boolean;
 		position: number;
+		show_dimensions: boolean;
 		seo_title: string,
 		seo_description: string,
 		seo_og_image_url: string,
@@ -92,9 +94,11 @@ declare global {
 		id: string;
 		section_id: string;
 		title: string;
+		description?: string;
 		slug: string;
 		position: number;
 		is_default: boolean;
+		show_dimensions: boolean;
 	};
 
 	interface GalleryCollectionWithSection extends GalleryCollection {

@@ -66,7 +66,7 @@ export function Navigation({
 			<div className="gallery-stack:col-span-1 col-span-2 w-full gallery-stack:block flex justify-between z-30">
 
 				<Link href="/" className="flex items-center">
-					<h1 className={`font-title font-semibold text-xl text-neutral-800 tracking-wide space-x-4 flex shrink-0`}>
+					<h1 className={`font-title font-semibold text-xl text-neutral-700 tracking-wide space-x-4 flex shrink-0`}>
 						<span>Georges</span>
 						<span>Bréhier</span>
 					</h1>

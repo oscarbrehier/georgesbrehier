@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { EditData } from "./CreateItemDialog";
 import { createCollection, updateCollection } from "../../actions/collections";
 import { UI_LABELS } from "@/utils/constants";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FormState {
 	message?: string;
@@ -19,7 +20,9 @@ interface FormState {
 const initialForm = {
 	sectionId: "",
 	collectionTitle: "",
-	isDefault: false
+	description: "",
+	isDefault: false,
+	showDimensions: true
 };
 
 export function CollectionForm({
@@ -36,7 +39,9 @@ export function CollectionForm({
 	const [formData, setFormData] = useState({
 		sectionId: initialData?.section_id ?? "",
 		collectionTitle: initialData?.title ?? "",
+		description: initialData?.description ?? "",
 		isDefault: initialData?.is_default ?? false,
+		showDimensions: initialData?.show_dimensions ?? true,
 	});
 
 	const [formState, setFormState] = useState<FormState>({});
@@ -45,13 +50,14 @@ export function CollectionForm({
 	async function handleSubmit(e: FormEvent) {
 
 		e.preventDefault();
-		if (pending) return ;
+		if (pending) return;
 		setPending(true);
 
 		if (isEditMode) {
 
 			const { error } = await updateCollection(initialData.id, {
 				title: formData.collectionTitle,
+				description: formData.description,
 				is_default: formData.isDefault
 			});
 
@@ -62,6 +68,7 @@ export function CollectionForm({
 			const res = await createCollection({
 				sectionId: formData.sectionId,
 				title: formData.collectionTitle,
+				description: formData.description,
 				is_default: formData.isDefault,
 			});
 
@@ -102,7 +109,7 @@ export function CollectionForm({
 	useEffect(() => {
 
 		if (formState.success) {
-			
+
 			if (onSuccess) onSuccess();
 
 			if (!isEditMode) setFormData(initialForm);
@@ -157,18 +164,47 @@ export function CollectionForm({
 				/>
 			</div>
 
-			<div className="flex items-start gap-3">
-				<Checkbox
-					id="isDefault"
-					name="isDefault"
-					checked={formData.isDefault}
-					onCheckedChange={(checked) => {
-						setFormData(prev => ({ ...prev, isDefault: checked === true }));
-					}}
+			<div className="grid w-full max-w-sm items-center gap-3">
+				<Label htmlFor="description">Description</Label>
+				<Textarea
+					// type="text"
+					id="description"
+					name="description"
+					value={formData.description}
+					onChange={handleInputChange}
 				/>
-				<div className="grid gap-2">
-					<Label htmlFor="isDefault">Make default</Label>
+			</div>
+
+			<div className="space-y-2">
+
+				<div className="flex items-start gap-3">
+					<Checkbox
+						id="isDefault"
+						name="isDefault"
+						checked={formData.isDefault}
+						onCheckedChange={(checked) => {
+							setFormData(prev => ({ ...prev, isDefault: checked === true }));
+						}}
+					/>
+					<div className="grid gap-2">
+						<Label htmlFor="isDefault">Make default</Label>
+					</div>
 				</div>
+
+				<div className="flex items-start gap-3">
+					<Checkbox
+						id="showDimensions"
+						name="showDimensions"
+						checked={formData.showDimensions}
+						onCheckedChange={(checked) => {
+							setFormData(prev => ({ ...prev, showDimensions: checked === true }));
+						}}
+					/>
+					<div className="grid gap-2">
+						<Label htmlFor="showDimensions">Show dimensions</Label>
+					</div>
+				</div>
+
 			</div>
 
 			<div className="w-full space-y-4">

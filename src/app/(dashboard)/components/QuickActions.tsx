@@ -8,10 +8,12 @@ import Link from "next/link";
 export function QuickActions({
 	className,
 	initialData,
+	sectionId,
 	upload = {},
 }: {
 	className?: string;
 	initialData?: EditData;
+	sectionId?: string;
 	upload?: { sectionId?: string };
 }) {
 
@@ -65,7 +67,7 @@ export function QuickActions({
 			{upload.sectionId && (
 
 				<Link
-					href={`/dashboard/upload?section=${upload.sectionId}`}
+					href={`/dashboard/upload?section=${sectionId}`}
 				>
 					<Button
 						size="sm"

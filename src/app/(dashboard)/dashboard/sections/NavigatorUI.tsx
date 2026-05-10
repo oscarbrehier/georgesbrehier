@@ -108,7 +108,7 @@ export function NavigatorUI<T extends NavigableItem>({
 
 			<QuickActions
 				className="mb-4"
-				upload={{ sectionId }}
+				sectionId={sectionId}
 			/>
 
 			{items.length >= 1 ? (

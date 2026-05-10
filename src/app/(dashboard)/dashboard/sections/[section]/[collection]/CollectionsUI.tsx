@@ -81,6 +81,7 @@ export function CollectionsUI({
 		};
 		
 		setIsEditing(false);
+		setHasChanges(false);
 
 	};
 

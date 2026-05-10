@@ -9,8 +9,10 @@ import { revalidatePath, revalidateTag } from "next/cache";
 export interface CollectionUpdatePayload {
 	title?: string;
 	slug?: string;
+	description: string | null;
 	is_default?: boolean;
 	is_visible?: boolean;
+	show_dimensions: boolean;
 	order?: number;
 };
 
@@ -97,7 +99,7 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 
 	};
 
-	let payload: CollectionUpdatePayload = { ...data };
+	let payload: CollectionUpdatePayload = { ...data, description: data.description?.trim() || null, show_dimensions: data.show_dimensions ?? true };
 	if (data.title) {
 		payload.slug = createSlug(data.title);
 	};
@@ -148,10 +150,12 @@ export async function updateCollection(collectionId: string, data: Partial<Colle
 export async function createCollection({
 	sectionId,
 	title: rawTitle,
+	description,
 	is_default: userWantsDefault
 }: {
 	sectionId: string;
 	title: string;
+	description: string;
 	is_default: boolean;
 }) {
 
@@ -172,6 +176,7 @@ export async function createCollection({
 		title,
 		slug: createSlug(title),
 		section_id: sectionId,
+		description: description?.trim() || null,
 		is_default: shouldBeDefault,
 		is_visible: true
 	};
