@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Montserrat } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Montserrat, EB_Garamond  } from "next/font/google";
 import "./globals.css";
 
 import { baseSeo, getBaseUrl } from "@/utils/seo";
@@ -24,6 +24,14 @@ const inter = Inter({
 const montserrat = Montserrat({
 	subsets: ["latin"],
 	variable: "--font-tenor",
+});
+
+const ebGaramond = EB_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-eb-garamond",
+  display: "swap",
 });
 
 const name = baseSeo.name;
@@ -80,7 +88,7 @@ export default function RootLayout({
 		<html lang="en">
 
 			<body
-				className={`${inter.variable} ${montserrat.variable} font-sans antialiased min-h-screen w-full bg-background`}
+				className={`${inter.variable} ${montserrat.variable} ${ebGaramond.variable} font-sans antialiased min-h-screen w-full bg-background`}
 			>
 				{children}
 				<Toaster />

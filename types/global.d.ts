@@ -11,7 +11,9 @@ declare global {
 		description: string;
 		image_url: string;
 		image_width: number;
-		image_height: number;
+    image_height: number;
+    height: number;
+    width: number;
 		section: string;
 		position: number;
 		created_at: string;

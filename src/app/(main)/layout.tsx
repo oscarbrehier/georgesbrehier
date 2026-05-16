@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import "../globals.css";
 import { getNavSections } from "@/utils/supabase/sections";
 import { Navigation } from "@/components/Navigation";
+import { cn } from "@/utils/utils";
+
 
 export default async function Layout({
 	children,
