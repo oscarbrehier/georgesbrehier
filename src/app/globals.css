@@ -17,6 +17,8 @@
 
 @theme inline {
 	--font-garamond: var(--font-eb-garamond), serif;
+	--font-ortica: var(--font-ortica), serif;
+
 	--color-dashboard: oklch(98.5% 0 0);
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

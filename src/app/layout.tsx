@@ -1,10 +1,12 @@
 import React from "react";
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { Geist, Geist_Mono, Inter, Montserrat, EB_Garamond  } from "next/font/google";
 import "./globals.css";
 
 import { baseSeo, getBaseUrl } from "@/utils/seo";
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/utils/utils";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -33,6 +35,18 @@ const ebGaramond = EB_Garamond({
   variable: "--font-eb-garamond",
   display: "swap",
 });
+
+const ortica = localFont({
+	src: [
+		{
+			path: "./fonts/OrticaLinear-Light.woff",
+			weight: "300",
+			style: "normal"
+		}
+	],
+	variable: "--font-ortica",
+	display: "swap"
+})
 
 const name = baseSeo.name;
 const description = baseSeo.description;
@@ -88,7 +102,10 @@ export default function RootLayout({
 		<html lang="en">
 
 			<body
-				className={`${inter.variable} ${montserrat.variable} ${ebGaramond.variable} font-sans antialiased min-h-screen w-full bg-background`}
+				className={cn(
+					"font-sans antialiased min-h-screen w-full bg-background",
+					inter.variable, montserrat.variable, ebGaramond.variable, ortica.variable
+				)}
 			>
 				{children}
 				<Toaster />

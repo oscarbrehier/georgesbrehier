@@ -40,9 +40,9 @@ export function GalleryMarkup({
 					className="flex items-center pr-24 gap-10 will-change-transform"
 				>
 					{collectionData?.description && (
-						<div className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative w-auto aspect-1/2 flex mt-4 mr-10">
+						<div className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative w-auto aspect-1/2 flex flex-col mt-4 mr-10">
 							<div className="h-[80%]">
-								<p className="text-xl font-garamond">{collectionData.description}</p>
+								<p className="text tracking-wide font-ortica font-extralight">{collectionData.description}</p>
 							</div>
 						</div>
 					)}
