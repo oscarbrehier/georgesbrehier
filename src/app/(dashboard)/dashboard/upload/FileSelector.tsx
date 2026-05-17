@@ -27,7 +27,7 @@ export function FileSelector({
 			<input
 				id="image_input"
 				type="file"
-				accept="image/jpeg,image/png,image/webp"
+				accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"
 				multiple
 				onChange={onInputChange}
 				className="hidden"
@@ -40,7 +40,7 @@ export function FileSelector({
 				</div>
 
 				<h3 className="text-lg font-medium text-neutral-900 mb-2">
-					Drag your images here
+					Drag your media here
 				</h3>
 
 				<p className="text-sm text-neutral-600 mb-4">
@@ -49,7 +49,7 @@ export function FileSelector({
 
 				<label htmlFor="image_input" className="inline-block">
 					<span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-900 text-white font-medium text-sm cursor-pointer hover:bg-neutral-800 transition-colors">
-						Select images
+						Select media
 					</span>
 				</label>
 

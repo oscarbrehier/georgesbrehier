@@ -14,6 +14,8 @@ export interface UploadImageState {
 		url: string | null;
 		image_width?: number;
 		image_height?: number;
+		media_type?: "image" | "video";
+		duration?: number;
 		cloudinary_public_id?: string;
 	};
 	error: string | null;
@@ -23,6 +25,13 @@ export async function uploadImage(file: File): Promise<UploadImageState> {
 
 	if (!file) return { data: null, error: "No was file uploaded" };
 
+	 const isVideo = file.type.startsWith("video/");
+    const isImage = file.type.startsWith("image/");
+
+	if (!isVideo || !isImage) {
+		return { data: null, error: "File must be an image or a video" };
+	};
+
 	try {
 
 		const arrayBuffer = await file.arrayBuffer();
@@ -31,8 +40,11 @@ export async function uploadImage(file: File): Promise<UploadImageState> {
 
 		const res = await cloudinary.uploader.upload(base64File, {
 			folder: "portfolio",
-			tags: ['artwork']
+			tags: ['artwork'],
+			resource_type: "auto"
 		});
+
+		todo: video support
 
 		return {
 			data: {

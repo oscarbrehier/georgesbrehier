@@ -15,6 +15,7 @@ import { getCollectionsBySection } from "@/utils/supabase/collections";
 import { UploadDestionation } from "./UploadDestination";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { FILE } from "dns";
 
 export interface UploadProgress {
 	filename: string
@@ -103,7 +104,7 @@ export function Upload({
 
 		Array.from(files).forEach((file) => {
 
-			if (!file.type.startsWith("image/")) return;
+			if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) return;
 
 			if (file.size > MAX_BODY_SIZE) {
 				rejectedFiles.push(`${file.name} (${toMB(file.size)}MB)`);
@@ -129,7 +130,7 @@ export function Upload({
 		};
 
 		if (items.length === 0 && rejectedFiles.length === 0) {
-			toast("No valid image files selected");
+			toast("No valid image or video files selected");
 			return;
 		}
 
@@ -320,7 +321,7 @@ export function Upload({
 					<div className="flex items-center space-x-4">
 
 						{isLoading && (
-							<p className="text-sm text-muted-foreground">Images uploaded: {uploadCount}/{formData.items.length}</p>
+							<p className="text-sm text-muted-foreground">Files uploaded: {uploadCount}/{formData.items.length}</p>
 						)}
 
 						{!isLoading && (
@@ -362,7 +363,7 @@ export function Upload({
 							) : (
 								<>
 									<UploadIcon className="mr-2 h-4 w-4" />
-									Upload {formData.items.length} images
+									Upload {formData.items.length} {formData.items.length === 1 ? "file" : "files"}
 								</>
 							)}
 						</Button>

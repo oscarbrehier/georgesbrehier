@@ -46,7 +46,7 @@ const ortica = localFont({
 	],
 	variable: "--font-ortica",
 	display: "swap"
-})
+});
 
 const name = baseSeo.name;
 const description = baseSeo.description;
@@ -104,7 +104,10 @@ export default function RootLayout({
 			<body
 				className={cn(
 					"font-sans antialiased min-h-screen w-full bg-background",
-					inter.variable, montserrat.variable, ebGaramond.variable, ortica.variable
+					inter.variable, 
+					montserrat.variable, 
+					ebGaramond.variable, 
+					ortica.variable
 				)}
 			>
 				{children}

@@ -1,4 +1,3 @@
-import { getActiveCollections } from "@/utils/supabase/collections";
 import { cn } from "@/utils/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +29,7 @@ export function GalleryMarkup({
 									"text-neutral-500 hover:text-black transition-all",
 							)}
 						>
-							{c.title}
+							<p className="text-xl">{c.title}</p>
 						</Link>
 					))}
 				</div>
@@ -40,9 +39,9 @@ export function GalleryMarkup({
 					className="flex items-center pr-24 gap-10 will-change-transform"
 				>
 					{collectionData?.description && (
-						<div className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative w-auto aspect-1/2 flex flex-col mt-4 mr-10">
-							<div className="h-[80%]">
-								<p className="text tracking-wide font-ortica font-extralight">{collectionData.description}</p>
+						<div className="shrink-0 panel 2xl:h-[50vh] xl:h-[55vh] h-[60vh] relative w-auto flex flex-col mt-4 mr-10">
+							<div className="h-[80%] aspect-square -mt-2.5">
+								<p className="text-lg tracking-wide font-ortica font-extralight">{collectionData.description}</p>
 							</div>
 						</div>
 					)}
